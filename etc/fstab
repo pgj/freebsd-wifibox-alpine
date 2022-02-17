@@ -1,0 +1,5 @@
+root		/		9p	trans=virtio,ro,noatime,nodiratime,norelatime 0 0
+tmpfs           /tmp            tmpfs   size=1M 				      0 0
+config          /media/etc      9p      trans=virtio,ro,noatime,nodiratime,norelatime 0 0
+var             /var    	9p      trans=virtio,rw 			      0 0
+tmpfs           /var/run/chrony tmpfs	size=128K,uid=100,gid=101,mode=0750	      0 0
