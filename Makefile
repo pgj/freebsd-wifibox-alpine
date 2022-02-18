@@ -9,6 +9,7 @@ GUESTDIR=$(SHAREDIR)/guest
 PACKAGEDIR=$(GUESTDIR)/packages
 ETCDIR=$(DESTDIR)$(PREFIX)/etc/wifibox
 MANDIR=$(DESTDIR)$(PREFIX)/man
+RUNDIR=$(DESTDIR)/var/run/wifibox
 
 MKDIR=/bin/mkdir
 CP=/bin/cp
@@ -29,6 +30,8 @@ SUB_LIST=	PREFIX=$(PREFIX) \
 
 _SUB_LIST_EXP=  ${SUB_LIST:S/$/!g/:S/^/ -e s!%%/:S/=/%%!/}
 
+APPLIANCE_DIR=	$(RUNDIR)/appliance
+
 install:
 	$(MKDIR) -p $(GUESTDIR)
 	$(SED) ${_SUB_LIST_EXP} share/grub.cfg > $(SHAREDIR)/grub.cfg
@@ -48,6 +51,10 @@ install:
 	$(MKDIR) -p $(MANDIR)/man5
 	$(SED) ${_SUB_LIST_EXP} man/wifibox-alpine.5 \
 	  | $(GZIP) -c > $(MANDIR)/man5/wifibox-alpine.5.gz
+
+	$(MKDIR) -p $(APPLIANCE_DIR)
+	$(CP) -R $(GUESTDIR)/var/* $(APPLIANCE_DIR)/
+	$(RM) -rf $(GUESTDIR)/var/*
 
 .MAIN: clean
 

@@ -177,8 +177,13 @@ of the
 .Xr chroot 8
 command is recommended to launch a Linux-based shell (i.e. BusyBox)
 inside the directory that holds the guest root file system on the
-host.
+host.  Because some of the commands may depend on the contents of the
+.Pa /var
+directory, first it must be mounted from its place with the help of
+.Xr mount_nullfs 8 .
 .Bd -literal -offset indent
+# mount -t nullfs /var/run/wifibox/appliance \\
+  %%ROOT%%/var
 # chroot %%ROOT%% /bin/ash
 .Ed
 .Pp
@@ -255,8 +260,12 @@ Restart the guest for these changes to take effect by issuing the
 following command on the host.  Note that one can get back to the host
 system by exiting the shell, e.g. by the
 .Cm exit
-command.
+command.  Remember to unmount the guest's
+.Pa /var
+file system if it has been mounted earlier.
 .Bd -literal -offset indent
+# exit
+# umount %%ROOT%%/var
 # wifibox restart guest
 .Ed
 .Sh CAVEATS
@@ -264,6 +273,8 @@ Custom modifications to the guest file system are not supported.  Use
 the respective commands at your own risk!
 .Sh SEE ALSO
 .Xr wifibox 8 ,
-.Xr chroot 8
+.Xr chroot 8 ,
+.Xr mount 8 ,
+.Xr mount_nullfs 8
 .Sh AUTHORS
 .An Gábor Páli Aq Mt pali.gabor@gmail.com
