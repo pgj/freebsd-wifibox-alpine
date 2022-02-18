@@ -15,6 +15,7 @@ SED=/usr/bin/sed
 TAR=/usr/bin/tar
 CHROOT=/usr/sbin/chroot
 RM=/bin/rm
+GZIP=/usr/bin/gzip
 GIT=$(LOCALBASE)/bin/git
 
 .if !defined(VERSION)
@@ -39,6 +40,10 @@ install:
 	$(RM) -rf $(PACKAGEDIR)
 	$(RM) $(GUESTDIR)/setup.sh
 	$(RM) $(GUESTDIR)/busybox.core
+
+	$(MKDIR) -p $(MANDIR)/man5
+	$(SED) ${_SUB_LIST_EXP} man/wifibox-alpine.5 \
+	  | $(GZIP) -c > $(MANDIR)/man5/wifibox-alpine.5.gz
 
 .MAIN: clean
 
