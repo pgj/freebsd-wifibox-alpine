@@ -7,6 +7,7 @@ ROOT=$(PREFIX)/share/wifibox/guest
 SHAREDIR=$(DESTDIR)$(PREFIX)/share/wifibox
 GUESTDIR=$(SHAREDIR)/guest
 PACKAGEDIR=$(GUESTDIR)/packages
+ETCDIR=$(DESTDIR)$(PREFIX)/etc/wifibox
 MANDIR=$(DESTDIR)$(PREFIX)/man
 
 MKDIR=/bin/mkdir
@@ -40,6 +41,9 @@ install:
 	$(RM) -rf $(PACKAGEDIR)
 	$(RM) $(GUESTDIR)/setup.sh
 	$(RM) $(GUESTDIR)/busybox.core
+
+	$(MKDIR) -p $(ETCDIR)
+	$(CP) etc/* $(ETCDIR)/
 
 	$(MKDIR) -p $(MANDIR)/man5
 	$(SED) ${_SUB_LIST_EXP} man/wifibox-alpine.5 \
