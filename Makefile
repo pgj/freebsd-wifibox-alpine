@@ -30,12 +30,12 @@ _SUB_LIST_EXP=  ${SUB_LIST:S/$/!g/:S/^/ -e s!%%/:S/=/%%!/}
 
 install:
 	$(MKDIR) -p $(GUESTDIR)
-	$(SED) ${_SUB_LIST_EXP} grub.cfg > $(SHAREDIR)/grub.cfg
+	$(SED) ${_SUB_LIST_EXP} share/grub.cfg > $(SHAREDIR)/grub.cfg
 	$(TAR) -xf $(MINIROOTFS) -C $(GUESTDIR)
-	$(CP) -R etc/* $(GUESTDIR)/etc/
+	$(CP) -R guest/etc/* $(GUESTDIR)/etc/
 	$(MKDIR) -p $(PACKAGEDIR)
 	$(CP) -R $(PACKAGES) $(PACKAGEDIR)/
-	$(CP) setup.sh $(GUESTDIR)/
+	$(CP) guest/setup.sh $(GUESTDIR)/
 	$(CHROOT) $(GUESTDIR) /bin/ash setup.sh
 	$(RM) -rf $(PACKAGEDIR)
 	$(RM) $(GUESTDIR)/setup.sh
