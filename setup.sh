@@ -1,5 +1,9 @@
-apk add --no-network /packages/*.apk
+apk add \
+    --no-network \
+    --force-non-repository \
+    /packages/*.apk
 passwd -d root
+ln -s /dev/null /root/.ash_history
 rm /etc/motd
 rc-update add networking boot
 rc-update add urandom boot
