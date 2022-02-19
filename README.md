@@ -59,5 +59,5 @@ used once installed.
 
 [FreeBSD Wifibox]: https://github.com/pgj/freebsd-wifibox
 [Alpine Linux]: https://alpinelinux.org/
-[freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port
+[freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/tree/9p-root
 
