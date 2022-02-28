@@ -39,6 +39,7 @@ install:
 	$(TAR) -xf $(MINIROOTFS) -C $(GUESTDIR)
 
 	$(CP) -R guest/etc/* $(GUESTDIR)/etc/
+	$(CP) -R guest/sbin/* $(GUESTDIR)/sbin/
 	$(ECHO) "VERSION=$(VERSION)" >> $(GUESTDIR)/etc/wifibox-guest
 
 	$(MKDIR) -p $(PACKAGEDIR)

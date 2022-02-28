@@ -1,4 +1,5 @@
-root		/		9p	trans=virtio,ro,noatime,nodiratime,norelatime 0 0
-tmpfs           /tmp            tmpfs   size=1M 				      0 0
-config          /media/etc      9p      trans=virtio,ro,noatime,nodiratime,norelatime 0 0
-var             /var    	9p      trans=virtio,rw 			      0 0
+root       /          9p    trans=virtio,ro,noatime,nodiratime,norelatime 0 0
+tmpfs      /tmp       tmpfs size=1M                                       0 0
+config     /media/etc 9p    trans=virtio,ro,noatime,nodiratime,norelatime 0 0
+wpa_config /media/wpa 9p    trans=virtio,rw                               0 0
+var        /var       9p    trans=virtio,rw                               0 0

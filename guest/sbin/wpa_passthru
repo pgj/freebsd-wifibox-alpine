@@ -1,0 +1,101 @@
+#!/bin/sh
+# shellcheck disable=SC2034,SC3043,SC3060
+
+log() {
+    local _level="$1"
+    local _message="$2"
+
+    /usr/bin/logger -p "daemon.${_level}" -t "wpa_passthru[$$]" "${_message}"
+}
+
+enabled=no
+
+# shellcheck disable=SC1091
+. /media/etc/wpa_ctrl.conf
+
+_wlan_devs=$(set | /bin/grep -F "_port=" | /bin/sed 's!_port=.*!!')
+log debug "Configuration: enabled=${enabled}, network=${network}, wlan devs=[${_wlan_devs}]"
+
+if [ "${enabled}" = "no" ]; then
+    log info "Not enabled, exiting."
+    exit 0
+fi
+
+if_lan=eth0
+wpa_conf="/media/wpa/wpa_supplicant.conf"
+
+cleanup() {
+    local _socats
+
+    _socats=$(/usr/bin/pgrep socat)
+    log info "Stopping, socat processes: [${_socats}]"
+    [ -n "${_socats}" ] \
+	&& /usr/bin/kill -TERM ${_socats}
+    [ -n "${_socket_directory}" ] \
+	&& /bin/rm -rf "${_socket_directory}"
+}
+
+trap cleanup EXIT TERM
+
+find_network() {
+    /sbin/ifconfig ${if_lan} \
+	| /bin/grep -F "inet addr:" \
+	| /bin/sed -E 's!.*inet addr:([0-9\.]+).*Mask:([0-9\.]+)!\1:\2!'
+}
+
+get_ctrl_interface() {
+    /bin/grep "^ctrl_interface=" "${wpa_conf}" \
+	| /bin/sed 's!^ctrl_interface=!!'
+}
+
+if [ -z "${network}" ]; then
+    if ! /sbin/ifconfig ${if_lan}; then
+	log error "Interface ${if_lan} not found, exiting."
+	exit 1
+    fi
+
+    network=$(find_network)
+fi
+
+_ip=${network%%:*}
+
+if [ -z "${_ip}" ]; then
+    log error "No IP address for ${if_lan} could found, exiting."
+    exit 1
+fi
+
+_ctrl_interface=$(get_ctrl_interface)
+
+if [ -z "${_ctrl_interface}" ]; then
+    log warn "No control interface found, exiting."
+    exit 0
+fi
+
+_socket_directory=$(/bin/mktemp -d)
+
+for _wlan_dev in ${_wlan_devs}; do
+    _wlan=${_wlan_dev//_/-}
+    _ctrl_socket="${_ctrl_interface}/${_wlan}"
+
+    if [ ! -S "${_ctrl_socket}" ]; then
+	log warn "${_ctrl_socket} is not available, skipping."
+	continue
+    fi
+
+    _socket="${_socket_directory}/${_wlan}"
+    _port=$(eval "echo \${${_wlan_dev}_port}")
+
+    if [ -z "${_port}" ]; then
+        log warn "No port defined for ${_wlan}, skipping."
+	continue
+    fi
+
+    log info "Associating ${_ip}:${_port} (${network}) with ${_ctrl_socket} (${_socket})"
+    /usr/bin/socat \
+	TCP4-LISTEN:"${_port}",reuseaddr,bind="${_ip}",range="${network}",fork \
+	UNIX-SENDTO:"${_ctrl_socket}",bind="${_socket}",unlink-early &
+done
+
+while /bin/true; do
+    /bin/sleep 60
+done

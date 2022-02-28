@@ -24,4 +24,6 @@ rc-update add sysctl boot
 rc-update add syslog boot
 rc-update add udhcpd default
 rc-update add wpa_supplicant boot
+rc-update add wpa_passthru boot
 mkdir -p /media/etc
+mkdir -p /media/wpa
