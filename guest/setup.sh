@@ -4,6 +4,7 @@ apk add \
     /packages/*.apk
 passwd -d root
 ln -s /dev/null /root/.ash_history
+ln -s /tmp/resolv.conf /etc
 rm /etc/motd
 rc-update add networking boot
 rc-update add urandom boot
