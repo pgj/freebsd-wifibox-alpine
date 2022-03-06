@@ -7,6 +7,7 @@ ln -s /dev/null /root/.ash_history
 rm /etc/motd
 rc-update add networking boot
 rc-update add urandom boot
+rc-update add bootmisc boot
 rc-update add acpid default
 rc-update add modules boot
 rc-update add chronyd default
