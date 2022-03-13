@@ -10,6 +10,14 @@ guest based on [Alpine Linux] on top of its vanilla distribution.
 guarantees or warranties.  It is shared in the hope that is going to
 be useful and inspiring for others.*
 
+## Prerequisites
+
+For building the virtual disk image, [Squashfs-tools] or the
+corresponding `sysutils/squashfs-tools` FreeBSD package is used, which
+must be installed beforehand.  Because a complete root file system is
+created in this case, system administrator (`root`) privileges are
+required.
+
 ## Installation
 
 Whenever possible, use the `net/wifibox-alpine` FreeBSD port from the
@@ -27,15 +35,16 @@ for development and testing.
 	PREFIX=<prefix> \
 	LOCALBASE=<prefix of third-party software> \
 	MINIROOTFS=<Alpine minimal root file system tarball> \
-	PACKAGES=<Alpine package set>
+	PACKAGES=<Alpine package set> \
+	SQUASHFS_COMP=<Squashfs compression type>
 ```
 
 The `PREFIX` variable is optional, it is set to `/usr/local` by
 default.  This is the prefix under which the guest's file system will
 be constructed, in the `share/wifibox/guest` sub-directory.  It is
 possible to set the `LOCALBASE` variable as well to tell if the prefix
-under which various third-party utilities, such as `git` was installed
-is different.
+under which various third-party utilities, such as `git` and
+`mksquashfs` were installed is different.
 
 The `MINIROOTFS` variable should point to the Alpine minimal root file
 system tarball for the `x86_64` architecture, which can be retrieved
@@ -48,6 +57,11 @@ install for the guest.  Those are all must be local files with the
 available packages are looked up in the current directory and utilized
 during the installation process.
 
+The `SQUASHFS_COMP` variable controls the compression method used for
+building the Squashfs file system.  By default, that is the rather
+conservative `lzo` setting, but `lz4`, `gzip`, `xz`, and `zstd` are
+also available.
+
 ## Documentation
 
 There is a manual page available that describes how the guest can be
@@ -59,5 +73,6 @@ used once installed.
 
 [FreeBSD Wifibox]: https://github.com/pgj/freebsd-wifibox
 [Alpine Linux]: https://alpinelinux.org/
-[freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/tree/9p-root
+[Squashfs-tools]: https://github.com/plougher/squashfs-tools
+[freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/tree/squashfs-root
 

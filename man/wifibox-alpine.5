@@ -1,4 +1,4 @@
-.Dd February 18, 2022
+.Dd March 13, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -30,7 +30,7 @@ https://busybox.net/
 .ft R
 .El
 .Sh IMPLEMENTATION
-By default, the guest is created with a
+The guest is created with a
 .Sy root
 user, which is associated with a blank password.  This can only be
 used to login to the guest via the
@@ -42,10 +42,10 @@ no other services are configured for remote access.
 Although the
 .Sy root
 user possesses unlimited access to every resource inside the guest,
-files cannot be changed from there.  That is because the operating
-system is built in a way that it does not normally require any write
-access to the contents of the root file system.  Everything that needs
-to be modified during the guest's run time is stored on dedicated file
+files cannot be changed.  That is because the operating system is
+built in a way that it does not require any write access to the
+contents of the root file system.  Everything that needs to be
+modified during the guest's run time is stored on dedicated file
 systems that are either memory-backed or shared with the host.  This
 prevents the guest from damaging the system files on sudden shutdowns,
 which may occur due to short and strict time limits placed on the
@@ -83,22 +83,27 @@ file and implements a DHCP server for
 so that it can hand out IP addresses in a given range for the host and
 set itself the default gateway for forwarding the network traffic.  It
 also manages the distribution of information about the name servers.
+.It
+.Sy wpa_passthru
+works with the
+.Pa wpa_ctrl.conf
+file that is shared with the host and manages the forwarding of
+control sockets created for
+.Sy wpa_supplicant .
+When enabled, it attemps to parse the contents of
+.Pa wpa_supplicant.conf
+to learn if there are sockets available and exposes them over the
+configured TCP ports with the help of
+.Sy socat .
 .El
 .Pp
-The configuration files are read from the
+The generic configuration files are read from the
 .Pa /media/etc
 directory where the
 .Sy config
 9P (VirtFS) share is mounted in read-only mode.  From there, the files
 are hooked up in the system in the following ways.
 .Bl -bullet
-.It
-.Pa /media/etc/wpa_supplicant.conf
-is mapped to
-.Pa /etc/wpa_supplicant/wpa_supplicant.conf
-where
-.Sy wpa_supplicant
-will read its contents.
 .It
 .Pa /media/etc/interfaces.conf
 is mapped to
@@ -116,22 +121,41 @@ is mapped to
 where
 .Sy udhcpd
 will read its contents.
+.It
+.Pa /media/etc/wpa_ctrl.conf
+is not mapped to anywhere under
+.Pa /etc ,
+it is used directly from there by
+.Sy wpa_passthru .
 .El
+.Pp
+The
+.Pa wpa_supplicant.conf
+configuration file is shared with the host through the
+.Pa /media/wpa
+directory where the
+.Sy wpa_config
+9P (VirtFS) share is mounted.  This will let
+.Sy wpa_supplicant
+change the contents when instructed to do so from the host through the
+forwarded control sockets and permitted by the configuration.
 .Pp
 The variable data files under the guest's
 .Pa /var
 directory are shared with the host by mounting the
 .Sy var
-9P (VirtFS) share under the standard
-.Pa /var
-directory.  This includes streaming out all the logs under the
+9P (VirtFS) share there.  This includes streaming out all the logs
+under the
 .Pa /var/log
 directory, such as
 .Pa /var/log/dmesg
 or
 .Pa /var/log/messages
 so that the internal state of the guest can be tracked by accessing
-these files on the host.
+these files on the host.  The contents of the
+.Pa /var/run
+directory will not be visible on the host, as it is stored only in the
+memory.
 .Sh STARTING, STOPPING, AND RESTARTING SERVICES
 Every service running on the guest can be managed by the
 .Sy rc-service
@@ -168,113 +192,7 @@ service.
 .Pp
 These commands can help with troubleshooting and restoring the
 respective services in case of failures.
-.Sh MANAGING THE ROOT FILE SYSTEM
-When changing the contents of the guest's root file system is desired,
-it may be accessed from the host directly.  It is shared via 9P
-(VirtFS), which means that the files are visible and modifiable
-through the host.  But because it still features Linux binaries, use
-of the
-.Xr chroot 8
-command is recommended to launch a Linux-based shell (i.e. BusyBox)
-inside the directory that holds the guest root file system on the
-host.  Because some of the commands may depend on the contents of the
-.Pa /var
-directory, first it must be mounted from its place with the help of
-.Xr mount_nullfs 8 .
-.Bd -literal -offset indent
-# mount -t nullfs /var/run/wifibox/appliance \\
-  %%ROOT%%/var
-# chroot %%ROOT%% /bin/ash
-.Ed
-.Pp
-For the rest of this document, the commands are discussed in such an
-environment, unless stated otherwise.
-.Sh INSTALLING OR REMOVING PACKAGES
-The list of installed packages can be queried by the
-.Sy apk
-(Alpine Package Keeper) tool.  This tool is going to be used for the
-rest of the section.
-.Bd -literal -offset indent
-# apk list --installed
-.Ed
-.Pp
-Before installing any package, it is recommended to get the latest
-version of the database.  The
-.Sy apk
-tool stores the list of currently used package repositories in the
-.Pa /etc/apk/repositories
-file.
-.Bd -literal -offset indent
-# apk update
-.Ed
-.Pp
-Individual packages can be then installed by the
-.Cm add
-command, assuming that they are available.  For example, in case of
-the
-.Sy wireless-tools
-package, this works as follows:
-.Bd -literal -offset indent
-# apk add wireless-tools
-.Ed
-.Pp
-The unneeded packages can be removed by the
-.Cm del
-command.
-.Bd -literal -offset indent
-# apk del wireless-tools
-.Ed
-.Sh PERFORMING UPGRADES
-It is possible to upgrade the operating system running on the guest to
-receive fixes for the kernel, drivers, and the userland programs.  The
-entire process can be managed with the help of the
-.Sy apk
-tool.
-.Pp
-First make sure that the local package database is brought in sync
-with latest versions of the configured repositories.  This can be
-verified by checking that the proper version numbers are used in the
-.Pa /etc/apk/repositories
-file.  In addition to this, before moving between major or minor
-versions, e.g. from Alpine Linux 3.14 to 3.15, it is important to
-ensure that the system is on the latest available version for the
-current branch, and then try to pull the package index for the next
-major or minor version.  That is required otherwise
-.Sy apk
-may report an untrusted signature due to lack of the necessary
-certificates to verify the fresh ones.
-.Pp
-As soon as everything is properly prepared, refresh the package index.
-.Bd -literal -offset indent
-# apk update
-.Ed
-.Pp
-The system can be then upgraded in a single step by using the
-.Cm upgrade
-command.
-.Bd -literal -offset indent
-# apk upgrade --available
-.Ed
-.Pp
-Restart the guest for these changes to take effect by issuing the
-following command on the host.  Note that one can get back to the host
-system by exiting the shell, e.g. by the
-.Cm exit
-command.  Remember to unmount the guest's
-.Pa /var
-file system if it has been mounted earlier.
-.Bd -literal -offset indent
-# exit
-# umount %%ROOT%%/var
-# wifibox restart guest
-.Ed
-.Sh CAVEATS
-Custom modifications to the guest file system are not supported.  Use
-the respective commands at your own risk!
 .Sh SEE ALSO
-.Xr wifibox 8 ,
-.Xr chroot 8 ,
-.Xr mount 8 ,
-.Xr mount_nullfs 8
+.Xr wifibox 8
 .Sh AUTHORS
 .An Gábor Páli Aq Mt pali.gabor@gmail.com
