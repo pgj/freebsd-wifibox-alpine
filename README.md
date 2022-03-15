@@ -12,11 +12,11 @@ be useful and inspiring for others.*
 
 ## Prerequisites
 
-For building the virtual disk image, [Squashfs-tools] or the
-corresponding `sysutils/squashfs-tools` FreeBSD package is used, which
-must be installed beforehand.  Because a complete root file system is
-created in this case, system administrator (`root`) privileges are
-required.
+For building the virtual disk image, the following third-party
+software is employed, which must be installed beforehand.
+
+- [Squashfs-tools] or the `sysutils/squashfs-tools` FreeBSD package.
+- [PatchELF] or the `sysutils/patchelf` FreeBSD package. 
 
 ## Installation
 
@@ -36,6 +36,7 @@ for development and testing.
 	LOCALBASE=<prefix of third-party software> \
 	MINIROOTFS=<Alpine minimal root file system tarball> \
 	PACKAGES=<Alpine package set> \
+	INITRD_FILES=<Contents of the initramfs> \
 	SQUASHFS_COMP=<Squashfs compression type>
 ```
 
@@ -57,6 +58,11 @@ install for the guest.  Those are all must be local files with the
 available packages are looked up in the current directory and utilized
 during the installation process.
 
+The `INITRD_FILES` variable specifies the plain-text file that holds
+the list of files and directories to be included in the `initramfs`
+that is going to be used for booting the guest.  By default, this is
+set to `guest/initrd.files`.
+
 The `SQUASHFS_COMP` variable controls the compression method used for
 building the Squashfs file system.  By default, that is the rather
 conservative `lzo` setting, but `lz4`, `gzip`, `xz`, and `zstd` are
@@ -74,5 +80,6 @@ used once installed.
 [FreeBSD Wifibox]: https://github.com/pgj/freebsd-wifibox
 [Alpine Linux]: https://alpinelinux.org/
 [Squashfs-tools]: https://github.com/plougher/squashfs-tools
+[PatchELF]: https://github.com/NixOS/patchelf
 [freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/tree/squashfs-root
 
