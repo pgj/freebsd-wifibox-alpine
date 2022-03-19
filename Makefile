@@ -162,6 +162,8 @@ install:
 
 	$(MKDIR) -p $(APPLIANCEDIR)
 	$(CP) -R $(GUESTDIR)/var/* $(APPLIANCEDIR)/
+	$(RM) -rf $(APPLIANCEDIR)/lock
+	$(LN) -s /run/lock $(APPLIANCEDIR)/lock
 
 clean:
 	$(RM) -rf $(GUESTDIR)
