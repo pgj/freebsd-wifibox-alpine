@@ -136,13 +136,21 @@ $(INITRD_IMG): image-contents $(INITRD_FILES)
 			| $(CPIO) -o -y --format newc --owner root:wheel \
 			> $(INITRD_IMG))
 
+.if defined(EXCLUDED_FILES)
+_EXCLUDE_FILES=	-ef $(EXCLUDED_FILES)
+.else
+_EXCLUDE_FILES=
+.endif
+
 $(SQUASHFS_IMG): image-contents $(INITRD_IMG)
 	$(MKSQUASHFS) \
 		$(GUESTDIR) \
 		$(SQUASHFS_IMG) \
 		-all-root \
 		-comp $(SQUASHFS_COMP) \
-		-wildcards -e boot -e .done -e "var/*"
+		-wildcards \
+		$(_EXCLUDE_FILES) \
+		-e boot -e .done -e "var/*"
 
 all:	$(SQUASHFS_IMG)
 
