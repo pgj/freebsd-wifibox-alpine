@@ -142,7 +142,24 @@ _EXCLUDE_FILES=	-ef $(EXCLUDED_FILES)
 _EXCLUDE_FILES=
 .endif
 
+EXCLUDE_FIRMWARE_FILES=	$(WORKDIR)/exclude_firmware.files
+
+.if defined(FIRMWARE_FILES)
+.for fw_file in $(FIRMWARE_FILES)
+__FW_FILES+=		-name ${fw_file} -or
+.endfor
+_FW_FILES=		-not \( ${__FW_FILES:S/ -or$//W} \)
+_EXCLUDE_FW_FILES= 	-ef $(EXCLUDE_FIRMWARE_FILES)
+.else
+_EXCLUDE_FW_FILES=
+.endif
+
 $(SQUASHFS_IMG): image-contents $(INITRD_IMG)
+.if defined(_FW_FILES)
+	(cd $(GUESTDIR) \
+		&& $(FIND) lib/firmware -not -type d -and $(_FW_FILES) \
+		> $(EXCLUDE_FIRMWARE_FILES))
+.endif
 	$(MKSQUASHFS) \
 		$(GUESTDIR) \
 		$(SQUASHFS_IMG) \
@@ -150,6 +167,7 @@ $(SQUASHFS_IMG): image-contents $(INITRD_IMG)
 		-comp $(SQUASHFS_COMP) \
 		-wildcards \
 		$(_EXCLUDE_FILES) \
+		$(_EXCLUDE_FW_FILES) \
 		-e boot -e .done -e "var/*"
 
 all:	$(SQUASHFS_IMG)

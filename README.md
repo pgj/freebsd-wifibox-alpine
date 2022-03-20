@@ -37,7 +37,8 @@ for development and testing.
 	MINIROOTFS=<Alpine minimal root file system tarball> \
 	PACKAGES=<Alpine package set> \
 	INITRD_FILES=<Contents of the initramfs> \
-	EXCLUDED_FILES=<List of files to be excluded> \
+	EXCLUDED_FILES=<List of files to exclude> \
+	FIRMWARE_FILES=<List of firmware files to keep> \
 	SQUASHFS_COMP=<Squashfs compression type>
 ```
 
@@ -71,6 +72,11 @@ process:
   directories from the image that are deemed to be unnecessary.  By
   default, this is not set, but a recommendation is compiled as
   `guest/excluded.files`, which might be set here.
+
+- `FIRMWARE_FILES` is interpreted on top of `EXCLUDED_FILES`, and its
+  purpose is to tell which exact firmware files to keep to reduce
+  further the size of the disk image.  It is optional, mostly
+  recommended in case of `iwlwifi`.
 
 - `SQUASHFS_COMP` configures the compression method used for building
   the Squashfs file system.  By default, that is the rather
