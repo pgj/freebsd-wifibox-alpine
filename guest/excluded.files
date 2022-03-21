@@ -208,8 +208,6 @@ lib/modules/*/kernel/crypto/crypto_user.ko.gz
 lib/modules/*/kernel/crypto/curve25519-generic.ko.gz
 lib/modules/*/kernel/crypto/des_generic.ko.gz
 lib/modules/*/kernel/crypto/drbg.ko.gz
-lib/modules/*/kernel/crypto/ecc.ko.gz
-lib/modules/*/kernel/crypto/ecdh_generic.ko.gz
 lib/modules/*/kernel/crypto/ecdsa_generic.ko.gz
 lib/modules/*/kernel/crypto/echainiv.ko.gz
 lib/modules/*/kernel/crypto/essiv.ko.gz
@@ -357,7 +355,6 @@ lib/modules/*/kernel/drivers/base/regmap/regmap-mmio.ko.gz
 lib/modules/*/kernel/drivers/base/regmap/regmap-sdw-mbq.ko.gz
 lib/modules/*/kernel/drivers/base/regmap/regmap-sdw.ko.gz
 lib/modules/*/kernel/drivers/base/regmap/regmap-spi.ko.gz
-lib/modules/*/kernel/drivers/bcma/bcma.ko.gz
 lib/modules/*/kernel/drivers/block/aoe/aoe.ko.gz
 lib/modules/*/kernel/drivers/block/cryptoloop.ko.gz
 lib/modules/*/kernel/drivers/block/drbd/drbd.ko.gz
@@ -382,7 +379,6 @@ lib/modules/*/kernel/drivers/bluetooth/btbcm.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/btintel.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/btmrvl.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/btmrvl_sdio.ko.gz
-lib/modules/*/kernel/drivers/bluetooth/btrsi.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/btrtl.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/btsdio.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/btusb.ko.gz
@@ -390,7 +386,6 @@ lib/modules/*/kernel/drivers/bluetooth/dtl1_cs.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/hci_uart.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/hci_vhci.ko.gz
 lib/modules/*/kernel/drivers/bluetooth/virtio_bt.ko.gz
-lib/modules/*/kernel/drivers/bus/mhi/core/mhi.ko.gz
 lib/modules/*/kernel/drivers/cdrom/cdrom.ko.gz
 lib/modules/*/kernel/drivers/char/agp/agpgart.ko.gz
 lib/modules/*/kernel/drivers/char/agp/amd64-agp.ko.gz
@@ -403,7 +398,6 @@ lib/modules/*/kernel/drivers/char/hangcheck-timer.ko.gz
 lib/modules/*/kernel/drivers/char/hw_random/amd-rng.ko.gz
 lib/modules/*/kernel/drivers/char/hw_random/ba431-rng.ko.gz
 lib/modules/*/kernel/drivers/char/hw_random/intel-rng.ko.gz
-lib/modules/*/kernel/drivers/char/hw_random/rng-core.ko.gz
 lib/modules/*/kernel/drivers/char/hw_random/timeriomem-rng.ko.gz
 lib/modules/*/kernel/drivers/char/hw_random/via-rng.ko.gz
 lib/modules/*/kernel/drivers/char/hw_random/virtio-rng.ko.gz
@@ -670,7 +664,6 @@ lib/modules/*/kernel/drivers/hwmon/g762.ko.gz
 lib/modules/*/kernel/drivers/hwmon/gl518sm.ko.gz
 lib/modules/*/kernel/drivers/hwmon/gl520sm.ko.gz
 lib/modules/*/kernel/drivers/hwmon/hwmon-vid.ko.gz
-lib/modules/*/kernel/drivers/hwmon/hwmon.ko.gz
 lib/modules/*/kernel/drivers/hwmon/i5500_temp.ko.gz
 lib/modules/*/kernel/drivers/hwmon/i5k_amb.ko.gz
 lib/modules/*/kernel/drivers/hwmon/ibmaem.ko.gz
@@ -1566,7 +1559,6 @@ lib/modules/*/kernel/drivers/misc/eeprom/at24.ko.gz
 lib/modules/*/kernel/drivers/misc/eeprom/at25.ko.gz
 lib/modules/*/kernel/drivers/misc/eeprom/ee1004.ko.gz
 lib/modules/*/kernel/drivers/misc/eeprom/eeprom.ko.gz
-lib/modules/*/kernel/drivers/misc/eeprom/eeprom_93cx6.ko.gz
 lib/modules/*/kernel/drivers/misc/eeprom/eeprom_93xx46.ko.gz
 lib/modules/*/kernel/drivers/misc/eeprom/max6875.ko.gz
 lib/modules/*/kernel/drivers/misc/enclosure.ko.gz
@@ -1593,7 +1585,6 @@ lib/modules/*/kernel/drivers/misc/tsl2550.ko.gz
 lib/modules/*/kernel/drivers/misc/vmw_balloon.ko.gz
 lib/modules/*/kernel/drivers/misc/vmw_vmci/vmw_vmci.ko.gz
 lib/modules/*/kernel/drivers/mmc/core/mmc_block.ko.gz
-lib/modules/*/kernel/drivers/mmc/core/mmc_core.ko.gz
 lib/modules/*/kernel/drivers/mmc/core/mmc_test.ko.gz
 lib/modules/*/kernel/drivers/mmc/core/sdio_uart.ko.gz
 lib/modules/*/kernel/drivers/mmc/host/cb710-mmc.ko.gz
@@ -1863,7 +1854,6 @@ lib/modules/*/kernel/drivers/net/mdio/mdio-i2c.ko.gz
 lib/modules/*/kernel/drivers/net/mdio/mdio-thunder.ko.gz
 lib/modules/*/kernel/drivers/net/mdio.ko.gz
 lib/modules/*/kernel/drivers/net/mhi_net.ko.gz
-lib/modules/*/kernel/drivers/net/mii.ko.gz
 lib/modules/*/kernel/drivers/net/net_failover.ko.gz
 lib/modules/*/kernel/drivers/net/netconsole.ko.gz
 lib/modules/*/kernel/drivers/net/nlmon.ko.gz
@@ -1939,7 +1929,6 @@ lib/modules/*/kernel/drivers/net/usb/ax88179_178a.ko.gz
 lib/modules/*/kernel/drivers/net/usb/catc.ko.gz
 lib/modules/*/kernel/drivers/net/usb/cdc-phonet.ko.gz
 lib/modules/*/kernel/drivers/net/usb/cdc_eem.ko.gz
-lib/modules/*/kernel/drivers/net/usb/cdc_ether.ko.gz
 lib/modules/*/kernel/drivers/net/usb/cdc_mbim.ko.gz
 lib/modules/*/kernel/drivers/net/usb/cdc_ncm.ko.gz
 lib/modules/*/kernel/drivers/net/usb/cdc_subset.ko.gz
@@ -1962,13 +1951,11 @@ lib/modules/*/kernel/drivers/net/usb/plusb.ko.gz
 lib/modules/*/kernel/drivers/net/usb/qmi_wwan.ko.gz
 lib/modules/*/kernel/drivers/net/usb/r8152.ko.gz
 lib/modules/*/kernel/drivers/net/usb/r8153_ecm.ko.gz
-lib/modules/*/kernel/drivers/net/usb/rndis_host.ko.gz
 lib/modules/*/kernel/drivers/net/usb/rtl8150.ko.gz
 lib/modules/*/kernel/drivers/net/usb/sierra_net.ko.gz
 lib/modules/*/kernel/drivers/net/usb/smsc75xx.ko.gz
 lib/modules/*/kernel/drivers/net/usb/smsc95xx.ko.gz
 lib/modules/*/kernel/drivers/net/usb/sr9700.ko.gz
-lib/modules/*/kernel/drivers/net/usb/usbnet.ko.gz
 lib/modules/*/kernel/drivers/net/usb/zaurus.ko.gz
 lib/modules/*/kernel/drivers/net/veth.ko.gz
 lib/modules/*/kernel/drivers/net/virtio_net.ko.gz
@@ -2036,8 +2023,6 @@ lib/modules/*/kernel/drivers/pci/pci-stub.ko.gz
 lib/modules/*/kernel/drivers/pci/switch/switchtec.ko.gz
 lib/modules/*/kernel/drivers/pci/xen-pcifront.ko.gz
 lib/modules/*/kernel/drivers/pcmcia/i82092.ko.gz
-lib/modules/*/kernel/drivers/pcmcia/pcmcia.ko.gz
-lib/modules/*/kernel/drivers/pcmcia/pcmcia_core.ko.gz
 lib/modules/*/kernel/drivers/pcmcia/pcmcia_rsrc.ko.gz
 lib/modules/*/kernel/drivers/pcmcia/pd6729.ko.gz
 lib/modules/*/kernel/drivers/pcmcia/yenta_socket.ko.gz
@@ -2125,7 +2110,6 @@ lib/modules/*/kernel/drivers/pwm/pwm-lpss-pci.ko.gz
 lib/modules/*/kernel/drivers/pwm/pwm-lpss-platform.ko.gz
 lib/modules/*/kernel/drivers/pwm/pwm-lpss.ko.gz
 lib/modules/*/kernel/drivers/pwm/pwm-pca9685.ko.gz
-lib/modules/*/kernel/drivers/rpmsg/rpmsg_core.ko.gz
 lib/modules/*/kernel/drivers/rpmsg/rpmsg_ns.ko.gz
 lib/modules/*/kernel/drivers/rpmsg/virtio_rpmsg_bus.ko.gz
 lib/modules/*/kernel/drivers/rtc/rtc-abx80x.ko.gz
@@ -2258,7 +2242,6 @@ lib/modules/*/kernel/drivers/scsi/virtio_scsi.ko.gz
 lib/modules/*/kernel/drivers/scsi/vmw_pvscsi.ko.gz
 lib/modules/*/kernel/drivers/scsi/wd719x.ko.gz
 lib/modules/*/kernel/drivers/scsi/xen-scsifront.ko.gz
-lib/modules/*/kernel/drivers/soc/qcom/qmi_helpers.ko.gz
 lib/modules/*/kernel/drivers/soundwire/soundwire-cadence.ko.gz
 lib/modules/*/kernel/drivers/soundwire/soundwire-generic-allocation.ko.gz
 lib/modules/*/kernel/drivers/soundwire/soundwire-intel.ko.gz
@@ -2273,7 +2256,6 @@ lib/modules/*/kernel/drivers/spi/spi-pxa2xx-platform.ko.gz
 lib/modules/*/kernel/drivers/spi/spi-tle62x0.ko.gz
 lib/modules/*/kernel/drivers/spi/spi-xcomm.ko.gz
 lib/modules/*/kernel/drivers/spi/spidev.ko.gz
-lib/modules/*/kernel/drivers/ssb/ssb.ko.gz
 lib/modules/*/kernel/drivers/staging/qlge/qlge.ko.gz
 lib/modules/*/kernel/drivers/staging/r8188eu/r8188eu.ko.gz
 lib/modules/*/kernel/drivers/staging/rtl8723bs/r8723bs.ko.gz
@@ -2341,9 +2323,7 @@ lib/modules/*/kernel/drivers/usb/class/cdc-acm.ko.gz
 lib/modules/*/kernel/drivers/usb/class/cdc-wdm.ko.gz
 lib/modules/*/kernel/drivers/usb/class/usblp.ko.gz
 lib/modules/*/kernel/drivers/usb/class/usbtmc.ko.gz
-lib/modules/*/kernel/drivers/usb/common/usb-common.ko.gz
 lib/modules/*/kernel/drivers/usb/core/ledtrig-usbport.ko.gz
-lib/modules/*/kernel/drivers/usb/core/usbcore.ko.gz
 lib/modules/*/kernel/drivers/usb/host/ehci-hcd.ko.gz
 lib/modules/*/kernel/drivers/usb/host/ehci-pci.ko.gz
 lib/modules/*/kernel/drivers/usb/host/ehci-platform.ko.gz
@@ -2672,12 +2652,6 @@ lib/modules/*/kernel/fs/vboxsf/vboxsf.ko.gz
 lib/modules/*/kernel/fs/xfs/xfs.ko.gz
 lib/modules/*/kernel/kernel/configs.ko.gz
 lib/modules/*/kernel/lib/asn1_encoder.ko.gz
-lib/modules/*/kernel/lib/crc-ccitt.ko.gz
-lib/modules/*/kernel/lib/crc-itu-t.ko.gz
-lib/modules/*/kernel/lib/crc16.ko.gz
-lib/modules/*/kernel/lib/crc64.ko.gz
-lib/modules/*/kernel/lib/crc7.ko.gz
-lib/modules/*/kernel/lib/crc8.ko.gz
 lib/modules/*/kernel/lib/crypto/libblake2s-generic.ko.gz
 lib/modules/*/kernel/lib/crypto/libblake2s.ko.gz
 lib/modules/*/kernel/lib/crypto/libchacha.ko.gz
@@ -2690,7 +2664,6 @@ lib/modules/*/kernel/lib/crypto/libsm4.ko.gz
 lib/modules/*/kernel/lib/lru_cache.ko.gz
 lib/modules/*/kernel/lib/lz4/lz4_compress.ko.gz
 lib/modules/*/kernel/lib/lz4/lz4hc_compress.ko.gz
-lib/modules/*/kernel/lib/math/cordic.ko.gz
 lib/modules/*/kernel/lib/raid6/raid6_pq.ko.gz
 lib/modules/*/kernel/lib/reed_solomon/reed_solomon.ko.gz
 lib/modules/*/kernel/lib/ts_bm.ko.gz
@@ -2726,7 +2699,6 @@ lib/modules/*/kernel/net/atm/clip.ko.gz
 lib/modules/*/kernel/net/atm/lec.ko.gz
 lib/modules/*/kernel/net/atm/mpoa.ko.gz
 lib/modules/*/kernel/net/atm/pppoatm.ko.gz
-lib/modules/*/kernel/net/bluetooth/bluetooth.ko.gz
 lib/modules/*/kernel/net/bluetooth/bnep/bnep.ko.gz
 lib/modules/*/kernel/net/bluetooth/cmtp/cmtp.ko.gz
 lib/modules/*/kernel/net/bluetooth/hidp/hidp.ko.gz
@@ -3142,10 +3114,6 @@ lib/modules/*/kernel/net/vmw_vsock/vmw_vsock_vmci_transport.ko.gz
 lib/modules/*/kernel/net/vmw_vsock/vsock.ko.gz
 lib/modules/*/kernel/net/vmw_vsock/vsock_diag.ko.gz
 lib/modules/*/kernel/net/vmw_vsock/vsock_loopback.ko.gz
-lib/modules/*/kernel/net/wireless/lib80211.ko.gz
-lib/modules/*/kernel/net/wireless/lib80211_crypt_ccmp.ko.gz
-lib/modules/*/kernel/net/wireless/lib80211_crypt_tkip.ko.gz
-lib/modules/*/kernel/net/wireless/lib80211_crypt_wep.ko.gz
 lib/modules/*/kernel/net/x25/x25.ko.gz
 lib/modules/*/kernel/net/xfrm/xfrm_algo.ko.gz
 lib/modules/*/kernel/net/xfrm/xfrm_interface.ko.gz
