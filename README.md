@@ -83,6 +83,10 @@ process:
   conservative `lzo` setting, but `lz4`, `gzip`, `xz`, and `zstd` are
   also available.
 
+Besides these, it is considered that the `guest/lib/firmware`
+directory may be present for holding further firmware files that shall
+be added to the virtual disk image, under `/lib/firmware`.
+
 ## Documentation
 
 There is a manual page available that describes how the guest can be

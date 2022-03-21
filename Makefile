@@ -104,6 +104,9 @@ $(GUESTDIR)/.done:
 			--no-chown \
 			$(PACKAGES)
 	$(TAR) -xf $(MINIROOTFS) -C $(GUESTDIR) $(APK)
+	# install extra firmware files manually
+	[ -d guest/lib/firmware ] \
+		&& $(CP) -R guest/lib/firmware/ $(GUESTDIR)/lib/firmware
 	# busybox-extras.post-install
 .for binary in $(BUSYBOX_EXTRAS)
 	$(LN) -s /bin/busybox-extras $(GUESTDIR)/${binary}
