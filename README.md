@@ -10,13 +10,15 @@ guest based on [Alpine Linux] on top of its vanilla distribution.
 guarantees or warranties.  It is shared in the hope that is going to
 be useful and inspiring for others.*
 
+## Prerequisites
+
+For building the virtual disk image,
+[E2fsprogs](http://e2fsprogs.sourceforge.net/) or the corresponding
+`sysutils/e2fsprogs` FreeBSD package must be installed.  It also
+requires to be run as `root` and the Linux ABI support has to be
+activated.
+
 ## Installation
-
-Whenever possible, use the `net/wifibox-alpine` FreeBSD port from the
-[freebsd-wifibox-port] repository, which aims to automate the tasks
-described below and offers proper removal of the install files.
-
-### Manual Installation
 
 There is a `Makefile` present in the root of the repository that could
 be used to drive the installation process.  It is mostly recommended
