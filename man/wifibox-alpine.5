@@ -1,4 +1,4 @@
-.Dd February 18, 2022
+.Dd March 7, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -42,14 +42,27 @@ no other services are configured for remote access.
 Although the
 .Sy root
 user possesses unlimited access to every resource inside the guest,
-files cannot be changed from there.  That is because the operating
-system is built in a way that it does not normally require any write
-access to the contents of the root file system.  Everything that needs
-to be modified during the guest's run time is stored on dedicated file
-systems that are either memory-backed or shared with the host.  This
-prevents the guest from damaging the system files on sudden shutdowns,
-which may occur due to short and strict time limits placed on the
-spin-down sequence.
+files cannot be changed immediately.  Before any administrative
+operation, the root file system needs to be remounted in writeable
+mode.
+.Bd -literal -offset indent
+# mount -o remount,rw /
+.Ed
+.Pp
+That is because the guest is built in a way that it does not normally
+require any write access to the contents of the root file system.
+Everything that needs to be modified during the guest's run time is
+stored on dedicated file systems that are either memory-backed or
+shared with the host.  This prevents the guest from damaging the
+system files on sudden shutdowns, which may occur due to short and
+strict time limits placed on the spin-down sequence, and lack of
+journaling enabled.
+.Pp
+For the same reasons, it is recommended to restore the original
+mounting strategy once all the changes have been made on the guest.
+.Bd -literal -offset indent
+# mount -o remount,ro /
+.Ed
 .Pp
 For the ease of management, the host shares configuration files with
 the services that are responsible for implementing the domain logic.
@@ -83,22 +96,27 @@ file and implements a DHCP server for
 so that it can hand out IP addresses in a given range for the host and
 set itself the default gateway for forwarding the network traffic.  It
 also manages the distribution of information about the name servers.
+.It
+.Sy wpa_passthru
+works with the
+.Pa wpa_ctrl.conf
+file that is shared with the host and manages the forwarding of
+control sockets created for
+.Sy wpa_supplicant .
+When enabled, it attemps to parse the contents of
+.Pa wpa_supplicant.conf
+to learn if there are sockets available and exposes them over the
+configured TCP ports with the help of
+.Sy socat .
 .El
 .Pp
-The configuration files are read from the
+The generic configuration files are read from the
 .Pa /media/etc
 directory where the
 .Sy config
 9P (VirtFS) share is mounted in read-only mode.  From there, the files
 are hooked up in the system in the following ways.
 .Bl -bullet
-.It
-.Pa /media/etc/wpa_supplicant.conf
-is mapped to
-.Pa /etc/wpa_supplicant/wpa_supplicant.conf
-where
-.Sy wpa_supplicant
-will read its contents.
 .It
 .Pa /media/etc/interfaces.conf
 is mapped to
@@ -116,22 +134,41 @@ is mapped to
 where
 .Sy udhcpd
 will read its contents.
+.It
+.Pa /media/etc/wpa_ctrl.conf
+is not mapped to anywhere under
+.Pa /etc ,
+it is used directly from there by
+.Sy wpa_passthru .
 .El
+.Pp
+The
+.Pa wpa_supplicant.conf
+configuration file is shared with the host through the
+.Pa /media/wpa
+directory where the
+.Sy wpa_config
+9P (VirtFS) share is mounted.  This will let
+.Sy wpa_supplicant
+change the contents when instructed to do so from the host through the
+forwarded control sockets and permitted by the configuration.
 .Pp
 The variable data files under the guest's
 .Pa /var
 directory are shared with the host by mounting the
 .Sy var
-9P (VirtFS) share under the standard
-.Pa /var
-directory.  This includes streaming out all the logs under the
+9P (VirtFS) share there.  This includes streaming out all the logs
+under the
 .Pa /var/log
 directory, such as
 .Pa /var/log/dmesg
 or
 .Pa /var/log/messages
 so that the internal state of the guest can be tracked by accessing
-these files on the host.
+these files on the host.  The contents of the
+.Pa /var/run
+directory will not be visible on the host, as it is stored only in the
+memory.
 .Sh STARTING, STOPPING, AND RESTARTING SERVICES
 Every service running on the guest can be managed by the
 .Sy rc-service
@@ -168,27 +205,183 @@ service.
 .Pp
 These commands can help with troubleshooting and restoring the
 respective services in case of failures.
-.Sh MANAGING THE ROOT FILE SYSTEM
-When changing the contents of the guest's root file system is desired,
-it may be accessed from the host directly.  It is shared via 9P
-(VirtFS), which means that the files are visible and modifiable
-through the host.  But because it still features Linux binaries, use
-of the
-.Xr chroot 8
-command is recommended to launch a Linux-based shell (i.e. BusyBox)
-inside the directory that holds the guest root file system on the
-host.  Because some of the commands may depend on the contents of the
-.Pa /var
-directory, first it must be mounted from its place with the help of
-.Xr mount_nullfs 8 .
+.Sh RESIZING THE FILE SYSTEM
+The size of the disk image is optimized, and no free space left on the
+root file system.  In result, installation of further packages or
+performing a system upgrade requires changing the size of the root
+file system as well as that of the enclosing disk image.  This can be
+achieved with the help of specific tools, described below shortly.
+.Pp
+Such operations must always be considered on two levels: the size of
+the disk image needs to be changed on the host, and the size of the
+file system needs to be changed on the guest.  The order of the
+corresponding commands must always reflect the direction of the change
+in size to avoid losing data.
+.Pp
+For growing the root file system, increase the size of the disk image
+to the desired capacity with the
+.Xr truncate 1
+utility.  For example, consider extending the virtual disk to 1
+gigabyte.
 .Bd -literal -offset indent
-# mount -t nullfs /var/run/wifibox/appliance \\
-  %%ROOT%%/var
-# chroot %%ROOT%% /bin/ash
+# truncate -s 1G disk.img
 .Ed
 .Pp
-For the rest of this document, the commands are discussed in such an
-environment, unless stated otherwise.
+The guest has to be restarted to notice the change in the disk
+parameters.
+.Bd -literal -offset indent
+# wifibox restart guest
+.Ed
+.Pp
+Once the
+.Cm restart
+operation completed, the interactive
+.Cm cfdisk
+utility on the guest can be used to resize the partition of the root
+file system,
+.Pa /dev/vda1 .
+.Bd -literal -offset indent
+# cfdisk
+.Ed
+.Pp
+The
+.Cm resize2fs
+utility on the guest supports growing the root file system while it is
+in use, however it must be mounted writable first.  The command will
+automatically extends the file system's size to match with the size of
+the corresponding partition, which has been grown in the previous
+step.  After completion, the file system is ready for use.
+.Bd -literal -offset indent
+# mount -o remount,rw /
+# resize2fs /dev/vda1
+.Ed
+.Pp
+For shrinking the root file system, the size of the root file system
+has to be decreased first.  This can be implemented by the
+.Cm resize2fs
+utility, but it supports shrinking only when the underlying file
+system is not mounted.  In case of the root file system a way to
+achieve this is to mirror its contents in the memory and trigger all
+the processes to re-load themselves from there.  That is why this
+operation requires the guest to be configured with more memory, e.g. 1
+GB, otherwise it may fail.
+.Pp
+Through the following set of commands, a tmpfs-backed file system is
+created and populated with the contents of the root so it could take
+over its place in the next steps.
+.Bd -literal -offset indent
+mkdir /tmp/tmproot
+mount -t tmpfs tmpfs /tmp/tmproot
+for dir in oldroot dev proc sys run tmp boot; do \\
+  mkdir /tmp/tmproot/$dir; done
+for dir in bin etc home lib media mnt opt root sbin srv usr var; do \\
+  cp -a /$dir /tmp/tmproot/$dir; done
+.Ed
+.Pp
+Then the
+.Cm pivot_root
+and
+.Cm mount
+commands are employed to switch to the freshly built root file system
+and migrate all the existing mount points there.  The previous root
+file system becomes available under the path
+.Pa /oldroot .
+.Bd -literal -offset indent
+cd /tmp/tmproot
+pivot_root . oldroot
+for dir in boot dev proc run sys media/etc media/var; do \\
+  mount --move /oldroot/$dir /$dir; done
+mount -t tmpfs tmpfs /tmp
+.Ed
+.Pp
+Since all the services, including the
+.Cm init
+process with PID 1, have been launched from the old root,
+.Cm init
+must be told to restart itself by sending the QUIT signal.  In
+consequence, all the other services will also be restarted and the
+user is logged out.
+.Bd -literal -offset indent
+# kill -QUIT 1
+.Ed
+.Pp
+Login and restart the
+.Cm networking
+service to restore the network connection to the outside world.
+.Bd -literal -offset indent
+# rc-service networking restart
+.Ed
+.Pp
+Now it should be possible to detach the old root file system.
+.Bd -literal -offset indent
+# umount /oldroot
+.Ed
+.Pp
+In case this previous command fails, it is recommended to use the
+.Cm fuser
+utility to obtain the list of processes, by their IDs, that keep files
+open on the file system.
+.Bd -literal -offset indent
+# fuser -m /oldroot
+.Ed
+.Pp
+If the old root file system has been successfully unmounted, it must
+be checked for errors first and it must be marked clean, otherwise
+.Cm resize2fs
+refuses to modify it.  Then the
+.Cm resize2fs
+command could be called with the
+.Fl M
+flag that shrinks the file system to the smallest possible size that
+is considered safe to use.
+.Bd -literal -offset indent
+# e2fsck -f /dev/vda1
+# resize2fs -M /dev/vda1
+.Ed
+.Pp
+After the successful shrinking of the file system, the
+.Cm cfdisk
+utility can be launched to decrease the size of the corresponding
+partition so that the overall size of the disk image could be made
+smaller.  The size of the partition has to match with the size of the
+contained file system.  That latter can be queried with using the
+.Cm dumpe2fs
+tool, in the following way for instance.
+.Bd -literal -offset indent
+# dumpe2fs -h /dev/vda1 | fgrep "Block count:" | cut -c27-
+.Ed
+.Pp
+This value has to be multipled by 8 to get the number of sectors for
+the new partition size.  This ratio comes from the difference of file
+system block size, which is 4096 bytes, and the sector size, which is
+512 bytes.  Once this is learnt,
+.Cm cfdisk
+could be launched to shrink the partition.  Remember to use
+.Sy S
+as the unit of measure.
+.Bd -literal -offset indent
+# cfdisk
+.Ed
+.Pp
+Before leaving the
+.Cm cfdisk
+utility, take a note on the start sector of the free space after the
+resized partition because that shall indicate the new size of the disk
+image.  Multiply this number with the size of the sectors, which is
+512 bytes, to get the value to be passed for the
+.Xr truncate 1
+command for trimming the image.  In the following example, the free
+space started at sector 745472.
+.Bd -literal -offset indent
+# truncate -s `expr 745472 \\* 512` disk.img
+.Ed
+.Pp
+Restore the guest memory to the standard setting and restart the guest
+to make it pick up the changes in the disk parameters, also to give
+back the extra memory to the host.
+.Bd -literal -offset indent
+# wifibox restart guest
+.Ed
 .Sh INSTALLING OR REMOVING PACKAGES
 The list of installed packages can be queried by the
 .Sy apk
@@ -198,7 +391,11 @@ rest of the section.
 # apk list --installed
 .Ed
 .Pp
-Before installing any package, it is recommended to get the latest
+Note that the amount of memory configured for the guest might not be
+enough for the next steps.  Raise it to around 128 MB if it has not
+been set like that already.
+.Pp
+Once prepared, it is possible to proceed with getting the latest
 version of the database.  The
 .Sy apk
 tool stores the list of currently used package repositories in the
@@ -256,25 +453,16 @@ command.
 # apk upgrade --available
 .Ed
 .Pp
-Restart the guest for these changes to take effect by issuing the
-following command on the host.  Note that one can get back to the host
-system by exiting the shell, e.g. by the
-.Cm exit
-command.  Remember to unmount the guest's
-.Pa /var
-file system if it has been mounted earlier.
+Restart the guest for these changes to take effect, especially if the
+kernel or the firmware files received an update.
 .Bd -literal -offset indent
-# exit
-# umount %%ROOT%%/var
 # wifibox restart guest
 .Ed
 .Sh CAVEATS
-Custom modifications to the guest file system are not supported.  Use
-the respective commands at your own risk!
+Custom modifications to the published guest disk images are not
+supported.  Use these commands at your own risk!
 .Sh SEE ALSO
 .Xr wifibox 8 ,
-.Xr chroot 8 ,
-.Xr mount 8 ,
-.Xr mount_nullfs 8
+.Xr truncate 1
 .Sh AUTHORS
 .An Gábor Páli Aq Mt pali.gabor@gmail.com
