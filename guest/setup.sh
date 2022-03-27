@@ -1,6 +1,8 @@
+set -ex
 apk add \
     --no-network \
     --force-non-repository \
+    --allow-untrusted \
     /packages/*.apk
 passwd -d root
 ln -s /dev/null /root/.ash_history
