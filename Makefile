@@ -97,6 +97,7 @@ $(GUESTDIR)/.done:
 		$(_APK) add \
 			--no-network \
 			--force-non-repository \
+			--allow-untrusted \
 			--no-progress \
 			--clean-protected \
 			--root $(GUESTDIR) \
