@@ -66,7 +66,8 @@ process:
 - `INITRD_FILES` specifies the plain-text file that holds the list of
   files and directories to be included in the `initramfs` that is
   going to be used for booting the guest.  By default, this is set to
-  `guest/initrd.files`.
+  `guest/initrd.files`.  No `initramfs` file is created if this is
+  empty.
 
 - `EXCLUDED_FILES` can be used to exclude certain files and
   directories from the image that are deemed to be unnecessary.  By

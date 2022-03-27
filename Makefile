@@ -11,11 +11,13 @@ MANDIR=$(DESTDIR)$(PREFIX)/man
 RUNDIR=$(DESTDIR)/var/run/wifibox
 
 WORKDIR?=$(PWD)/work
-GUESTDIR?=$(WORKDIR)/image-contents
-INITRDDIR?=$(WORKDIR)/initrd-contents
+GUESTDIR=$(WORKDIR)/image-contents
+
+.if !empty(INITRD_FILES)
+INITRDDIR=$(WORKDIR)/initrd-contents
+.endif
 
 BOOTDIR=$(GUESTDIR)/boot
-MKINITFSDIR=$(GUESTDIR)/usr/share/mkinitfs
 
 SHAREMODE?=0644
 
@@ -43,7 +45,9 @@ APK=			sbin/apk
 
 _APK=			$(GUESTDIR)/$(APK)
 
+.if !empty(INITRD_FILES)
 INITRD_IMG=		$(BOOTDIR)/initramfs
+.endif
 
 SQUASHFS_COMP?=		lzo
 SQUASHFS_IMG=		$(PWD)/alpine-$(VERSION).squashfs.img
@@ -122,6 +126,9 @@ $(GUESTDIR)/.done:
 
 image-contents: $(GUESTDIR)/.done
 
+.if defined(INITRD_IMG)
+MKINITFSDIR=$(GUESTDIR)/usr/share/mkinitfs
+
 $(INITRD_IMG): image-contents $(INITRD_FILES)
 	$(RM) -rf $(INITRDDIR)
 	(cd $(GUESTDIR) \
@@ -139,6 +146,7 @@ $(INITRD_IMG): image-contents $(INITRD_FILES)
 		&& $(FIND) . \
 			| $(CPIO) -o -y --format newc --owner root:wheel \
 			> $(INITRD_IMG))
+.endif
 
 .if defined(EXCLUDED_FILES)
 _EXCLUDE_FILES=	-ef $(EXCLUDED_FILES)
@@ -158,7 +166,7 @@ _EXCLUDE_FW_FILES= 	-ef $(EXCLUDE_FIRMWARE_FILES)
 _EXCLUDE_FW_FILES=
 .endif
 
-$(SQUASHFS_IMG): image-contents $(INITRD_IMG)
+$(SQUASHFS_IMG): image-contents
 .if defined(_FW_FILES)
 	(cd $(GUESTDIR) \
 		&& $(FIND) lib/firmware -not -type d -and $(_FW_FILES) \
@@ -174,11 +182,18 @@ $(SQUASHFS_IMG): image-contents $(INITRD_IMG)
 		$(_EXCLUDE_FW_FILES) \
 		-e boot -e .done -e "var/*"
 
-all:	$(SQUASHFS_IMG)
+_TARGETS=	$(SQUASHFS_IMG)
+.if defined(INITRD_IMG)
+_TARGETS+=	$(INITRD_IMG)
+.endif
+
+all:	$(_TARGETS)
 
 install:
 	$(MKDIR) -p $(SHAREDIR)
+.if defined(INITRD_IMG)
 	$(INSTALL_DATA) $(INITRD_IMG) $(SHAREDIR)
+.endif
 	$(INSTALL_DATA) $(SQUASHFS_VMLINUZ) $(SHAREDIR)/vmlinuz
 	$(INSTALL_DATA) $(SQUASHFS_IMG) $(SHAREDIR)/disk.img
 	$(SED) ${_SUB_LIST_EXP} share/grub.cfg > $(SHAREDIR)/grub.cfg
@@ -197,7 +212,9 @@ install:
 
 clean:
 	$(RM) -rf $(GUESTDIR)
+.if defined(INITRDDIR)
 	$(RM) -rf $(INITRDDIR)
+.endif
 	$(RM) -f $(SQUASHFS_IMG)
 
 .MAIN:	all
