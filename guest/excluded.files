@@ -3463,6 +3463,7 @@ etc/libnl
 etc/local.d
 etc/logrotate.d
 etc/mkinitfs
+etc/network/if-up.d/dad
 etc/os-release
 etc/pkcs11
 etc/ssl
