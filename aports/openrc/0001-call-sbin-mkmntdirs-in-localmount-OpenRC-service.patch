@@ -1,0 +1,25 @@
+From 78245081fe109ed7777b79ba9c99890d56c21272 Mon Sep 17 00:00:00 2001
+From: Natanael Copa <ncopa@alpinelinux.org>
+Date: Wed, 1 Feb 2017 04:04:52 +0000
+Subject: [PATCH] call /sbin/mkmntdirs in localmount OpenRC service
+
+---
+ init.d/localmount.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/init.d/localmount.in b/init.d/localmount.in
+index c571504a..14189396 100644
+--- a/init.d/localmount.in
++++ b/init.d/localmount.in
+@@ -21,6 +21,8 @@ depend()
+ 
+ start()
+ {
++	[ -x /sbin/mkmntdirs ] && mkmntdirs
++
+ 	# Mount local filesystems in /etc/fstab.
+ 	# The types variable must start with no, and must be a type
+ 	local critical= types="noproc" x= no_netdev= rc=
+-- 
+2.33.1
+

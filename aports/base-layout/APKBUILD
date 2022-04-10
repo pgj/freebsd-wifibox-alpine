@@ -1,0 +1,195 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=baselayout
+pkgver=3.2.0
+pkgrel=18
+pkgdesc="Base dir structure and init scripts (Alpine Linux)"
+url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
+arch="all"
+license="GPL-2.0-only"
+pkggroups="shadow"
+options="!fhs !check"
+install=
+_nbver=6.2
+source="crontab
+	locale.sh
+
+	group
+	inittab
+	passwd
+	profile
+	protocols-$_nbver::https://salsa.debian.org/md/netbase/-/raw/v$_nbver/etc/protocols
+	services-$_nbver::https://salsa.debian.org/md/netbase/-/raw/v$_nbver/etc/services
+	"
+builddir="$srcdir/build"
+
+prepare() {
+	default_prepare
+	mkdir -p "$builddir"
+	mv "$srcdir"/protocols-$_nbver "$srcdir"/protocols
+	mv "$srcdir"/services-$_nbver "$srcdir"/services
+}
+
+build() {
+	# generate shadow
+	awk -F: '{
+		pw = ":!:"
+		if ($1 == "root") { pw = "::" }
+		print($1 pw ":0:::::")
+	}' "$srcdir"/passwd > shadow
+}
+
+package() {
+	mkdir -p "$pkgdir"
+	cd "$pkgdir"
+	install -m 0755 -d \
+		dev \
+		dev/pts \
+		dev/shm \
+		etc \
+		etc/conf.d \
+		etc/crontabs \
+		etc/init.d \
+		etc/modprobe.d \
+		etc/modules-load.d \
+		etc/network/if-down.d \
+		etc/network/if-post-down.d \
+		etc/network/if-pre-up.d \
+		etc/network/if-up.d \
+		etc/periodic/15min \
+		etc/periodic/daily \
+		etc/periodic/hourly \
+		etc/periodic/monthly \
+		etc/periodic/weekly \
+		etc/profile.d \
+		etc/sysctl.d \
+		lib/firmware \
+		lib/mdev \
+		lib/modules-load.d \
+		lib/sysctl.d \
+		media/etc \
+		media/wpa \
+		proc \
+		run \
+		sbin \
+		sys \
+		usr/bin \
+		usr/lib/modules-load.d \
+		usr/local/bin \
+		usr/local/lib \
+		usr/local/share \
+		usr/sbin \
+		usr/share \
+		usr/share/man \
+		usr/share/misc \
+		var/cache \
+		var/cache/misc \
+		var/lib \
+		var/lib/misc \
+		var/local \
+		var/lock/subsys \
+		var/log \
+		var/opt \
+		var/spool \
+		var/spool/cron \
+		var/mail
+
+	ln -s /run var/run
+	install -d -m 0555 var/empty
+	install -d -m 0700 "$pkgdir"/root
+	install -d -m 1777 "$pkgdir"/tmp "$pkgdir"/var/tmp
+
+	install -m600 "$srcdir"/crontab "$pkgdir"/etc/crontabs/root
+	install -m644 \
+		"$srcdir"/locale.sh \
+		"$pkgdir"/etc/profile.d/
+
+	echo "wifibox" > "$pkgdir"/etc/hostname
+	cat > "$pkgdir"/etc/hosts <<-EOF
+		127.0.0.1	localhost localhost.localdomain
+		::1		localhost localhost.localdomain
+	EOF
+	cat > "$pkgdir"/etc/modules <<-EOF
+		af_packet
+		ipv6
+	EOF
+	cat > "$pkgdir"/etc/shells <<-EOF
+		/bin/sh
+		/bin/ash
+	EOF
+	cat > "$pkgdir"/etc/sysctl.conf <<-EOF
+		net.ipv4.ip_forward=1
+	EOF
+	cat > "$pkgdir"/lib/sysctl.d/00-alpine.conf <<-EOF
+		# Prevents SYN DOS attacks. Applies to ipv6 as well, despite name.
+		net.ipv4.tcp_syncookies = 1
+
+		# Prevents ip spoofing.
+		net.ipv4.conf.default.rp_filter = 1
+		net.ipv4.conf.all.rp_filter = 1
+
+		# Only groups within this id range can use ping.
+		net.ipv4.ping_group_range=999 59999
+
+		# Redirects can potentially be used to maliciously alter hosts
+		# routing tables.
+		net.ipv4.conf.all.accept_redirects = 0
+		net.ipv4.conf.all.secure_redirects = 1
+		net.ipv6.conf.all.accept_redirects = 0
+
+		# The source routing feature includes some known vulnerabilities.
+		net.ipv4.conf.all.accept_source_route = 0
+		net.ipv6.conf.all.accept_source_route = 0
+
+		# See RFC 1337
+		net.ipv4.tcp_rfc1337 = 1
+
+		## Enable IPv6 Privacy Extensions (see RFC4941 and RFC3041)
+		net.ipv6.conf.default.use_tempaddr = 2
+		net.ipv6.conf.all.use_tempaddr = 2
+
+		# Restarts computer after 120 seconds after kernel panic
+		kernel.panic = 120
+
+		# Users should not be able to create soft or hard links to files
+		# which they do not own. This mitigates several privilege
+		# escalation vulnerabilities.
+		fs.protected_hardlinks = 1
+		fs.protected_symlinks = 1
+	EOF
+	cat > "$pkgdir"/etc/fstab <<-EOF
+		tmpfs      /tmp       tmpfs    size=128K                                     0 0
+		config     /media/etc 9p       trans=virtio,ro,noatime,nodiratime,norelatime 0 0
+		wpa_config /media/wpa 9p       trans=virtio,rw                               0 0
+		var        /var       9p       trans=virtio,rw                               0 0
+	EOF
+
+	install -m644 \
+		"$srcdir"/group \
+		"$srcdir"/passwd \
+		"$srcdir"/inittab \
+		"$srcdir"/profile \
+		"$srcdir"/protocols \
+		"$srcdir"/services \
+		"$pkgdir"/etc/
+
+	install -m640 -g shadow "$builddir"/shadow \
+		"$pkgdir"/etc/
+
+	# symlinks
+	ln -s /dev/null "$pkgdir"/root/.ash_history
+	ln -s /etc/crontabs "$pkgdir"/var/spool/cron/crontabs
+	ln -s /proc/mounts "$pkgdir"/etc/mtab
+	ln -s /var/mail "$pkgdir"/var/spool/mail
+}
+
+sha512sums="
+6e169c0975a1ad1ad871a863e8ee83f053de9ad0b58d94952efa4c28a8c221445d9e9732ad8b52832a50919c2f39aa965a929b3d5b3f9e62f169e2b2e0813d82  crontab
+b2fc9b72846a43a45ba9a8749e581cef34d1915836833b51b7919dfbf4e275b7d55fec4dea7b23df3796380910971a41331e53e8cf0d304834e3da02cc135e5a  locale.sh
+806b8f23f823a9471846d12fa6b55690b95eedb4c613b82aefaba7ffef23f83e17552befd891a487864f72ef24e395d8611738933f684a85eb4c336cb20994f8  group
+7cc3c23062c730ec7a1d7850423d9901047005520da5b347b7b24e5f33a9c9a9129b430557f7f41e565f143624b7f3c47e3f6e4a6a446e75f0ea245c03d70880  inittab
+06d12a7b9ca14fe17e412d0f24814620b67d035ae859be7906cbf4782dd69e359a6a555dafb98060b7fb7e4714aaa676c88d9017cded36e6d8398e23369bb290  passwd
+b14920eae431d1f15b066e264a94f804540c5dcbf91caef034019d95456c975c0c054672e53369082682dd9454a034f26bd45b312adfc0ab68a0311d97b037ac  profile
+eadc83e47fcc354ab83fd109bee452bda170886fb684e67faf615930c11480919505f4af60c685b124efc54af0ded9522663132f911eac6622144f8b4c8be695  protocols-6.2
+adfae0d2f569c2a2f413b7e27683a007fc8ca689b8c3349672fe0dcb6208c192ede4402eff09c604b7e7b4fd9d8df93b875efa5bdaa6c14ff1d8022a7caad5cd  services-6.2
+"

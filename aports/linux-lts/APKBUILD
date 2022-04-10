@@ -1,0 +1,115 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=linux-lts
+pkgver=5.15.33
+case $pkgver in
+	*.*.*)	_kernver=${pkgver%.*};;
+	*.*) _kernver=$pkgver;;
+esac
+pkgrel=0
+pkgdesc="Linux LTS kernel"
+url="https://www.kernel.org"
+depends=
+makedepends="perl flex bison elfutils-dev sed installkernel bc linux-headers linux-firmware-any openssl1.1-compat-dev diffutils findutils zstd"
+options="!strip"
+install=
+source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
+	config-lts.x86_64
+	"
+subpackages=
+
+if [ "${pkgver%.0}" = "$pkgver" ]; then
+	source="$source
+	https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/patch-$pkgver.xz"
+fi
+
+arch="x86_64"
+license="GPL-2.0"
+
+prepare() {
+	local _patch_failed=
+	cd "$srcdir"/linux-$_kernver
+	if [ "$_kernver" != "$pkgver" ]; then
+		msg "Applying patch-$pkgver.xz"
+		unxz -c < "$srcdir"/patch-$pkgver.xz | patch -p1 -N
+	fi
+
+	# first apply patches in specified order
+	for i in $source; do
+		case $i in
+		*.patch)
+			msg "Applying $i..."
+			if ! patch -s -p1 -N -i "$srcdir"/$i; then
+				echo $i >>failed
+				_patch_failed=1
+			fi
+			;;
+		esac
+	done
+
+	if ! [ -z "$_patch_failed" ]; then
+		error "The following patches failed:"
+		cat failed
+		return 1
+	fi
+
+	# remove localversion from patch if any
+	rm -f localversion*
+	oldconfig
+}
+
+oldconfig() {
+	local _config=config-lts.x86_64
+	local _builddir="$srcdir"/build-lts.x86_64
+	mkdir -p "$_builddir"
+	echo "-$pkgrel-lts" > "$_builddir"/localversion-alpine \
+		|| return 1
+
+	cp "$srcdir"/$_config "$_builddir"/.config
+	make -C "$srcdir"/linux-$_kernver \
+		O="$_builddir" \
+		ARCH="x86_64" \
+		listnewconfig oldconfig
+}
+
+build() {
+	unset LDFLAGS
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+	cd "$srcdir"/build-lts.x86_64
+	make ARCH="x86_64" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
+}
+
+package() {
+	local _outdir="$pkgdir"
+	local _abi_release=${pkgver}-${pkgrel}-lts
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+
+	cd "$srcdir"/build-lts.x86_64
+	# modules_install seems to regenerate a defect Modules.symvers on s390x. Work
+	# around it by backing it up and restore it after modules_install
+	cp Module.symvers Module.symvers.backup
+
+	mkdir -p "$_outdir"/boot "$_outdir"/lib/modules
+
+	make -j1 modules_install install \
+		ARCH="x86_64" \
+		INSTALL_MOD_PATH="$_outdir" \
+		INSTALL_PATH="$_outdir"/boot \
+		INSTALL_DTBS_PATH="$_outdir/boot/dtbs-lts"
+
+	cp Module.symvers.backup Module.symvers
+
+	rm -f "$_outdir"/lib/modules/${_abi_release}/build \
+		"$_outdir"/lib/modules/${_abi_release}/source
+	rm -rf "$_outdir"/lib/firmware
+
+	install -D -m644 include/config/kernel.release \
+		"$_outdir"/usr/share/kernel/lts/kernel.release
+}
+
+sha512sums="
+d25ad40b5bcd6a4c6042fd0fd84e196e7a58024734c3e9a484fd0d5d54a0c1d87db8a3c784eff55e43b6f021709dc685eb0efa18d2aec327e4f88a79f405705a  linux-5.15.tar.xz
+a91a622f12e1b5d59a6ed12be98a18da2055a21420536c84790028ee5c5d92417beaf259048f0796635bc6bda75092b56065b3f728aafde9cd72a14283f7e0a6  config-lts.x86_64
+399e287c5715702774f0a9b7e817c0bcd8135de4152ae784ac73d53a7777de6c577d414d92ff6b56b91766b7af7af630cdc421b105262ea5f3c2fda9436a8c17  patch-5.15.33.xz
+"

@@ -1,0 +1,42 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=ifupdown-ng
+pkgver=0.11.3
+pkgrel=0
+pkgdesc="tools for managing network configuration"
+url="https://github.com/ifupdown-ng/ifupdown-ng"
+arch="all"
+license="ISC"
+checkdepends=
+makedepends=
+install=""
+subpackages=
+source="https://distfiles.dereferenced.org/ifupdown-ng/ifupdown-ng-$pkgver.tar.xz
+	no-examples.patch
+	interfaces
+"
+builddir="$srcdir/ifupdown-ng-$pkgver"
+provides="ifupdown-any"
+provider_priority=900
+
+# We conflict with the vlan package because we provide our own
+# vlan support with the link executor.
+depends="!vlan"
+
+build() {
+	make CONFIG_YAML=n
+}
+
+package() {
+	make DESTDIR="$pkgdir" EXECUTOR_SCRIPTS_OPT= EXECUTOR_SCRIPTS_STUB= install
+	install -D -m755 "$builddir"/dist/openrc/networking.initd "$pkgdir"/etc/init.d/networking
+	install -D -m644 "$builddir"/dist/openrc/networking.confd "$pkgdir"/etc/conf.d/networking
+	install -D -m644 "$srcdir"/interfaces "$pkgdir"/etc/network/interfaces
+	ln -s /media/etc/interfaces.conf "$pkgdir"/etc/network/interfaces.conf
+}
+
+sha512sums="
+7339d8d14bc881968093fa4a92c84850d99b5469847858be5423b98c5ed25776198fe1065686c22b6823cf7ace17845e96d7932782c111207264f8e3a52cbbb7  ifupdown-ng-0.11.3.tar.xz
+e261fd3f185372bf8f2075216b9dd3e2d8090e978654ee742122ee7869017d309eac54b1415e79878015f312a39fa8fdd4b0d8c2bed8515e5a94c15da1b7b844  no-examples.patch
+372debdf3cdbcff247f8d757a4325ae49157bab1bc6f2fc9c621d1f21864321231856a719c00f5d2b77e0715ad44c5928cb856d97b52b659584d76f08326e28c  interfaces
+"

@@ -2,7 +2,7 @@
 
 The purpose of this repository is to maintain all the configuration
 files and scripts that are used for rolling out a [FreeBSD Wifibox]
-guest based on [Alpine Linux] on top of its vanilla distribution.
+guest based on [Alpine Linux].
 
 ## Warning
 
@@ -16,7 +16,7 @@ For building the virtual disk image, the following third-party
 software is employed, which must be installed beforehand.
 
 - [Squashfs-tools] or the `sysutils/squashfs-tools` FreeBSD package.
-- [PatchELF] or the `sysutils/patchelf` FreeBSD package. 
+- [PatchELF] or the `sysutils/patchelf` FreeBSD package.
 
 ## Installation
 
@@ -36,8 +36,6 @@ for development and testing.
 	LOCALBASE=<prefix of third-party software> \
 	MINIROOTFS=<Alpine minimal root file system tarball> \
 	PACKAGES=<Alpine package set> \
-	INITRD_FILES=<Contents of the initramfs> \
-	EXCLUDED_FILES=<List of files to exclude> \
 	FIRMWARE_FILES=<List of firmware files to keep> \
 	SQUASHFS_COMP=<Squashfs compression type>
 ```
@@ -53,8 +51,9 @@ process:
   installed is different.
 
 - `MINIROOTFS` should point to the Alpine minimal root file system
-  tarball for the `x86_64` architecture, which can be retrieved from
-  the Alpine Linux [web site](https://alpinelinux.org/downloads/).  By
+  tarball for the `x86_64` architecture, which is going to be used in
+  the bootstrapping phase.  Such tarballs can be retrieved from the
+  Alpine Linux [web site](https://alpinelinux.org/downloads/).  By
   default, that is set to `alpine-minirootfs.tar.gz`.
 
 - `PACKAGES` should tell which Alpine Linux packages to install for
@@ -63,20 +62,8 @@ process:
   available packages are looked up in the current directory and
   utilized during the installation process.
 
-- `INITRD_FILES` specifies the plain-text file that holds the list of
-  files and directories to be included in the `initramfs` that is
-  going to be used for booting the guest.  By default, this is set to
-  `guest/initrd.files`.  No `initramfs` file is created if this is
-  empty.
-
-- `EXCLUDED_FILES` can be used to exclude certain files and
-  directories from the image that are deemed to be unnecessary.  By
-  default, this is not set, but a recommendation is compiled as
-  `guest/excluded.files`, which might be set here.
-
-- `FIRMWARE_FILES` is interpreted on top of `EXCLUDED_FILES`, and its
-  purpose is to tell which exact firmware files to keep to reduce
-  further the size of the disk image.  It is optional, mostly
+- `FIRMWARE_FILES` is tell which exact firmware files to keep to
+  reduce further the size of the disk image.  It is optional, mostly
   recommended in case of `iwlwifi`.
 
 - `SQUASHFS_COMP` configures the compression method used for building

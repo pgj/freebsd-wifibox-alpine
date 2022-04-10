@@ -1,0 +1,10 @@
+--- ifupdown-ng-0.11.3/Makefile.orig
++++ ifupdown-ng-0.11.3/Makefile
+@@ -153,7 +153,6 @@
+ 	for i in ${EXECUTOR_SCRIPTS_STUB}; do \
+ 		install -D -m755 executor-scripts/stub/$$i ${DESTDIR}${EXECUTOR_PATH}/$$i; \
+ 	done
+-	install -D -m644 dist/ifupdown-ng.conf.example ${DESTDIR}${CONFIG_FILE}.example
+ 
+ .scd.1 .scd.2 .scd.3 .scd.4 .scd.5 .scd.6 .scd.7 .scd.8:
+ 	${SCDOC} < $< > $@

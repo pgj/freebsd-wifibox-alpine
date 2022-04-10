@@ -1,0 +1,50 @@
+--- socat-1.7.4.2/Makefile.in.orig	2022-04-01 22:07:25.284535646 +0000
++++ socat-1.7.4.2/Makefile.in	2022-04-01 22:09:04.484450962 +0000
+@@ -57,7 +57,7 @@
+ UTLOBJS = $(UTLSRCS:.c=.o)
+ CFILES = $(XIOSRCS) $(UTLSRCS) socat.c procan_main.c filan_main.c
+ OFILES = $(CFILES:.c=.o)
+-PROGS = socat procan filan
++PROGS = socat
+ 
+ HFILES = sycls.h sslcls.h error.h dalan.h procan.h filan.h hostan.h sysincludes.h xio.h xioopen.h sysutils.h utils.h nestlex.h vsnprintf_r.h snprinterr.h compat.h \
+ 	xioconfig.h mytypes.h xioopts.h xiodiag.h xiohelp.h xiosysincludes.h \
+@@ -87,7 +87,7 @@
+ 	Config/Makefile.MacOSX-10-5 Config/config.MacOSX-10-5.h \
+ 	Config/Makefile.DragonFly-2-8-2 Config/config.DragonFly-2-8-2.h
+ 
+-all: progs doc
++all: progs
+ 
+ scmclean: gitclean
+ 
+@@ -131,19 +131,12 @@
+ strip: progs
+ 	strip $(PROGS)
+ 
+-install: progs $(srcdir)/doc/socat.1
++install: progs
+ 	mkdir -p $(DESTDIR)$(BINDEST)
+ 	$(INSTALL) -m 755 socat $(DESTDIR)$(BINDEST)
+-	$(INSTALL) -m 755 procan $(DESTDIR)$(BINDEST)
+-	$(INSTALL) -m 755 filan $(DESTDIR)$(BINDEST)
+-	mkdir -p $(DESTDIR)$(MANDEST)/man1
+-	$(INSTALL) -m 644 $(srcdir)/doc/socat.1 $(DESTDIR)$(MANDEST)/man1/
+ 
+ uninstall:
+ 	rm -f $(DESTDIR)$(BINDEST)/socat
+-	rm -f $(DESTDIR)$(BINDEST)/procan
+-	rm -f $(DESTDIR)$(BINDEST)/filan
+-	rm -f $(DESTDIR)$(MANDEST)/man1/socat.1
+ 
+ # make a GNU-zipped tar ball of the source files
+ dist: socat.tar.gz socat.tar.bz2
+@@ -165,7 +158,7 @@
+ 	rm -r $(TARDIR)
+ 
+ clean:
+-	rm -f *.o libxio.a socat procan filan \
++	rm -f *.o libxio.a socat \
+ 	socat.tar socat.tar.Z socat.tar.gz socat.tar.bz2 \
+ 	socat.out compile.log test.log
+ 

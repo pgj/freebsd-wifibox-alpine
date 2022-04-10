@@ -1,0 +1,91 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=wpa_supplicant
+pkgver=2.9
+pkgrel=17
+pkgdesc="utility providing key negotiation for WPA wireless networks"
+url="https://w1.fi/wpa_supplicant/"
+arch="x86_64"
+options="!check" # has no tests
+license="BSD-3-Clause"
+subpackages=
+makedepends="linux-headers openssl1.1-compat-dev dbus-dev libnl3-dev pcsc-lite-dev"
+source="https://w1.fi/releases/wpa_supplicant-$pkgver.tar.gz
+
+	wpa_supplicant.initd
+	wpa_supplicant.confd
+
+	eloop.patch
+	no-tools.patch
+	CVE-2019-16275.patch
+	CVE-2021-0326.patch
+	CVE-2021-27803.patch
+	CVE-2021-30004.patch::https://w1.fi/cgit/hostap/patch/?id=a0541334a6394f8237a4393b7372693cd7e96f15
+
+	config"
+
+# secfixes:
+#   2.9-r13:
+#     - CVE-2021-30004
+#   2.9-r12:
+#     - CVE-2021-27803
+#   2.9-r10:
+#     - CVE-2021-0326
+#   2.9-r5:
+#     - CVE-2019-16275
+#   2.7-r3:
+#     - CVE-2019-11555
+#   2.7-r2:
+#     - CVE-2019-9494
+#     - CVE-2019-9495
+#     - CVE-2019-9497
+#     - CVE-2019-9498
+#     - CVE-2019-9499
+#   2.6-r14:
+#     - CVE-2018-14526
+#   2.6-r7:
+#     - CVE-2017-13077
+#     - CVE-2017-13078
+#     - CVE-2017-13079
+#     - CVE-2017-13080
+#     - CVE-2017-13081
+#     - CVE-2017-13082
+#     - CVE-2017-13086
+#     - CVE-2017-13087
+#     - CVE-2017-13088
+
+prepare() {
+	default_prepare
+
+	# Copy our configuration file to the build directory
+	cp "$srcdir"/config "$builddir"/wpa_supplicant/.config
+}
+
+build() {
+	cd "$builddir"/wpa_supplicant
+	make LIBDIR=/lib BINDIR=/sbin
+}
+
+package() {
+	cd "$builddir"/wpa_supplicant
+	make DESTDIR="$pkgdir" LIBDIR=/lib BINDIR=/sbin install
+
+	# openrc runscripts
+	install -Dm755 "$srcdir"/wpa_supplicant.initd \
+		"$pkgdir"/etc/init.d/wpa_supplicant
+	install -Dm644 "$srcdir"/wpa_supplicant.confd \
+		"$pkgdir"/etc/conf.d/wpa_supplicant
+}
+
+sha512sums="
+37a33f22cab9d27084fbef29856eaea0f692ff339c5b38bd32402dccf293cb849afd4a870cd3b5ca78179f0102f4011ce2f3444a53dc41dc75a5863b0a2226c8  wpa_supplicant-2.9.tar.gz
+92c4cbaa9776a354275640c9411d2f547f4c0e00415af4ab30039f1a0be6a11082d49e2514905010f0abcc4a9276353276da9864e3d5f7264a0f0767c8cc9d78  wpa_supplicant.initd
+ec4185c202e4fd8f1270af01f6a4210d79980f4a91e56efe83dc7c8f99bb7f050ca2008f8411b02b45ac1574234c6391efe18ff3fa2f0680c2c732582dee3c09  wpa_supplicant.confd
+39cb1a0706bdaf1797dc88543a62c5b68497a2f733e8b42e8eb1e1bb39a6513fc10bfdde8f7fcb0ad8370aba6325c7613b2b9a390be4a07c4e556a2c6c618d86  no-tools.patch
+2be055dd1f7da5a3d8e79c2f2c0220ddd31df309452da18f290144d2112d6dbde0fc633bb2ad02c386a39d7785323acaf5f70e5969995a1e8303a094eb5fe232  eloop.patch
+63710cfb0992f2c346a9807d8c97cbeaed032fa376a0e93a2e56f7742ce515e9c4dfadbdb1af03ba272281f639aab832f0178f67634c222a5d99e1d462aa9e38  CVE-2019-16275.patch
+e212dd6a2c56c086c14a2c96f479f7a8e6521b6a24c648eb03363db078398e64a38e343ff6faa327d5a0244a7969ecd34c5844d676c697eeb8eb842101fa9cf9  CVE-2021-0326.patch
+af8b4a526a6833de4921fcbbd1b03da7e027276c909d512bd59a95e9767ffe8580135f9aee8947c4317681c4fe130f7ec50cba947f8375313f832a66c66b2cd5  CVE-2021-27803.patch
+674328dc44246ce10939a769ed70c71e94e61600592d54ed9088dacbed1fd3dd3d0a834c75825d1448380ec8c076eb30e0d72e601794f507c12db3b6e724af5e  CVE-2021-30004.patch
+5aeebaad14f9d43bac8d7322a5a001a54d2cbc83376528f08eaff60217b170c67a44b5a634c3c14c90eec134aee844d9b79c471c45cd601948f492d645ec9678  config
+"
