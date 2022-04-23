@@ -293,49 +293,134 @@ additional, often proprietary firmware files have to be placed under
 for activation.
 .Pp
 .Bl -tag -width Ds -offset indent -compact
-.It IEEE 802.11b wireless cards based on ADMtek ADM8211
-.It 5xxx series of Atheros 802.11 wireless LAN cards
-.It Atheros 802.11n wireless LAN cards
-.It Qualcomm Atheros 802.11ac WLAN PCIe/AHB devices
-.It Qualcomm Technologies 802.11ax WLAN PCIe devices
-.It Atmel at76c50x 802.11 wireless Ethernet cards
-.It Broadcom B43xx wireless cards
-.It Broadcom 802.11n wireless LAN
-.It Cisco/Aironet 802.11 wireless ethernet cards
+.It ADMTek/Infineon AMD8211A
+.It ADMTek/Infineon AMD8211B
+.It ADMTek/Infineon AMD8211C
+.It Qualcomm Atheros AR2413
+.It Qualcomm Atheros AR2414
+.It Qualcomm Atheros AR2415
+.It Qualcomm Atheros AR2417
+.It Qualcomm Atheros AR2423/4
+.It Qualcomm Atheros AR2425
+.It Qualcomm Atheros AR5210
+.It Qualcomm Atheros AR5211
+.It Qualcomm Atheros AR5212
+.It Qualcomm Atheros AR5213
+.It Qualcomm Atheros AR5214
+.It Qualcomm Atheros IPQ4018
+.It Qualcomm Atheros IPQ8074
+.It Qualcomm Atheros IPQ6018
+.It Qualcomm Atheros QCA6174 / QCA6174A
+.It Qualcomm Atheros QCA6390
+.It Qualcomm Atheros QCA9337
+.It Qualcomm Atheros QCA9880
+.It Qualcomm Atheros QCA9882
+.It Qualcomm Atheros QCA9886
+.It Qualcomm Atheros QCA9888
+.It Qualcomm Atheros QCA9890
+.It Qualcomm Atheros QCA9892
+.It Qualcomm Atheros QCA9984
+.It Qualcomm Atheros QCN9074
+.It Qualcomm Atheros WCN6855
+.It Broadcom BCM4301
+.It Broadcom BCM4306/2
+.It Broadcom BCM4306/3
+.It Broadcom BCM4311
+.It Broadcom BCM4312
+.It Broadcom BCM4313
+.It Broadcom BCM43131
+.It Broadcom BCM43142
+.It Broadcom BCM4318
+.It Broadcom BCM4321
+.It Broadcom BCM43217
+.It Broadcom BCM4322
+.It Broadcom BCM43222
+.It Broadcom BCM43224
+.It Broadcom BCM43225
+.It Broadcom BCM43227
+.It Broadcom BCM43228
+.It Broadcom BCM4331
+.It Broadcom BCM4352
+.It Broadcom BCM4360
+.It Cisco Aironet 350 Series PCI-351
+.It Cisco Aironet 350 Series PCI-352
 .It Intel(R) PRO/Wireless 2100
 .It Intel(R) PRO/Wireless 2200/2915
-.It Intel(R) Wireless WiFi 4965
 .It Intel(R) PRO/Wireless 3945ABG/BG
-.It Intel(R) Wireless WiFi
-.It Intel(R) Wireless WiFi Link AGN
-.It Libertas WLAN
-.It Marvell WiFi-Ex
-.It Marvell TOPDOG(R) 802.11 wireless network adapter
-.It MediaTek MT76xx and MT79xx wireless cards
-.It Ralink RT2400 Wireless LAN
-.It Ralink RT2500 Wireless LAN
-.It Ralink RT61 Wireless LAN
-.It Ralink RT2800 Wireless LAN
-.It RTL8180 / RTL8185 / RTL8187SE PCI wireless
-.It Realtek 8192C/8188C 802.11n PCI wireless
-.It Realtek 8192S/8191S 802.11n PCI wireless
-.It Realtek 8192DE 802.11n Dual Mac PCI wireless
-.It Realtek 8723E 802.11n PCI wireless
-.It Realtek 8723BE 802.11n PCI wireless
-.It Realtek 8188E 802.11n PCI wireless
-.It Realtek 8821ae 802.11ac PCI wireless
-.It Realtek 8192EE 802.11n PCI wireless
-.It Realtek 802.11ac wireless 8822b
-.It Realtek 802.11ac wireless 8822be
-.It Realtek 802.11ac wireless 8822c
-.It Realtek 802.11ac wireless 8822ce
-.It Realtek 802.11n wireless 8723d
-.It Realtek 802.11n wireless 8723de
-.It Realtek 802.11ac wireless 8821c
-.It Realtek 802.11ac wireless 8821ce
-.It Realtek 802.11ac wireless
-.It Texas Instruments WL12xx and WL18xx Wireless LAN
-.It Quantenna 802.11 wireless LAN
+.It Intel(R) Wireless WiFi 4965
+.It Intel(R) Centrino(R) Wireless-N 1000
+.It Intel(R) Centrino(R) Wireless-N 1030
+.It Intel(R) Centrino(R) Wireless-N 100
+.It Intel(R) Centrino(R) Wireless-N 105
+.It Intel(R) Centrino(R) Wireless-N 130
+.It Intel(R) Centrino(R) Wireless-N 135
+.It Intel(R) Centrino(R) Wireless-N 2200
+.It Intel(R) Centrino(R) Wireless-N 2230
+.It Intel(R) Centrino(R) Ultimate-N 5100
+.It Intel(R) Centrino(R) Ultimate-N Wi-Fi Link 5300
+.It Intel(R) Centrino(R) WiMAX/Wi-Fi Link 5350
+.It Intel(R) Centrino(R) Advanced-N + WiMAX 6150
+.It Intel(R) Centrino(R) Advanced-N 6200
+.It Intel(R) Centrino(R) Advanced-N 6205
+.It Intel(R) Centrino(R) Advanced-N 6230
+.It Intel(R) Centrino(R) Advanced-N 6235
+.It Intel(R) Centrino(R) Advanced-N + WiMAX 6250
+.It Intel(R) Centrino(R) Ultimate-N 6300
+.It Intel(R) Wireless 3160
+.It Intel(R) Wireless 7260
+.It Intel(R) Wireless 7265
+.It Intel(R) Wireless-AC 3165
+.It Intel(R) Wireless-AC 3168
+.It Intel(R) Wireless-AC 8260
+.It Intel(R) Wireless-AC 8265
+.It Intel(R) Wireless-AC 9260
+.It Intel(R) Wireless-AC 9461
+.It Intel(R) Wireless-AC 9462
+.It Intel(R) Wireless-AC 9560
+.It Intel(R) Wi-Fi 6 AX200
+.It Intel(R) Wi-Fi 6 AX201
+.It Intel(R) Wi-Fi 6 AX210
+.It Intel(R) Wi-Fi 6 AX211
+.It Marvell 88W8363
+.It Marvell 88W8366
+.It Marvell 88W8387
+.It Marvell 88W8764
+.It MediaTek MT7603E
+.It MediaTek MT7610E
+.It MediaTek MT7612/MT7602/MT7662
+.It MediaTek MT7615
+.It MediaTek MT7622
+.It MediaTek MT7628
+.It MediaTek MT7630E
+.It MediaTek MT7663
+.It MediaTek MT7915
+.It MediaTek MT7921
+.It Quantenna QSR10G
+.It Ralink RT2400
+.It Ralink RT2500
+.It Ralink RT2800
+.It Ralink RT61
+.It Realtek 8180
+.It Realtek 8185
+.It Realtek 8187SE
+.It Realtek 8188E
+.It Realtek 8192EE
+.It Realtek 8192C/8188C
+.It Realtek 8192S/8191S
+.It Realtek 8192DE
+.It Realtek 8723BE
+.It Realtek 8723D
+.It Realtek 8723DE
+.It Realtek 8723E
+.It Realtek 8821AE
+.It Realtek 8822B
+.It Realtek 8822BE
+.It Realtek 8822C
+.It Realtek 8822CE
+.It Realtek 8821C
+.It Realtek 8821CE
+.It Texas Instruments WL1271/3
+.It Texas Instruments WL1281/3
 .El
 .Sh SEE ALSO
 .Xr wifibox 8
