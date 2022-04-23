@@ -101,11 +101,10 @@ package() {
 	cp Module.symvers.backup Module.symvers
 
 	rm -f "$_outdir"/lib/modules/${_abi_release}/build \
-		"$_outdir"/lib/modules/${_abi_release}/source
+		"$_outdir"/lib/modules/${_abi_release}/source \
+		"$_outdir"/boot/System.map-lts \
+		"$_outdir"/boot/config-lts
 	rm -rf "$_outdir"/lib/firmware
-
-	install -D -m644 include/config/kernel.release \
-		"$_outdir"/usr/share/kernel/lts/kernel.release
 }
 
 sha512sums="
