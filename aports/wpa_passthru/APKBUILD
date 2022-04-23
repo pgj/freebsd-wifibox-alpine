@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=wpa_passthru
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=0
 pkgdesc="WPA Supplicant pass-through for Wifibox"
 url="https://github.com/pgj/freebsd-wifibox-alpine"
@@ -19,5 +19,5 @@ package() {
 }
 sha512sums="
 ab107ef28b73517468c8e4558642b798fb3b6861e9ad92df4fd9912b5c3a56aa83822ce71ac1d4b84bf3113dc9c8c1aec6a76e3be17f0613ee722108a384e3ff  wpa_passthru.initd
-46178341d5cd323bc2e7bdf1f21158e7806f6746efe480f1f0f9b57254355b78def8e90d5f5e87e10122b04f6280da711865640ee38faa7566c5da0f3d9f18c3  wpa_passthru
+d4af36a86994b6332ac261b450a00f28bc83f0478fdd7bbee7b7ebcbafd90bec144eb657bc00ae373797c207199d12ca9e525b164cb5cfe634866f0de41dc35c  wpa_passthru
 "
