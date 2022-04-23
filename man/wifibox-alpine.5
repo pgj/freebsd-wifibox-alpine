@@ -1,4 +1,4 @@
-.Dd March 13, 2022
+.Dd April 23, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -13,11 +13,13 @@ network card on behalf of the host.  In order to meet the requirements
 of this setup, this has to be a system with a low resource footprint
 and easy to manage.
 .Pp
-Alpine Linux is an actively maintained, security-oriented, lightweight
-Linux distribution that is based on musl libc and busybox.  For more
-information and introduction to the tools that are going to be used
-in the sections below, please visit the following sites:
-.Bl -bullet
+This solution is derived from Alpine Linux, which is an actively
+maintained, security-oriented, lightweight distribution, based on musl
+libc and busybox.  For more information and introduction to the tools
+that are going to be used in the sections below, please visit the
+following sites:
+.Pp
+.Bl -bullet -compact
 .It
 Alpine Linux:
 .ft B
@@ -27,6 +29,16 @@ https://alpinelinux.org/
 BusyBox:
 .ft B
 https://busybox.net/
+.ft R
+.It
+OpenRC:
+.ft B
+http://www.gentoo.org/proj/en/base/openrc/
+.ft R
+.It
+iw:
+.ft B
+https://wireless.wiki.kernel.org/en/users/documentation/iw
 .ft R
 .El
 .Sh IMPLEMENTATION
@@ -44,12 +56,12 @@ Although the
 user possesses unlimited access to every resource inside the guest,
 files cannot be changed.  That is because the operating system is
 built in a way that it does not require any write access to the
-contents of the root file system.  Everything that needs to be
-modified during the guest's run time is stored on dedicated file
-systems that are either memory-backed or shared with the host.  This
-prevents the guest from damaging the system files on sudden shutdowns,
-which may occur due to short and strict time limits placed on the
-spin-down sequence.
+contents of the root file system.  In addition to that, all the
+contents of the disk image is stored in a compressed format via
+SquashFS and uncompressed to memory only on demand.  Everything that
+needs to be modified during the guest's run time is stored on
+dedicated file systems that are either memory-backed or shared with
+the host.
 .Pp
 For the ease of management, the host shares configuration files with
 the services that are responsible for implementing the domain logic.
@@ -58,10 +70,10 @@ the services that are responsible for implementing the domain logic.
 .Sy wpa_supplicant
 works with the
 .Pa wpa_supplicant.conf
-file and handles the configuration of the wireless
-networks.  This is the same tool that is used in the FreeBSD base
-system for the same purpose, and it is utilized here to make it
-possible to reuse the configuration files of the same format.
+file and handles the configuration of the wireless networks.  This is
+the same tool that is used in the FreeBSD base system for the same
+purpose, and it is utilized here to make it possible to reuse the
+configuration files of the same format.
 .It
 .Sy ifup
 and
@@ -83,6 +95,7 @@ file and implements a DHCP server for
 so that it can hand out IP addresses in a given range for the host and
 set itself the default gateway for forwarding the network traffic.  It
 also manages the distribution of information about the name servers.
+This is utilized only when the host is configured to do so.
 .It
 .Sy wpa_passthru
 works with the
@@ -95,6 +108,9 @@ When enabled, it attemps to parse the contents of
 to learn if there are sockets available and exposes them over the
 configured TCP ports with the help of
 .Sy socat .
+Note that a heavily stripped-down version of
+.Sy socat
+is installed to minimize the related security risks.
 .El
 .Pp
 The generic configuration files are read from the
@@ -156,6 +172,37 @@ these files on the host.  The contents of the
 .Pa /var/run
 directory will not be visible on the host, as it is stored only in the
 memory.
+.Pp
+Further components of the guest that are not directly configurable or
+visible to the outside:
+.Bl -bullet
+.It
+.Sy busybox
+is a combination of tiny versions of the common UNIX utilities,
+including the
+.Sy ash
+shell itself, shipped in a single small executable.  It provides the
+execution environment for all the scripts and services.  All the
+irrelevant modules were removed for security hardening.
+.It
+.Sy iptables
+implements the forwarding (Network Address Translation, NAT) between
+the
+.Sy eth0
+and
+.Sy wlan0
+interfaces.  The respective rules are static and they are stored in
+the
+.Pa /etc/iptables/rules-save
+configuration file.
+.It
+The base layout of the Alpine sytem is stripped down to the bare
+minimum, and for example, the guest does not have the
+.Sy apk
+package manager installed since it would be able to work.  Instead,
+the disk image itself should be constructed in a way that it includes
+all the needed applications.
+.El
 .Sh STARTING, STOPPING, AND RESTARTING SERVICES
 Every service running on the guest can be managed by the
 .Sy rc-service
@@ -192,6 +239,104 @@ service.
 .Pp
 These commands can help with troubleshooting and restoring the
 respective services in case of failures.
+.Sh WIRELESS DIAGNOSTICS
+Details of wireless configuration can be learned through the use of
+the
+.Sy iw
+tool, which is suitable for showing and manipulating wireless devices
+and their configuration.  For example, it can list the device
+capabilities, such as band information (2.4 GHz and 5 GHz), and
+802.11n information.
+.Bd -literal -offset indent
+# iw list
+.Ed
+.Pp
+Scanning can be initiated as follows.  There,
+.Sy wlan0
+is the name of the wireless networking device, which can be considered
+constant.
+.Bd -literal -offset indent
+# iw dev wlan0 scan
+.Ed
+.Pp
+Wireless events can be traced with the
+.Cm event
+command.  In the related example below, the
+.Fl f
+and
+.Fl t
+flags are added to show full frames for auth/assoc/deauth/disassoc as
+well as the timestamps for each event.
+.Bd -literal -offset indent
+# iw event -t -f
+.Ed
+.Pp
+To determine if there is an active connection to an Access Point and
+further related information can be displayed by the
+.Cm link
+command.
+.Bd -literal -offset indent
+# iw dev wlan0 link
+.Ed
+.Pp
+More details can be collected by the
+.Cm station dump
+command.
+.Bd -literal -offset indent
+# iw dev wlan0 station dump
+.Ed
+.Sh SUPPORTED HARDWARE
+There are a number of Linux drivers available as kernel modules.  Note
+that not all of them could be used immediately because there might be
+additional, often proprietary firmware files have to be placed under
+.Pa /lib/firmware
+for activation.
+.Pp
+.Bl -tag -width Ds -offset indent -compact
+.It IEEE 802.11b wireless cards based on ADMtek ADM8211
+.It 5xxx series of Atheros 802.11 wireless LAN cards
+.It Atheros 802.11n wireless LAN cards
+.It Qualcomm Atheros 802.11ac WLAN PCIe/AHB devices
+.It Qualcomm Technologies 802.11ax WLAN PCIe devices
+.It Atmel at76c50x 802.11 wireless Ethernet cards
+.It Broadcom B43xx wireless cards
+.It Broadcom 802.11n wireless LAN
+.It Cisco/Aironet 802.11 wireless ethernet cards
+.It Intel(R) PRO/Wireless 2100
+.It Intel(R) PRO/Wireless 2200/2915
+.It Intel(R) Wireless WiFi 4965
+.It Intel(R) PRO/Wireless 3945ABG/BG
+.It Intel(R) Wireless WiFi
+.It Intel(R) Wireless WiFi Link AGN
+.It Libertas WLAN
+.It Marvell WiFi-Ex
+.It Marvell TOPDOG(R) 802.11 wireless network adapter
+.It MediaTek MT76xx and MT79xx wireless cards
+.It Ralink RT2400 Wireless LAN
+.It Ralink RT2500 Wireless LAN
+.It Ralink RT61 Wireless LAN
+.It Ralink RT2800 Wireless LAN
+.It RTL8180 / RTL8185 / RTL8187SE PCI wireless
+.It Realtek 8192C/8188C 802.11n PCI wireless
+.It Realtek 8192S/8191S 802.11n PCI wireless
+.It Realtek 8192DE 802.11n Dual Mac PCI wireless
+.It Realtek 8723E 802.11n PCI wireless
+.It Realtek 8723BE 802.11n PCI wireless
+.It Realtek 8188E 802.11n PCI wireless
+.It Realtek 8821ae 802.11ac PCI wireless
+.It Realtek 8192EE 802.11n PCI wireless
+.It Realtek 802.11ac wireless 8822b
+.It Realtek 802.11ac wireless 8822be
+.It Realtek 802.11ac wireless 8822c
+.It Realtek 802.11ac wireless 8822ce
+.It Realtek 802.11n wireless 8723d
+.It Realtek 802.11n wireless 8723de
+.It Realtek 802.11ac wireless 8821c
+.It Realtek 802.11ac wireless 8821ce
+.It Realtek 802.11ac wireless
+.It Texas Instruments WL12xx and WL18xx Wireless LAN
+.It Quantenna 802.11 wireless LAN
+.El
 .Sh SEE ALSO
 .Xr wifibox 8
 .Sh AUTHORS
