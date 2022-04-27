@@ -74,8 +74,8 @@ $(DISK_IMAGE):
 
 	$(MKDIR) -p $(APPLIANCE_DIR)
 	$(CP) -R $(GUESTDIR)/var/* $(APPLIANCE_DIR)/
-	$(RM) -rf $(APPLIANCEDIR)/lock
-	$(LN) -s /run/lock $(APPLIANCEDIR)/lock
+	$(RM) -rf $(APPLIANCE_DIR)/lock
+	$(LN) -s /run/lock $(APPLIANCE_DIR)/lock
 
 	$(RM) -rf $(GUESTDIR)/var/*
 
