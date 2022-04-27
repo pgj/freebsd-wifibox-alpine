@@ -1,0 +1,10 @@
+--- a/src/wl/sys/wl_cfg80211_hybrid.c
++++ b/src/wl/sys/wl_cfg80211_hybrid.c
+@@ -1446,7 +1446,6 @@
+ 
+ 	if (memcmp(mac, wl->profile->bssid, ETHER_ADDR_LEN)) {
+ 		WL_ERR(("Wrong Mac address, mac = %pM   profile =%pM\n", mac, wl->profile->bssid));
+-		return -ENOENT;
+ 	}
+ 
+ 	err = wl_dev_ioctl(dev, WLC_GET_RATE, &rate, sizeof(rate));
