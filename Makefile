@@ -25,6 +25,7 @@ TAR=/usr/bin/tar
 FIND=/usr/bin/find
 RM=/bin/rm
 LN=/bin/ln
+LS=/bin/ls
 GZIP=/usr/bin/gzip
 INSTALL_DATA=/usr/bin/install -m $(SHAREMODE)
 TOUCH=/usr/bin/touch
@@ -35,8 +36,10 @@ MKSQUASHFS=$(LOCALBASE)/bin/mksquashfs
 
 ELF_INTERPRETER=	/lib/ld-musl-x86_64.so.1
 APK=			sbin/apk
+BUSYBOX=		bin/busybox
 
 _APK=			$(BOOTSTRAPDIR)/$(APK)
+_BUSYBOX=		$(BOOTSTRAPDIR)/$(BUSYBOX)
 
 .if !empty(INITRD_FILES)
 INITRD_IMG=		$(BOOTDIR)/initramfs
@@ -71,11 +74,13 @@ $(GUESTDIR)/.done:
 		$(GUESTDIR) \
 		$(BOOTSTRAPDIR)
 	$(TAR) -xf $(MINIROOTFS) -C $(BOOTSTRAPDIR)
-	# add packages without chroot(8)
+.for bin in $(_APK) $(_BUSYBOX)
 	$(PATCHELF) \
 		--set-interpreter $(BOOTSTRAPDIR)$(ELF_INTERPRETER) \
-		$(_APK)
-	$(BRANDELF) -t Linux $(_APK)
+		${bin}
+	$(BRANDELF) -t Linux ${bin}
+.endfor
+	# add packages without chroot(8)
 	$(ENV) LD_LIBRARY_PATH=$(BOOTSTRAPDIR)/lib \
 		$(_APK) add \
 			--initdb \
@@ -89,6 +94,10 @@ $(GUESTDIR)/.done:
 			--no-scripts \
 			--no-chown \
 			$(PACKAGES)
+	# rebuild module dependency data
+	$(ENV) LD_LIBRARY_PATH=$(BOOTSTRAPDIR)/lib \
+		$(_BUSYBOX) \
+		depmod -A -b $(GUESTDIR) $$($(LS) $(GUESTDIR)/lib/modules)
 	# install extra firmware files manually
 .if exists($(PWD)/guest/lib/firmware)
 	$(CP) -R $(PWD)/guest/lib/firmware/ $(GUESTDIR)/lib/firmware
