@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-lts
-pkgver=5.15.35
+pkgver=5.15.36
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -10,13 +10,14 @@ pkgrel=0
 pkgdesc="Linux LTS kernel"
 url="https://www.kernel.org"
 depends=
-makedepends="perl flex bison elfutils-dev sed installkernel bc linux-headers linux-firmware-any openssl1.1-compat-dev diffutils findutils zstd xz"
+_depends_dev="perl gmp-dev mpc1-dev mpfr-dev elfutils-dev bash flex bison zstd"
+makedepends="$_depends_dev perl flex bison elfutils-dev sed installkernel bc linux-headers linux-firmware-any openssl1.1-compat-dev diffutils findutils zstd xz"
 options="!strip"
 install=
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
 	config-lts.x86_64
 	"
-subpackages=
+subpackages="$pkgname-dev:_dev:$CBUILD_ARCH"
 
 if [ "${pkgver%.0}" = "$pkgver" ]; then
 	source="$source
@@ -107,8 +108,59 @@ package() {
 	rm -rf "$_outdir"/lib/firmware
 }
 
+_dev() {
+	local _abi_release=${pkgver}-${pkgrel}-lts
+	# copy the only the parts that we really need for build 3rd party
+	# kernel modules and install those as /usr/src/linux-headers,
+	# simlar to what ubuntu does
+	#
+	# this way you dont need to install the 300-400 kernel sources to
+	# build a tiny kernel module
+	#
+	pkgdesc="Headers and script for third party modules for lts kernel"
+	depends="$_depends_dev"
+	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+
+	# first we import config, run prepare to set up for building
+	# external modules, and create the scripts
+	mkdir -p "$dir"
+	cp "$srcdir"/config-lts.x86_64 "$dir"/.config
+	echo "-$pkgrel-lts" > "$dir"/localversion-alpine
+
+	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" ARCH="x86_64" \
+		syncconfig prepare modules_prepare scripts
+
+	# remove the stuff that points to real sources. we want 3rd party
+	# modules to believe this is the soruces
+	rm "$dir"/Makefile "$dir"/source
+
+	# copy the needed stuff from real sources
+	#
+	# this is taken from ubuntu kernel build script
+	# http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
+	cd "$srcdir"/linux-$_kernver
+	find .  -path './include/*' -prune \
+		-o -path './scripts/*' -prune -o -type f \
+		\( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
+		   -name '*.sh' -o -name '*.pl' -o -name '*.lds' -o -name 'Platform' \) \
+		-print | cpio -pdm "$dir"
+
+	cp -a scripts include "$dir"
+
+	find $(find arch -name include -type d -print) -type f \
+		| cpio -pdm "$dir"
+
+	install -Dm644 "$srcdir"/build-lts.$CARCH/Module.symvers \
+		"$dir"/Module.symvers
+
+	mkdir -p "$subpkgdir"/lib/modules/${_abi_release}
+	ln -sf /usr/src/linux-headers-${_abi_release} \
+		"$subpkgdir"/lib/modules/${_abi_release}/build
+}
+
 sha512sums="
 d25ad40b5bcd6a4c6042fd0fd84e196e7a58024734c3e9a484fd0d5d54a0c1d87db8a3c784eff55e43b6f021709dc685eb0efa18d2aec327e4f88a79f405705a  linux-5.15.tar.xz
 707daa3a56186daac44478e746a883f65d8b198ccedc2f32febaf9302482685270bde9695786a14914020925197f6d952530cd5753a709731f183ad32303b099  config-lts.x86_64
-3e4e3f4634bb170b5ddf5cf090c0b17968af44485b23e791d91124ecb578ab58220a6c988e8e8a1bf775e03d1683565aa3ab3eb21964dcd0c2950cc6033a4861  patch-5.15.35.xz
+e4ff344c62a99bc48a69b3c241eed15288a20476ee89030b961d0bf09dad7762f18831b12abdc445a3346c6367c132ca30420e8f7d1b813fe857fcf96e6e49ae  patch-5.15.36.xz
 "
