@@ -137,7 +137,7 @@ $(SQUASHFS_IMG): image-contents
 		-comp $(SQUASHFS_COMP) \
 		-wildcards \
 		$(_EXCLUDE_FW_FILES) \
-		-e boot -e .done -e "var/*"
+		-e boot -e "proc/*" -e .done -e "var/*"
 
 _TARGETS=	$(SQUASHFS_IMG)
 
