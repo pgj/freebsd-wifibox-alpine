@@ -28,11 +28,16 @@ LN=/bin/ln
 LS=/bin/ls
 GZIP=/usr/bin/gzip
 INSTALL_DATA=/usr/bin/install -m $(SHAREMODE)
+ID=/usr/bin/id
+UMOUNT=/sbin/umount
 TOUCH=/usr/bin/touch
+TRUE=/usr/bin/true
 GIT=$(LOCALBASE)/bin/git
 PATCHELF=$(LOCALBASE)/bin/patchelf
 BRANDELF=/usr/bin/brandelf
 MKSQUASHFS=$(LOCALBASE)/bin/mksquashfs
+
+UID!=			$(ID) -u
 
 ELF_INTERPRETER=	/lib/ld-musl-x86_64.so.1
 APK=			sbin/apk
@@ -98,6 +103,11 @@ $(GUESTDIR)/.done:
 	$(ENV) LD_LIBRARY_PATH=$(BOOTSTRAPDIR)/lib \
 		$(_BUSYBOX) \
 		depmod -A -b $(GUESTDIR) $$($(LS) $(GUESTDIR)/lib/modules)
+	# try umounting `linprocfs` if that was mounted (on FreeBSD 13
+	# or later), usually happens for `root`
+.if $(UID) == 0
+	$(UMOUNT) $(GUESTDIR)/proc || $(TRUE)
+.endif
 	# install extra firmware files manually
 .if exists($(PWD)/guest/lib/firmware)
 	$(CP) -R $(PWD)/guest/lib/firmware/ $(GUESTDIR)/lib/firmware
@@ -137,7 +147,14 @@ $(SQUASHFS_IMG): image-contents
 		-comp $(SQUASHFS_COMP) \
 		-wildcards \
 		$(_EXCLUDE_FW_FILES) \
-		-e boot -e "proc/*" -e .done -e "var/*"
+		-e boot \
+		-e "dev/*" \
+		-e "proc/*" \
+		-e "run/*" \
+		-e "sys/*" \
+		-e "tmp/*" \
+		-e "var/*" \
+		-e .done
 
 _TARGETS=	$(SQUASHFS_IMG)
 
