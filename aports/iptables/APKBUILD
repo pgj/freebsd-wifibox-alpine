@@ -2,7 +2,7 @@
 
 pkgname=iptables
 pkgver=1.8.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Linux kernel firewall, NAT and packet mangling tools"
 url="https://www.netfilter.org/projects/iptables/index.html"
 arch="all"
@@ -11,7 +11,6 @@ makedepends="libnftnl-dev bison flex autoconf automake"
 source="https://www.netfilter.org/projects/iptables/files/iptables-$pkgver.tar.bz2
 	iptables.initd
 	iptables.confd
-	iptables.rules-save
 	ip6tables.confd
 	"
 
@@ -47,13 +46,10 @@ package() {
 		"$pkgdir"/usr/lib/pkgconfig
 
 	mkdir -p "$pkgdir"/usr/lib \
-		"$pkgdir"/var/lib/iptables \
-		"$pkgdir"/etc/iptables
+		"$pkgdir"/var/lib/iptables
 
 	install -D -m755 "$srcdir"/iptables.initd "$pkgdir"/etc/init.d/iptables
 	install -D -m644 "$srcdir"/iptables.confd "$pkgdir"/etc/conf.d/iptables
-
-	install -D -m644 "$srcdir"/iptables.rules-save "$pkgdir"/etc/iptables/rules-save
 
 	install -D -m755 "$srcdir"/iptables.initd "$pkgdir"/etc/init.d/ip6tables
 	install -D -m644 "$srcdir"/ip6tables.confd "$pkgdir"/etc/conf.d/ip6tables
@@ -62,7 +58,6 @@ package() {
 sha512sums="
 c0a33fafbf1139157a9f52860938ebedc282a1394a68dcbd58981159379eb525919f999b25925f2cb4d6b18089bd99a94b00b3e73cff5cb0a0e47bdff174ed75  iptables-1.8.7.tar.bz2
 a37c17a5382c756fcfb183af73af2283f0d09932c5a767241cbab5d784738f6f587f287a0cdf13b4fa74724ecd3a2063a9689ccee84c1bda02e730f63480f74d  iptables.initd
-258ad0341381f251ef9b278c09d8a794c6e4bfc067950d5770539d3beabf8702a5be9a8a3418c849b9707f4b33a55eabef5594ccc290c9b9c7dc5fcad1ed80a5  iptables.confd
-382e1ce634aca598891b8f7cf8d1a91bb485a845cc65a92f85ff29f953b629c2f001c3d38bd18928ae89d53b4877eb993236a538e82a94e0089483e50fbda66f  iptables.rules-save
+85bb1660c2452fdede5ae0a483489a3648a8b327ea658839a1ad8c6405f6526bdf842a62d4df3f6e3cbbb9ad59137d37b39266cee21e252814191964d4c50f44  iptables.confd
 0897a7a22f8b700f7f1f5c355ad6cbf39740e44d6c962af99e479978d8a2d556ca7fe4e31f238829046b4a871ce0b5fd52e2544f1361d15dd1ea3e33992646c4  ip6tables.confd
 "

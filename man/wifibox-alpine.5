@@ -1,4 +1,4 @@
-.Dd April 30, 2022
+.Dd May 14, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -34,6 +34,11 @@ https://busybox.net/
 OpenRC:
 .ft B
 http://www.gentoo.org/proj/en/base/openrc/
+.ft R
+.It
+iptables:
+.ft B
+https://www.netfilter.org/projects/iptables/index.html
 .ft R
 .It
 iw:
@@ -87,6 +92,19 @@ is the wireless device which is automatically configured through DHCP,
 is the virtual Ethernet device which is configured according to the
 contents of the configuration file.
 .It
+.Sy iptables
+works with the
+.Pa iptables
+file and it is responsible for moving network packets (Network Address
+Translation, NAT) between the
+.Sy eth0
+and
+.Sy wlan0
+interfaces.  The configuration file describes the flow of the network
+packets through the interfaces.  It is loaded once at launching the
+respective service, usually on boot, and cannot be modified from the
+guest.
+.It
 .Sy udhcpd
 works with the
 .Pa udhcpd.conf
@@ -130,6 +148,12 @@ when managed by
 .Sy ifup
 and
 .Sy ifdown .
+.It
+.Pa /media/etc/iptables
+is not mapped to anywhere under
+.Pa /etc ,
+it is used directly from this location by
+.Sy iptables .
 .It
 .Pa /media/etc/udhcpd.conf
 is mapped to
@@ -185,17 +209,6 @@ shell itself, shipped in a single small executable.  It provides the
 execution environment for all the scripts and services.  All the
 irrelevant modules were removed for security hardening.
 .It
-.Sy iptables
-implements the forwarding (Network Address Translation, NAT) between
-the
-.Sy eth0
-and
-.Sy wlan0
-interfaces.  The respective rules are static and they are stored in
-the
-.Pa /etc/iptables/rules-save
-configuration file.
-.It
 The base layout of the Alpine sytem is stripped down to the bare
 minimum, and for example, the guest does not have the
 .Sy apk
@@ -239,6 +252,37 @@ service.
 .Pp
 These commands can help with troubleshooting and restoring the
 respective services in case of failures.
+.Sh CONFIGURATION OF NETWORK PACKET FILTERING
+The network packet filtering rules are managed by the
+.Sy iptables
+service, which needs to be restarted so that the changes in the
+.Pa iptables
+file can take effect.
+.Bd -literal -offset indent
+# rc-service iptables restart
+.Ed
+.Pp
+The active set of rules can be queried by the following command.
+.Bd -literal -offset indent
+# iptables -L -n
+.Ed
+.Pp
+Rules can be dynamically added, deleted, inserted, replaced, and
+flushed through the corresponding commands of the
+.Sy iptables
+utility, see its documentation for the details.  The current state of
+the configuration can be recorded by dumping it to temporary file
+under a directory which is shared with the host, that is
+.Pa /var/tmp
+in this case.
+.Bd -literal -offset indent
+# iptables-save > /var/tmp/iptables
+.Ed
+.Pp
+The file exported this way could be then used as the main
+configuration by moving it to the location from where the
+.Pa /media/etc
+directory is mounted.
 .Sh WIRELESS DIAGNOSTICS
 Details of wireless configuration can be learned through the use of
 the

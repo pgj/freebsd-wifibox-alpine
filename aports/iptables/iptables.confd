@@ -1,4 +1,4 @@
-IPTABLES_SAVE="/etc/iptables/rules-save"
-SAVE_RESTORE_OPTIONS="-c"
+IPTABLES_SAVE="/media/etc/iptables"
+SAVE_RESTORE_OPTIONS=""
 SAVE_ON_STOP="no"
 IPFORWARD="yes"
