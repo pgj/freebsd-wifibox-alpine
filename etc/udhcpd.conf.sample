@@ -1,4 +1,4 @@
-# This is configuration file for udhcpd(8) with relatively sane
+# This is a configuration file for udhcpd(8) with relatively sane
 # defaults.  Consult https://udhcp.busybox.net/udhcpd.conf for more.
 #
 # The value of `interface` should match with the one defined in the
