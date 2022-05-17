@@ -1,4 +1,4 @@
-.Dd May 14, 2022
+.Dd May 17, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -87,10 +87,10 @@ work with the
 .Pa interfaces.conf
 file to associate the internal network interfaces with IP addresses:
 .Sy wlan0
-is the wireless device which is automatically configured through DHCP,
+is the wireless device and
 .Sy eth0
-is the virtual Ethernet device which is configured according to the
-contents of the configuration file.
+is the virtual Ethernet device towards the host which are configured
+according to the contents of the configuration file.
 .It
 .Sy iptables
 works with the
@@ -140,9 +140,7 @@ are hooked up in the system in the following ways.
 .Bl -bullet
 .It
 .Pa /media/etc/interfaces.conf
-is mapped to
-.Pa /etc/network/interfaces.conf
-which is included as part of
+is directly included as part of
 .Pa /etc/network/interfaces
 when managed by
 .Sy ifup
@@ -150,9 +148,7 @@ and
 .Sy ifdown .
 .It
 .Pa /media/etc/iptables
-is not mapped to anywhere under
-.Pa /etc ,
-it is used directly from this location by
+is used directly from this location by
 .Sy iptables .
 .It
 .Pa /media/etc/udhcpd.conf
@@ -163,9 +159,7 @@ where
 will read its contents.
 .It
 .Pa /media/etc/wpa_ctrl.conf
-is not mapped to anywhere under
-.Pa /etc ,
-it is used directly from there by
+is used directly from this location by
 .Sy wpa_passthru .
 .El
 .Pp

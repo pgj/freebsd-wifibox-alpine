@@ -2,8 +2,6 @@ auto lo
 iface lo inet loopback
 
 auto eth0
-
-source /etc/network/interfaces.conf
-
 auto wlan0
-iface wlan0 dhcp
+
+source /media/etc/interfaces.conf

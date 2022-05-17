@@ -2,11 +2,17 @@
 # defaults.  Consult http://manpages.org/etc-network-interfaces/5 for
 # more.
 #
-# The purpose is to bring up an interface on the guest which would be
-# the default gateway for the host.  Here, `eth0` is the networking
-# interface of the virtual Ethernet card.  Change these values only if
-# the 10.0.0.0/24 network is not suitable.
+# The `eth0` networking interface represents the virtual Ethernet card
+# of the guest, which would be the default gateway for the host.
+# Change these values only if the 10.0.0.0/24 network is not suitable.
 
 iface eth0 inet static
   address 10.0.0.1
   netmask 255.255.255.0
+
+# The `wlan0` networking interface is associated with the wireless
+# networking card as it is exposed by the driver.  By this default
+# configuration, the corresponding IP address is obtained through the
+# use of DHCP.  This should just work for most of the cases.
+
+iface wlan0 dhcp
