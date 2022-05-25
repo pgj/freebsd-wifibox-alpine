@@ -18,6 +18,14 @@ software is employed, which must be installed beforehand.
 - [Squashfs-tools] or the `sysutils/squashfs-tools` FreeBSD package.
 - [PatchELF] or the `sysutils/patchelf` FreeBSD package.
 
+Note that the build process also uses native Linux binaries, that is
+why the [Linuxulator] must be activated by loading the `linux64`
+kernel module.
+
+```console
+# kldload linux64
+```
+
 ## Installation
 
 Whenever possible, use the `net/wifibox-alpine` FreeBSD port from the
@@ -88,5 +96,6 @@ used once installed.
 [Alpine Linux]: https://alpinelinux.org/
 [Squashfs-tools]: https://github.com/plougher/squashfs-tools
 [PatchELF]: https://github.com/NixOS/patchelf
+[Linuxulator]: https://docs.freebsd.org/en/books/handbook/linuxemu/
 [freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/tree/squashfs-root
 
