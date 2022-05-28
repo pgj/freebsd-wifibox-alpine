@@ -1,0 +1,26 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=uds_passthru
+pkgver=0.1.0
+pkgrel=0
+pkgdesc="Unix Domain Socket pass-through for Wifibox"
+url="https://github.com/pgj/freebsd-wifibox-alpine"
+arch="all"
+license="BSD2"
+depends="socat"
+install=""
+subpackages=
+options="!check"
+arch="noarch"
+source="uds_passthru.initd
+	uds_passthru
+"
+
+package() {
+	install -D -m755 "$srcdir"/uds_passthru.initd "$pkgdir"/etc/init.d/uds_passthru
+	install -D -m755 "$srcdir"/uds_passthru "$pkgdir"/sbin/uds_passthru
+}
+sha512sums="
+efb66ffbfde79321b534c8427bbb77bbb298175fb30be8c79f21e091ed3b942d8260020996e15d62ada60de778d38d5352f4f323bd7023672b4b778e4ef1318f  uds_passthru.initd
+bc83be88e395dd73d1ba5e65d23dde045918b763b1562b3ebd17beb35e3599ca44f78dd6a732815fd6aecb0e6f8ae97ea70ef359620bf14c9ffbe88c5005ad00  uds_passthru
+"

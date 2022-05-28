@@ -1,0 +1,16 @@
+# This is a placeholder file.  On how to create one, consult
+# /usr/share/examples/hostapd/hostapd.conf or import an existing one
+# from the /etc directory.
+
+# Mind that the `ctrl_interface` parameter, when in use, has to be
+# kept in sync with UDS pass-through definitions in uds_passthru.conf.
+# The default values are aligned with these settings below.
+#
+#ctrl_interface=/var/run/hostapd
+#ctrl_interface_group=0
+#
+# The hostapd(8) configuration may refer to other files, for which
+# examples can also be found in /usr/share/examples/hostapd.  The
+# files will be mounted under /etc/hostapd in the guest, hence they
+# can be referenced under that path.  For example, hostapd.wpa_psk
+# will be available as /etc/hostapd/hostapd.wpa_psk.

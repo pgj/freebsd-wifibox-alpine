@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+
+supervisor=supervise-daemon
+name="Unix Domain Socket pass-through"
+description="Unix Domain Socket pass-through support"
+
+command=/sbin/uds_passthru
+command_background=true
+
+depend() {
+	need net
+	after firewall
+}

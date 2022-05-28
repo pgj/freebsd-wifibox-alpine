@@ -5,25 +5,28 @@ log() {
     local _level="$1"
     local _message="$2"
 
-    /usr/bin/logger -p "daemon.${_level}" -t "wpa_passthru[$$]" "${_message}"
+    /usr/bin/logger -p "daemon.${_level}" -t "uds_passthru[$$]" "${_message}"
 }
 
-enabled=no
+capture_output() {
+    local _type="$1"
+    local _id="$2"
+
+    while read -r message; do
+	log "${_type}" "[${_id}] ${message}"
+    done
+}
+
 _block=
+sockets=
+network=
 
 # shellcheck disable=SC1091
-. /media/etc/wpa_ctrl.conf
+. /media/etc/uds_passthru.conf
 
-_wlan_devs=$(set | /bin/grep -F "_port=" | /bin/sed 's!_port=.*!!')
-log debug "Configuration: enabled=${enabled}, network=${network}, wlan devs=[${_wlan_devs}]"
-
-if [ "${enabled}" = "no" ]; then
-    log info "Not enabled, exiting."
-    exit 0
-fi
+log debug "Configuration: network=${network}, sockets=[${sockets}]"
 
 if_lan=eth0
-wpa_conf="/media/wpa/wpa_supplicant.conf"
 
 terminate() {
     local _sleep
@@ -52,11 +55,6 @@ find_network() {
 	| /bin/sed -E 's!.*inet addr:([0-9\.]+).*Mask:([0-9\.]+)!\1:\2!'
 }
 
-get_ctrl_interface() {
-    /bin/grep "^ctrl_interface=" "${wpa_conf}" \
-	| /bin/sed 's!^ctrl_interface=!!'
-}
-
 if [ -z "${network}" ]; then
     if ! /sbin/ifconfig ${if_lan}; then
 	log error "Interface ${if_lan} not found, exiting."
@@ -73,36 +71,31 @@ if [ -z "${_ip}" ]; then
     exit 1
 fi
 
-_ctrl_interface=$(get_ctrl_interface)
-
-if [ -z "${_ctrl_interface}" ]; then
-    log warn "No control interface found, exiting."
-    exit 0
-fi
-
 _socket_directory=$(/bin/mktemp -d)
 
-for _wlan_dev in ${_wlan_devs}; do
-    _wlan=${_wlan_dev//_/-}
-    _ctrl_socket="${_ctrl_interface}/${_wlan}"
+for s in ${sockets}; do
+    _path="${s##*path=}"
+    _path="${_path%%,*}"
 
-    if [ ! -S "${_ctrl_socket}" ]; then
-	log warn "${_ctrl_socket} is not available, skipping."
+    if [ ! -S "${_path}" ]; then
+	log warn "${_path} is not available, skipping."
 	continue
     fi
 
-    _socket="${_socket_directory}/${_wlan}"
-    _port=$(eval "echo \${${_wlan_dev}_port}")
+    _socket=$(/bin/mktemp -up "${_socket_directory}")
+    _port="${s##*port=}"
+    _port="${_port%%,*}"
 
     if [ -z "${_port}" ]; then
-        log warn "No port defined for ${_wlan}, skipping."
+        log warn "No port defined for ${_path}, skipping."
 	continue
     fi
 
-    log info "Associating ${_ip}:${_port} (${network}) with ${_ctrl_socket} (${_socket})"
+    log info "Associating ${_ip}:${_port} (${network}) with ${_path} (${_socket})"
     /usr/bin/socat \
 	TCP4-LISTEN:"${_port}",reuseaddr,bind="${_ip}",range="${network}",fork \
-	UNIX-SENDTO:"${_ctrl_socket}",bind="${_socket}",unlink-early &
+	UNIX-SENDTO:"${_path}",bind="${_socket}",unlink-early 2>&1 \
+	| capture_output debug socat &
 done
 
 (while /bin/true; do /bin/sleep 365d; done) &

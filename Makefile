@@ -2,6 +2,10 @@ PREFIX?=/usr/local
 LOCALBASE?=/usr/local
 MINIROOTFS?=$(PWD)/alpine-minirootfs.tar.gz
 PACKAGES?=$(PWD)/*.apk
+BOOT_SERVICES?=networking urandom bootmisc modules hostname hwclock sysctl syslog
+DEFAULT_SERVICES?=acpid crond
+SYSINIT_SERVICES?=devfs dmesg hwdrivers mdev
+ETC_SRCS?=$(PWD)/etc/wpa_supplicant
 
 ROOT=$(PREFIX)/share/wifibox
 SHAREDIR=$(DESTDIR)$(ROOT)
@@ -17,6 +21,7 @@ BOOTDIR=$(GUESTDIR)/boot
 
 SHAREMODE?=0644
 
+ECHO=/bin/echo
 ENV=/usr/bin/env
 MKDIR=/bin/mkdir
 CP=/bin/cp
@@ -53,11 +58,6 @@ INITRD_IMG=		$(BOOTDIR)/initramfs
 SQUASHFS_COMP?=		lzo
 SQUASHFS_IMG=		$(PWD)/alpine-$(VERSION).squashfs.img
 SQUASHFS_VMLINUZ=	$(BOOTDIR)/vmlinuz*
-
-BOOT_SERVICES=		networking urandom bootmisc modules hostname hwclock sysctl syslog \
-			wpa_supplicant wpa_passthru
-DEFAULT_SERVICES=	acpid crond iptables udhcpd
-SYSINIT_SERVICES=	devfs dmesg hwdrivers mdev
 
 .if !defined(VERSION)
 VERSION!=	$(GIT) describe --tags --always
@@ -108,9 +108,9 @@ $(GUESTDIR)/.done:
 .if $(UID) == 0
 	$(UMOUNT) $(GUESTDIR)/proc || $(TRUE)
 .endif
-	# install extra firmware files manually
-.if exists($(PWD)/guest/lib/firmware)
-	$(CP) -R $(PWD)/guest/lib/firmware/ $(GUESTDIR)/lib/firmware
+	# install extra files manually
+.if exists($(PWD)/guest)
+	$(CP) -R $(PWD)/guest/ $(GUESTDIR)
 .endif
 	# rc-update add
 .for runlevel in boot default sysinit
@@ -118,6 +118,13 @@ $(GUESTDIR)/.done:
 	$(LN) -s /etc/init.d/${service} $(GUESTDIR)/etc/runlevels/${runlevel}
 .endfor
 .endfor
+	# add extra file system pass-through mounts
+.if defined(EXTRA_VIRTFS_MOUNTS)
+.for mnt in $(EXTRA_VIRTFS_MOUNTS)
+	$(ECHO) "${mnt:C@:@ @} 9p trans=virtio,rw 0 0" \
+		>> $(GUESTDIR)/etc/fstab
+.endfor
+.endif
 	$(TOUCH) $(GUESTDIR)/.done
 
 image-contents: $(GUESTDIR)/.done
@@ -167,7 +174,7 @@ install:
 	$(SED) ${_SUB_LIST_EXP} share/grub.cfg > $(SHAREDIR)/grub.cfg
 
 	$(MKDIR) -p $(ETCDIR)
-	$(CP) etc/* $(ETCDIR)/
+	$(CP) -R $(ETC_SRCS)/* $(ETCDIR)/
 
 	$(MKDIR) -p $(MANDIR)/man5
 	$(SED) ${_SUB_LIST_EXP} man/wifibox-alpine.5 \

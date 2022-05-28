@@ -1,4 +1,4 @@
-.Dd May 17, 2022
+.Dd May 31, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -59,14 +59,21 @@ no other services are configured for remote access.
 Although the
 .Sy root
 user possesses unlimited access to every resource inside the guest,
-files cannot be changed.  That is because the operating system is
-built in a way that it does not require any write access to the
-contents of the root file system.  In addition to that, all the
-contents of the disk image is stored in a compressed format via
-SquashFS and uncompressed to memory only on demand.  Everything that
-needs to be modified during the guest's run time is stored on
+files might not be changed in every case.  That is because the
+operating system is built in a way that it does not require any write
+access to the contents of the root file system.  In addition to that,
+all the contents of the disk image is stored in a compressed format
+via SquashFS and uncompressed to memory only on demand.  Everything
+that needs to be modified during the guest's run time is stored on
 dedicated file systems that are either memory-backed or shared with
 the host.
+.Pp
+The image can host either
+.Sy wpa_supplicant
+for connecting to wirelss networks, or
+.Sy hostapd
+for creating wireless access points, depending how it was built.  Each
+application-specific detail is going to be included below.
 .Pp
 For the ease of management, the host shares configuration files with
 the services that are responsible for implementing the domain logic.
@@ -74,27 +81,31 @@ the services that are responsible for implementing the domain logic.
 .It
 .Sy wpa_supplicant
 works with the
-.Pa wpa_supplicant.conf
-file and handles the configuration of the wireless networks.  This is
-the same tool that is used in the FreeBSD base system for the same
-purpose, and it is utilized here to make it possible to reuse the
-configuration files of the same format.
+.Pa wpa_supplicant/wpa_supplicant.conf
+file, while
+.Sy hostapd
+works with the
+.Pa hostapd/hostapd.conf
+file.  These are the same tools that are used in the FreeBSD base
+system for the same purpose, and their Linux version is utilized here
+to make it possible to reuse the configuration files of the same
+format from the host.
 .It
 .Sy ifup
 and
 .Sy ifdown
 work with the
-.Pa interfaces.conf
+.Pa appliance/interfaces.conf
 file to associate the internal network interfaces with IP addresses:
 .Sy wlan0
 is the wireless device and
 .Sy eth0
-is the virtual Ethernet device towards the host which are configured
-according to the contents of the configuration file.
+is the virtual Ethernet device towards the host which are both
+configured according to the contents of the configuration file.
 .It
 .Sy iptables
 works with the
-.Pa iptables
+.Pa appliance/iptables
 file and it is responsible for moving network packets (Network Address
 Translation, NAT) between the
 .Sy eth0
@@ -107,31 +118,41 @@ guest.
 .It
 .Sy udhcpd
 works with the
-.Pa udhcpd.conf
-file and implements a DHCP server for
+.Pa appliance/udhcpd.conf
+file and it can implements a DHCP server for either
 .Sy eth0
-so that it can hand out IP addresses in a given range for the host and
-set itself the default gateway for forwarding the network traffic.  It
-also manages the distribution of information about the name servers.
-This is utilized only when the host is configured to do so.
+or
+.Sy wlan0
+so that it can hand out IP addresses in a given range for the host
+.Sy ( wpa_supplicant )
+or the clients on the wireless network
+.Sy ( hostapd ) ,
+and can set itself the default gateway for forwarding the network
+traffic.  It also manages the distribution of information about the
+name servers.  This is utilized only when dynamic IP addresses are in
+use.
 .It
-.Sy wpa_passthru
-works with the
-.Pa wpa_ctrl.conf
-file that is shared with the host and manages the forwarding of
-control sockets created for
-.Sy wpa_supplicant .
-When enabled, it attemps to parse the contents of
-.Pa wpa_supplicant.conf
-to learn if there are sockets available and exposes them over the
-configured TCP ports with the help of
-.Sy socat .
-Note that a heavily stripped-down version of
-.Sy socat
-is installed to minimize the related security risks.
+.Sy uds_passthru
+is an optional service for managing the forwarding of control sockets
+created for either
+.Sy wpa_supplicant
+or
+.Sy hostapd .
+It works with the
+.Pa appliance/uds_passthru.conf
+file that is shared with the host.  This file is optional, and when it
+is present, it automatically implies that service is enabled.  The
+contents describe what sockets should be exposed over configured TCP
+ports with the help of
+.Sy socat ,
+which a heavily stripped-down version of the original tool to minimize
+the related security risks.
 .El
 .Pp
-The generic configuration files are read from the
+The
+.Pa appliance
+directory on the host holds the generic configuration files.  They are
+read from the
 .Pa /media/etc
 directory where the
 .Sy config
@@ -158,19 +179,25 @@ where
 .Sy udhcpd
 will read its contents.
 .It
-.Pa /media/etc/wpa_ctrl.conf
+.Pa /media/etc/uds_passthru.conf
 is used directly from this location by
-.Sy wpa_passthru .
+.Sy uds_passthru .
 .El
 .Pp
 The
-.Pa wpa_supplicant.conf
+.Pa wpa_supplicant/wpa_supplicant.conf
+or
+.Pa hostapd/hostapd.conf
 configuration file is shared with the host through the
-.Pa /media/wpa
-directory where the
-.Sy wpa_config
+.Pa /etc/wpa_supplicant
+or the
+.Pa /etc/hostapd
+directory respectively, where the
+.Sy app_config
 9P (VirtFS) share is mounted.  This will let
 .Sy wpa_supplicant
+or
+.Sy hostapd
 change the contents when instructed to do so from the host through the
 forwarded control sockets and permitted by the configuration.
 .Pp
@@ -493,6 +520,8 @@ for activation.
 .It Texas Instruments WL1281/3
 .El
 .Sh SEE ALSO
-.Xr wifibox 8
+.Xr wifibox 8 ,
+.Xr wpa_supplicant.conf 5 ,
+.Xr hostapd.conf 5
 .Sh AUTHORS
 .An Gábor Páli Aq Mt pali.gabor@gmail.com

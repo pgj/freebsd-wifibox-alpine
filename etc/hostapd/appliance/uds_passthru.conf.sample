@@ -1,0 +1,14 @@
+# This is a configuration file for the Unix Domain Socket (UDS)
+# pass-through feature.
+
+# The `network` setting should specify the IP address of the guest,
+# which should match how it was defined in the interfaces.conf file.
+network=10.0.0.2:255.255.255.0
+
+# The `sockets` setting should list all the sockets to be forwarded
+# for the host on the given ports.  The `path` will be created on the
+# host as a UDS with the specific owner and permissions.  Ideally,
+# this does not have to be changed.
+_sockdir=/var/run/hostapd
+_perms="user=root,group=0,mode=770"
+sockets="path=${_sockdir}/wlan0,${_perms},port=1200"

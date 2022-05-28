@@ -1,0 +1,18 @@
+# This is a configuration file for the Unix Domain Socket (UDS)
+# pass-through feature.
+
+# The `network` setting should specify the IP address of the guest,
+# which should match how it was defined in the interfaces.conf file.
+network=10.0.0.1:255.255.255.0
+
+# The `sockets` setting should list all the sockets to be forwarded
+# for the host on the given ports.  The `path` will be created on the
+# host as a UDS with the specific owner and permissions, independently
+# of how it was set in wpa_supplicant.conf.  When `p2p_disabled=1` is
+# set for wpa_supplicant.conf, it might make sense to remove the
+# corresponding forwarding.  Keep this in sync with
+# wpa_supplicant.conf in general.
+_sockdir=/var/run/wpa_supplicant
+_perms="user=root,group=0,mode=770"
+sockets="path=${_sockdir}/wlan0,${_perms},port=1200
+path=${_sockdir}/p2p-dev-wlan0,${_perms},port=1201"

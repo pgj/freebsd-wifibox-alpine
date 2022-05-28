@@ -1,0 +1,16 @@
+# This is a placeholder file.  On how to create one, consult
+# /usr/share/examples/etc/wpa_supplicant.conf or import an existing one
+# from the /etc directory.
+
+# Mind that the `ctrl_interface` parameter, when in use, has to be
+# kept in sync with UDS pass-through definitions in uds_passthru.conf.
+# The default values are aligned with these settings below.
+#
+#ctrl_interface=/var/run/wpa_supplicant
+#ctrl_interface_group=0
+#
+# It is also recommended to enable write access for the clients that
+# are connecting to wpa_supplicant from the host through the forwarded
+# control socket.
+#
+#update_config=1

@@ -1,0 +1,35 @@
+# This is an iface stanza for interfaces(5) with relatively sane
+# defaults.  Consult http://manpages.org/etc-network-interfaces/5 for
+# more.
+#
+# The `eth0` networking interface represents the virtual Ethernet card
+# of the guest, which is shared with the host.  The `gateway` IP
+# address should match with the address as it was configured on the
+# host, and `address` is the guest's own address.  In addition to
+# this, it is recommended to setup a NAT between `wifibox0` and the
+# interface that faces towards the Internet.  This can be done with
+# the help of pf(4) for example.  Here is sample configuration, see
+# pf.conf(5) for more information.
+#
+#     wlan_if="wifibox0"
+#     lan_if="em0"
+#     virt_net="10.0.0.0/24"
+#
+#     scrub all
+#     nat on $lan_if from $virt_net to any -> $lan_if
+#     pass log all
+#
+# Change these values as desired, they are here only for inspiration.
+
+iface eth0 inet static
+  gateway 10.0.0.1
+  address 10.0.0.2/24
+
+# The `wlan0` networking interface is associated with the wireless
+# networking card as it is exposed by the driver.  By this default
+# configuration, the corresponding IP address is statically set to
+# make it the gateway for the wireless network, see the contents of
+# udhcp.conf for the rest.
+
+iface wlan0 inet static
+  address 192.168.0.1/24

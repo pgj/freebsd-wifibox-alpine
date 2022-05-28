@@ -18,9 +18,9 @@ software is employed, which must be installed beforehand.
 - [Squashfs-tools] or the `sysutils/squashfs-tools` FreeBSD package.
 - [PatchELF] or the `sysutils/patchelf` FreeBSD package.
 
-Note that the build process also uses native Linux binaries, that is
-why the [Linuxulator] must be activated by loading the `linux64`
-kernel module.
+Note that the build process also uses native 64-bit Linux binaries,
+that is why the [Linuxulator] must be activated by loading the
+`linux64` kernel module.
 
 ```console
 # kldload linux64
@@ -44,6 +44,11 @@ for development and testing.
 	LOCALBASE=<prefix of third-party software> \
 	MINIROOTFS=<Alpine minimal root file system tarball> \
 	PACKAGES=<Alpine package set> \
+	BOOT_SERVICES=<services to launch on boot> \
+	DEFAULT_SERVICES=<default services> \
+	SYSINIT_SERVICES=<system initialization services> \
+	ETC_SRCS=<location of application-specific configuration files> \
+	EXTRA_VIRTFS_MOUNTS=<fstab entries for shared file systems> \
 	FIRMWARE_FILES=<List of firmware files to keep> \
 	SQUASHFS_COMP=<Squashfs compression type>
 ```
@@ -70,7 +75,33 @@ process:
   available packages are looked up in the current directory and
   utilized during the installation process.
 
-- `FIRMWARE_FILES` is tell which exact firmware files to keep to
+- `BOOT_SERVICES` should specify which [OpenRC] services have to be
+  launched on booting the guest.  They greatly depend on what the
+  installed packages provide.
+
+- `DEFAULT_SERVICES` should set which services are launched by
+  default.  Their actual set depends on the contents of the installed
+  packages.
+
+- `SYSINIT_SERVICES` should tell which services are launched as part
+  of the guest system initialization phase, along with the kernel.
+  They have to be sync with the installed packages.
+
+- `ETC_SRCS` should point to a location where the guest's generic
+  configuration files could be found.  This helps to choose between
+  application-specific configuration defaults.  Currently, such files
+  are offered for `wpa_supplicant` and `hostapd`, see the `etc`
+  directory in the repository.
+
+- `EXTRA_VIRTFS_MOUNTS` can optionally contain information about
+  further 9P/VirtFS entries for the guest's `/etc/fstab` file.  First,
+  the VirtFS share has to be named, which is then followed by the
+  location where it should be mounted in the guest.  These are
+  separated by a `:`, visually:
+
+	  share:/target/directory
+
+- `FIRMWARE_FILES` is to tell which exact firmware files to keep to
   reduce further the size of the disk image.  It is optional, mostly
   recommended in case of `iwlwifi`.
 
@@ -79,9 +110,9 @@ process:
   conservative `lzo` setting, but `lz4`, `gzip`, `xz`, and `zstd` are
   also available.
 
-Besides these, it is considered that the `guest/lib/firmware`
-directory may be present for holding further firmware files that shall
-be added to the virtual disk image, under `/lib/firmware`.
+Besides these, it is considered that a directory named `guest` might
+be present for holding further files and directories that shall be
+added to the virtual disk image, under its root.
 
 ## Documentation
 
@@ -98,4 +129,4 @@ used once installed.
 [PatchELF]: https://github.com/NixOS/patchelf
 [Linuxulator]: https://docs.freebsd.org/en/books/handbook/linuxemu/
 [freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/tree/squashfs-root
-
+[OpenRC]: https://github.com/OpenRC/openrc
