@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-lts
-pkgver=5.15.36
+pkgver=5.15.46
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -162,5 +162,5 @@ _dev() {
 sha512sums="
 d25ad40b5bcd6a4c6042fd0fd84e196e7a58024734c3e9a484fd0d5d54a0c1d87db8a3c784eff55e43b6f021709dc685eb0efa18d2aec327e4f88a79f405705a  linux-5.15.tar.xz
 707daa3a56186daac44478e746a883f65d8b198ccedc2f32febaf9302482685270bde9695786a14914020925197f6d952530cd5753a709731f183ad32303b099  config-lts.x86_64
-e4ff344c62a99bc48a69b3c241eed15288a20476ee89030b961d0bf09dad7762f18831b12abdc445a3346c6367c132ca30420e8f7d1b813fe857fcf96e6e49ae  patch-5.15.36.xz
+3da10b4e961bf40aa90c7e738f39efb12e04c9e87da08a90a5976c3fd9363bd58a75f972b8841d782adf54d950974951361d9c6353cc8f500754f68132fdf7b6  patch-5.15.46.xz
 "

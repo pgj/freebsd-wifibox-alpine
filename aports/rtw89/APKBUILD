@@ -2,7 +2,7 @@
 
 pkgname='rtw89'
 pkgver=20220421
-pkgrel=0
+pkgrel=1
 _gitrev='da9d01e4f08cdaa862bff0ec5dad73600016a4dc'
 pkgdesc='Driver for Realtek 8852AE, an 802.11ax device'
 arch="x86_64"
