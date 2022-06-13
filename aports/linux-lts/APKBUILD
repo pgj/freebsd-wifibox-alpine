@@ -6,7 +6,7 @@ case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=0
+pkgrel=1
 pkgdesc="Linux LTS kernel"
 url="https://www.kernel.org"
 depends=
@@ -16,6 +16,7 @@ options="!strip"
 install=
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
 	config-lts.x86_64
+	0001-mt76-mt7921-add-support-for-PCIe-ID-0x0608-0x0616.patch
 	"
 subpackages="$pkgname-dev:_dev:$CBUILD_ARCH"
 
@@ -162,5 +163,6 @@ _dev() {
 sha512sums="
 d25ad40b5bcd6a4c6042fd0fd84e196e7a58024734c3e9a484fd0d5d54a0c1d87db8a3c784eff55e43b6f021709dc685eb0efa18d2aec327e4f88a79f405705a  linux-5.15.tar.xz
 707daa3a56186daac44478e746a883f65d8b198ccedc2f32febaf9302482685270bde9695786a14914020925197f6d952530cd5753a709731f183ad32303b099  config-lts.x86_64
+a1dae2bcf296bf5b52f726595c0d19170f581a0be101eaef7238117a349873631c33bfc7595c58ddd0742b6b00d75e6800bec56857c339fa9457bd1adbfcd749  0001-mt76-mt7921-add-support-for-PCIe-ID-0x0608-0x0616.patch
 3da10b4e961bf40aa90c7e738f39efb12e04c9e87da08a90a5976c3fd9363bd58a75f972b8841d782adf54d950974951361d9c6353cc8f500754f68132fdf7b6  patch-5.15.46.xz
 "
