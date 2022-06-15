@@ -1,4 +1,4 @@
-.Dd May 31, 2022
+.Dd June 16, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -222,6 +222,11 @@ Further components of the guest that are not directly configurable or
 visible to the outside:
 .Bl -bullet
 .It
+Version 5.15 (LTS) of the Linux kernel and its wireless drivers are
+used to communicate with exposed hardware.  It does not always work
+with the latest ones, see the section on supported hardware for the
+exact details.
+.It
 .Sy busybox
 is a combination of tiny versions of the common UNIX utilities,
 including the
@@ -436,7 +441,7 @@ for activation.
 .It MediaTek MT7630E
 .It MediaTek MT7663
 .It MediaTek MT7915
-.It MediaTek MT7921
+.It MediaTek MT7921 (AMD RZ608 Wi-Fi 6E)
 .It Qualcomm Atheros AR2413
 .It Qualcomm Atheros AR2414
 .It Qualcomm Atheros AR2415
@@ -519,6 +524,13 @@ for activation.
 .It Texas Instruments WL1271/3
 .It Texas Instruments WL1281/3
 .El
+.Sh CAVEATS
+Certain vendors may assign different PCI IDs for their rebranded
+products even if they ship exactly the same chipset.  For example, AMD
+RZ608 is technically the same as MediaTek MT7921, but its PCI ID had
+to be explictly added for the corresponding driver to make it work.
+Similar situations may occur any time, please let us know if this
+happens.
 .Sh SEE ALSO
 .Xr wifibox 8 ,
 .Xr wpa_supplicant.conf 5 ,
