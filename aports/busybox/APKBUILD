@@ -1,13 +1,16 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=busybox
-pkgver=1.34.1
-pkgrel=5
+pkgver=1.35.0
+pkgrel=0 # base: 14, -initscripts: 4.1-r1
 pkgdesc="Size optimized toolbox of many common UNIX utilities"
 url="https://busybox.net/"
 arch="all"
 license="GPL-2.0-only"
 makedepends_build="perl"
-makedepends_host="linux-headers openssl1.1-compat-dev libretls-dev"
+makedepends_host="linux-headers openssl-dev"
+# Only build with UTMPS support if we are not bootstrapping.
+# skalibs-static is needed for utmps-static
+[ -z "$BOOTSTRAP" ] && makedepends_host="$makedepends_host utmps-dev utmps-static skalibs-static"
 makedepends="$makedepends_build $makedepends_host"
 checkdepends=
 provides="/bin/sh"
@@ -15,8 +18,6 @@ install=
 subpackages=
 options="!check"
 source="https://busybox.net/downloads/busybox-$pkgver.tar.bz2
-	0001-rev-correct-output-for-long-input-lines.patch
-
 	0001-nologin-Install-applet-to-sbin-instead-of-usr-sbin.patch
 	0001-adduser-default-to-sbin-nologin-as-shell-for-system-.patch
 	0001-properly-fix-wget-https-support.patch
@@ -31,16 +32,17 @@ source="https://busybox.net/downloads/busybox-$pkgver.tar.bz2
 	0009-depmod-support-generating-kmod-binary-index-files.patch
 	0010-Add-flag-for-not-following-symlinks-when-recursing.patch
 	0012-udhcpc-Don-t-background-if-n-is-given.patch
-
+	0013-ash-fix-unsafe-use-of-mempcpy.patch
+	0014-ash-fix-use-after-free-in-bash-pattern-substitution.patch
+	0015-ed-don-t-use-memcpy-with-overlapping-memory-regions.patch
+	0016-ash-don-t-read-past-end-of-var-in-subvareval-for-bas.patch
+	0017-ash-Fix-use-after-free-on-idx-variable.patch
 	0001-ash-add-built-in-BB_ASH_VERSION-variable.patch
-
-	0001-cpio-add-support-for-ignore-devno-like-GNU-cpio.patch
-	0002-cpio-add-support-for-renumber-inodes-like-GNU-cpio.patch
-
 	0001-pgrep-add-support-for-matching-against-UID-and-RUID.patch
-
+	0001-avoid-redefined-warnings-when-building-with-utmps.patch
 	0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch
 	0002-nslookup-sanitize-all-printed-strings-with-printable.patch
+	0001-modinfo-add-k-option-for-kernel-version.patch
 
 	acpid.logrotate
 	config
@@ -59,6 +61,9 @@ source="https://busybox.net/downloads/busybox-$pkgver.tar.bz2
 	"
 
 # secfixes:
+#   1.35.0-r7:
+#     - ALPINE-13661
+#     - CVE-2022-28391
 #   1.34.1-r5:
 #     - ALPINE-13661
 #     - CVE-2022-28391
@@ -162,7 +167,8 @@ EOF
 		install -m644 "$srcdir"/$i "$pkgdir"/etc/conf.d/${i%.*} || return 1
 	done
 	install -m644 mdev.conf "$pkgdir"/etc
-	install -m755 persistent-storage "$pkgdir"/lib/mdev/
+	install -m755 persistent-storage \
+		"$pkgdir"/lib/mdev/
 
 	# poweroff script for acpid
 	cat >"$pkgdir"/etc/acpi/PWRF/00000080 <<EOF
@@ -173,8 +179,7 @@ EOF
 }
 
 sha512sums="
-fb7e53a56c07b1098a12ee7232ad5401b147816648a0619b3b5358fdcf0915cfbb054500c0e0dd4acb3bc0a93a584b62bc5448e1f16b28004f58b39518a13b9d  busybox-1.34.1.tar.bz2
-054e766429887e610c4a17846f495b7099bb419217f5fcc0dce0ed62b8740c2d4ee53b12a609b1830c26ac2af1eca9beb6140063b7d2665939f99f8664dfcc05  0001-rev-correct-output-for-long-input-lines.patch
+62b2e718b6669271380445ed6db249618d777a4e8d5e6d879fa39ffee43887b6a2e93ceef874c615c565ad492deb772b03a19b7475c403202741579fb151e16a  busybox-1.35.0.tar.bz2
 ead3403578c071c2216de17ab0543984c1f1509c12c062f03af49141547c3ea21356f3e8f0f0695550f05a41a1379dd73fc3cc18dcd78addbb411f247351e353  0001-nologin-Install-applet-to-sbin-instead-of-usr-sbin.patch
 a2787a3ecaf6746dadef62166e8ee6ecaa166147e5ad8b917c5838536057c875bab5f9cf40c3e05eba74d575484ac662929ac3799d58432d3a99ac46f364f302  0001-adduser-default-to-sbin-nologin-as-shell-for-system-.patch
 1efe1c4894ae983fed5ac848125f8603f157b9d91c952c53f4192b48d3e50967e05559851148397b583f34fb02d480393547904b4635e4248248be567ab268ea  0001-properly-fix-wget-https-support.patch
@@ -189,14 +194,19 @@ f12916e70f7cc1ef4f6d85d09b9a496a52a494e6318029fdce9a9c812ab5c7b2a046c33b66834127
 df02adb3e3cd3349cc8d070911e3392164cb2e30bd72cae7ceaa974b2db6f958fdcedf809abc7b4bee37c729a4d20abf127f615b0e238a667d572137abe6a79e  0009-depmod-support-generating-kmod-binary-index-files.patch
 ecbe5c890d966f09280c7eb534109f785c68e292765f17ed7ff62fcc61d20f61443c4155add0a1ebfb67ce8564e104c1aa22a8ef0400e119b0bca2bca3671f2d  0010-Add-flag-for-not-following-symlinks-when-recursing.patch
 3ae5ecf3ea66c8d98762432026806fdb67b13a28075c6a3cb6e811a34ef89c2f0ed651946003aaad97fb4b7f74d132af3c394c114b7a72e1d20b319b739c5a6e  0012-udhcpc-Don-t-background-if-n-is-given.patch
-d12246f1134bbd3993462d27172c4739cc601b251d57ce8e088745773afa965551236e8cb8b9013dfc142fd055e369a771d86c7c54615c89bd30393400bfa390  0001-ash-add-built-in-BB_ASH_VERSION-variable.patch
-6f8fa4ec190d64d6c3d5377994be933885ed0b40361c99ca35881684db3b1b79664d6eab56a389df290b9f6c4db502c617ec8e4ffa6d5284bd41cea1f478b26c  0001-cpio-add-support-for-ignore-devno-like-GNU-cpio.patch
-97109be04445b7b887c402b7072c1da57212ef11f2eca6d34c24d5a4e3b2866ee79aca7a0ca41043726293d9bed1b2fa8aab100501569f00b8670c280a87a01c  0002-cpio-add-support-for-renumber-inodes-like-GNU-cpio.patch
+6b1ebc6da26c355a63c166f4c8d1774e7a9c5456ec76b773395a2158cb4848cf245fa5553843666c0a46f4c97d03e08815abae777f2b80bbb69d916618f94761  0013-ash-fix-unsafe-use-of-mempcpy.patch
+3eb7609054fa8e03d7e366f7debc5cb0630ff65d521a91be84803bdef3854f81e29d26a9567c501a121e94a55d3a3477894e774508f80def775f2ecc812805e7  0014-ash-fix-use-after-free-in-bash-pattern-substitution.patch
+0040800382a6e3adcc6a8094b821488c7e297fc80304afba23a4fca43b7b26ac699378dfbd930ebbf9985336b3e431301f7ca93e2d041a071902a48740d263ef  0015-ed-don-t-use-memcpy-with-overlapping-memory-regions.patch
+4c95dc4bf6aff9018bfb52b400f6d8375a1d22493b44ea516cb12dba6556f12797a3cba55768d2e59ff57c0f3247ec1ff95edb8f17561f3d37ec18d83ca47eb0  0016-ash-don-t-read-past-end-of-var-in-subvareval-for-bas.patch
+ccdf098fb15eaa316708181469a1193d6eec7067131e7b7645e0219bf03cfd07f4f79e8f62c1e560f6146dcc38186a29bdee08aaa39f290e11d020b8f07d2f65  0017-ash-Fix-use-after-free-on-idx-variable.patch
+6d100fe44da2b97c2cbdda253d0504b487212d195144d9315cddbe8c51d18fae3745701923b170b40e35f54b592f94f02cadbffd9cb716661c12a7f1da022763  0001-ash-add-built-in-BB_ASH_VERSION-variable.patch
 e33dbc27d77c4636f4852d5d5216ef60a9a4343484e4559e391c13c813bf65c782b889914eff2e1f038d74cf02cb0d23824ebbb1044b5f8c86260d5a1bbc4e4d  0001-pgrep-add-support-for-matching-against-UID-and-RUID.patch
+2640698e5108434991a8491fcc508bd991d2111b14bb6957385393a36603e1d81fdf826ad7b150d487d2a924630ee54c0fc4f979214e90feca9ba7d2fd96a865  0001-avoid-redefined-warnings-when-building-with-utmps.patch
 b52050678e79e4da856956906d07fcb620cbf35f2ef6b5a8ee3b8d244ea63b4b98eef505451184d5b4937740d91eef154ed748c30d329ac485be51b37626f251  0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch
 ead4ad65d270d8659e1898fa16f76b6cbcf567d8aba238eacccda3764edb4362240d9359d6389873bedc126d405f805fc6dfce653a7181618ebcc67c94bd08d2  0002-nslookup-sanitize-all-printed-strings-with-printable.patch
+4f6ddd59d6096943f617b0938fca428114190b8b37732d6783faab291451a2c30c452ed39299db22d1d9679d007022f87d43e93b38a4f6ced64a8659e9233773  0001-modinfo-add-k-option-for-kernel-version.patch
 aa93095e20de88730f526c6f463cef711b290b9582cdbd8c1ba2bd290019150cbeaa7007c2e15f0362d5b9315dd63f60511878f0ea05e893f4fdfb4a54af3fb1  acpid.logrotate
-86171e6e1a2c905ca4182997812758a249c5b38a3371e925e78c533845ff5f0e8035d8baf223dbe3f8c2afd2237c243f14b76d42d7c5db69117bed59dee245d2  config
+0b92eafab0722a6c9cc4880e3be4976de9713e1e1c715c6c727a948cbd68268fce01ce308291834f70d0cf3328f7c8a44cbdb5b7c70d90f91b15efcb5b90acb3  config
 c3194ccffe7300a0f55d50fb56d38c8df55d588adac13056fd0be2676594974477f94de5570a5a882bc864c3711cf67aa43b6ad6808e672f4533dd0f7363d2f5  default.script
 dd548670114a92404b8e35fb915fdbe5994498b05b0a418583271c3dd72fb7800950e42c095c902a014eb198c046b8a346d43dccd8e7a158048ae33767c572ed  acpid.initd
 c9d0fb0f8cc27d661d3b4e58c56eb598ca368890576e18ffffd42efdf68ba35537656be9be319b2e2818aa0152d3ca8611bece2433512fbfcd4eed7988765549  crond.initd

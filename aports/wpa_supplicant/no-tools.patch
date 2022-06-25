@@ -1,9 +1,6 @@
---- wpa_supplicant-2.9/wpa_supplicant/Makefile.orig
-+++ wpa_supplicant-2.9/wpa_supplicant/Makefile
-@@ -44,12 +44,8 @@
- CONFIG_TDLS_TESTING=y
- endif
- 
+--- a/wpa_supplicant/Makefile
++++ b/wpa_supplicant/Makefile
+@@ -1,9 +1,5 @@
 -BINALL=wpa_supplicant wpa_cli
 +BINALL=wpa_supplicant
  
@@ -14,27 +11,29 @@
  ALL = $(BINALL)
  ALL += systemd/wpa_supplicant.service
  ALL += systemd/wpa_supplicant@.service
-@@ -1805,7 +1801,7 @@
+@@ -1812,7 +1808,7 @@
  OBJS_priv += ../src/drivers/driver_common.o
  
- OBJS += wpa_supplicant.o events.o blacklist.o wpas_glue.o scan.o
+ OBJS += wpa_supplicant.o events.o bssid_ignore.o wpas_glue.o scan.o
 -OBJS_t := $(OBJS) $(OBJS_l2) eapol_test.o
 +OBJS_t := $(OBJS) $(OBJS_l2)
  OBJS_t += ../src/radius/radius_client.o
  OBJS_t += ../src/radius/radius.o
- ifndef CONFIG_AP
-@@ -1903,10 +1899,6 @@
+ OBJS_t2 := $(OBJS) $(OBJS_l2) preauth_test.o
+@@ -1894,12 +1890,6 @@
  	$(Q)$(LDO) $(LDFLAGS) -o wpa_supplicant $(OBJS) $(LIBS) $(EXTRALIBS)
  	@$(E) "  LD " $@
  
+-_OBJS_VAR := OBJS_t
+-include ../src/objs.mk
 -eapol_test: $(OBJS_t)
 -	$(Q)$(LDO) $(LDFLAGS) -o eapol_test $(OBJS_t) $(LIBS)
 -	@$(E) "  LD " $@
 -
+ _OBJS_VAR := OBJS_t2
+ include ../src/objs.mk
  preauth_test: $(OBJS_t2)
- 	$(Q)$(LDO) $(LDFLAGS) -o preauth_test $(OBJS_t2) $(LIBS)
- 	@$(E) "  LD " $@
-@@ -2007,8 +1999,6 @@
+@@ -2030,8 +2020,6 @@
  	mv -f $< $@
  win_if_list.exe: win_if_list
  	mv -f $< $@
@@ -43,12 +42,12 @@
  
  WINALL=wpa_supplicant.exe wpa_cli.exe wpa_passphrase.exe win_if_list.exe
  
-@@ -2040,7 +2030,7 @@
+@@ -2064,7 +2052,7 @@
  	$(MAKE) -C ../src clean
  	$(MAKE) -C dbus clean
  	rm -f core *~ *.o *.d *.gcno *.gcda *.gcov
--	rm -f eap_*.so $(ALL) $(WINALL) eapol_test preauth_test
-+	rm -f eap_*.so $(ALL) $(WINALL) preauth_test
+-	rm -f eap_*.so $(WINALL) eapol_test preauth_test
++	rm -f eap_*.so $(WINALL) preauth_test
  	rm -f wpa_priv
  	rm -f nfc_pw_token
  	rm -f lcov.info

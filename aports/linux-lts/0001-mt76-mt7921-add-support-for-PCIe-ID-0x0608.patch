@@ -1,11 +1,10 @@
 --- a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
 +++ b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
-@@ -14,6 +14,8 @@
+@@ -14,6 +14,7 @@
  
  static const struct pci_device_id mt7921_pci_device_table[] = {
  	{ PCI_DEVICE(PCI_VENDOR_ID_MEDIATEK, 0x7961) },
 +	{ PCI_DEVICE(PCI_VENDOR_ID_MEDIATEK, 0x0608) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_MEDIATEK, 0x0616) },
  	{ },
  };
  

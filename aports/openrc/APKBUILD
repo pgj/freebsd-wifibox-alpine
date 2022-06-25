@@ -1,13 +1,13 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=openrc
-pkgver=0.44.7
-pkgrel=5
+pkgver=0.44.10
+pkgrel=0 # base: 7
 pkgdesc="OpenRC manages the services, startup and shutdown of a host"
 url="https://github.com/OpenRC/openrc"
 arch="all"
 license="BSD-2-Clause"
 depends="ifupdown-any"
-makedepends="bsd-compat-headers linux-headers"
+makedepends="bsd-compat-headers linux-headers meson"
 checkdepends=
 subpackages=
 install=
@@ -21,8 +21,9 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/OpenRC/openrc/archive/$pkgve
 	0006-Add-support-for-starting-services-in-a-specified-VRF.patch
 	0007-Clean-up-staticroute-config-remove-irrelevant-parts-.patch
 	0008-bootmisc-switch-wipe_tmp-setting-to-no-by-default.patch
+	0009-fix-bootmisc-mv-error.patch
+	0010-noexec-devfs.patch
 	seedrng.patch
-
 	openrc.logrotate
 	hostname.initd
 	hwdrivers.initd
@@ -34,6 +35,7 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/OpenRC/openrc/archive/$pkgve
 	sysctl.initd
 	machine-id.initd
 	"
+options="!check" # not updated to meson build system, require makefile build
 
 # secfixes:
 #   0.44.6-r1:
@@ -41,19 +43,39 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/OpenRC/openrc/archive/$pkgve
 
 prepare() {
 	default_prepare
-	sed -i -e '/^sed/d' "$builddir"/pkgconfig/Makefile
+	# meson overrides this with the aports tag,
+	# we get there first :)
+	sed -i -e "s|@VCS_TAG@|$pkgver|" \
+		src/common/version.h.in \
+		src/common/version.in
 }
 
+
 build() {
-	export MKZSHCOMP=no
-	export MKBASHCOMP=no
-	make LIBDIR=/lib LIBEXECDIR=/lib/rc
+	abuild-meson \
+		-Dzsh-completions=false \
+		-Dbash-completions=false \
+		-Dpam=false \
+		-Dsplit-usr=false \
+		-Dpkgconfig=false \
+		--default-library=both \
+		--prefix=/ \
+		--libdir=/usr/lib \
+		--libexecdir=/lib \
+		--bindir=/bin \
+		--sbindir=/sbin \
+		. output
+	meson compile -C output
 }
 
 package() {
 	local i j
 
-	make LIBEXECDIR=/lib/rc DESTDIR="$pkgdir/" install
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+
+	# Alpine does not use openrc as its init so delete
+	# openrc-init & openrc-shutdown to avoid confusion.
+	rm -f "$pkgdir"/sbin/openrc-init "$pkgdir"/sbin/openrc-shutdown
 
 	# we cannot have anything turned on by default
 	rm -f "$pkgdir"/etc/runlevels/*/*
@@ -101,7 +123,7 @@ package() {
 }
 
 sha512sums="
-c6b3e2e30615d97a5185320a140ced881bc59ba31ea8dff5d80440396166af237826de6ffc7836ec141e305c92176cd9cc3dabff7e42ac0d80e5238513fefdb7  openrc-0.44.7.tar.gz
+0e41f5268c6b8c325a6773511ca58c38ba52a1987aa47165794df8a99359bd1bfcb99d30e0d129b9242a2661663234f6f85c92c55c891dbb6c5b8a11d93edea4  openrc-0.44.10.tar.gz
 6085d127f7385eb86a00676a263c8613748fb0cbbf064bc908d346a1b368e226d8a3014e871d281f57d334a70ec1301269fe431e085f0e907b4f6ef8a99bf07f  0001-call-sbin-mkmntdirs-in-localmount-OpenRC-service.patch
 3f47b4f7e6c5b7fb53ff8a13470fbada67f7470e5eba71a683e6c022162c3905f560d561c3d61698e3fde367d6ae715edf76e99949f52a22a3bbf79debc33f64  0002-fsck-don-t-add-C0-to-busybox-fsck.patch
 61c72be18283108163bde4349616e55adb535bd34312ee09f90fcd85277ffe17dcef792bbf465877c0d8b1fec87a3836f714d8d849a9cf322902a89bc1256e13  0003-rc-pull-in-sysinit-and-boot-as-stacked-levels-when-n.patch
@@ -110,6 +132,8 @@ c6b3e2e30615d97a5185320a140ced881bc59ba31ea8dff5d80440396166af237826de6ffc7836ec
 8bf00b82d7fc0eb1b529ec735009f91d277141ba7e5c04e23d10bbcf36eb453f0b31d48aec45e50b5be4c14f611acc4454933f3cefdf8beab07d851328223464  0006-Add-support-for-starting-services-in-a-specified-VRF.patch
 431ac28808e684bea5511386bf5f06efe7f509f1dbe7e15ae6309563d813deae8f3edd872a0943ef8088e3cf778d7bc5ebd15a893dc4a08f4022b7a56bbafc63  0007-Clean-up-staticroute-config-remove-irrelevant-parts-.patch
 475f4ea63b9b5d7eb9c623e96b6cc3d3072abcb7194d0045b84e0688836c8514fccfc68b0eae0b4bee60878cdea8042c3ce7e48406ee7a2f0e4a3e128a153468  0008-bootmisc-switch-wipe_tmp-setting-to-no-by-default.patch
+354b2df343ddf82aedba104039bbdb1dd5fdd9c4abac52f89e881341443b73fcf000ed9e8b88e9610f1c3218cb89722ff6a774e1ef2f7fe71fa6ff62b75f572b  0009-fix-bootmisc-mv-error.patch
+0535d7837ae0c695f25208199f4dec3a4031558366da346a8a1dd13c0fa2a044f14088b75eca37ce0f4a681e85c82b84aac3d65aac9176639e82b33a9355cb2a  0010-noexec-devfs.patch
 715af2188cf4d1ed42f75b31ad718f5c533ea6f8cfc3c5df0fd7fc4240cd342dc637b7edf358c5da1e77d700618adaa7927ddaeae60698dd9f130dd64d83d8d5  seedrng.patch
 12bb6354e808fbf47bbab963de55ee7901738b4a912659982c57ef2777fff9a670e867fcb8ec316a76b151032c92dc89a950d7d1d835ef53f753a8f3b41d2cec  openrc.logrotate
 493f27d588e64bb2bb542b32493ed05873f4724e8ad1751002982d7b4e07963cfb72f93603b2d678f305177cf9556d408a87b793744c6b7cd46cf9be4b744c02  hostname.initd

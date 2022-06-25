@@ -1,8 +1,8 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=ifupdown-ng
-pkgver=0.11.3
-pkgrel=1
+pkgver=0.12.1
+pkgrel=0 # base: 0
 pkgdesc="tools for managing network configuration"
 url="https://github.com/ifupdown-ng/ifupdown-ng"
 arch="all"
@@ -35,7 +35,7 @@ package() {
 }
 
 sha512sums="
-7339d8d14bc881968093fa4a92c84850d99b5469847858be5423b98c5ed25776198fe1065686c22b6823cf7ace17845e96d7932782c111207264f8e3a52cbbb7  ifupdown-ng-0.11.3.tar.xz
+c2c1e27fbd53eeb4150e544a893352f13845b491850e982a5880160c3be03b628794f7989c802ff823ac3e8c6c34dc4ab97c0abcefdda85f06fcd64ced8ac60c  ifupdown-ng-0.12.1.tar.xz
 e261fd3f185372bf8f2075216b9dd3e2d8090e978654ee742122ee7869017d309eac54b1415e79878015f312a39fa8fdd4b0d8c2bed8515e5a94c15da1b7b844  no-examples.patch
 cde5422ed19c79f970b24fde267f9bef34f069f806e7ed671fb443df6ff169e81791baaeebbe02595218f30224add65dabfd0337f9984d2387965001872a1038  interfaces
 "

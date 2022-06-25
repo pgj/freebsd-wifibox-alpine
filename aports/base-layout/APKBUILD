@@ -2,7 +2,7 @@
 
 pkgname=baselayout
 pkgver=3.2.0
-pkgrel=19
+pkgrel=19 # base: 22
 pkgdesc="Base dir structure and init scripts (Alpine Linux)"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="all"
