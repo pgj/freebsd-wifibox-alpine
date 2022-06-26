@@ -22,10 +22,19 @@
 # Change these values as desired, they are here only for inspiration.
 # Note that configuring the NAT requires the IP packet forwarding to
 # be enabled as well.  This could be done for example by adding
-# `gateway_enable=YES` to rc.conf(5).
+# `gateway_enable="YES"` to rc.conf(5) along with `pf_enable="YES"`.
 #
-#     gateway_enable=YES
-#     pf_enable=YES
+#     gateway_enable="YES"
+#     pf_enable="YES"
+#
+# The gateway address on the host should be brought up by assigning an
+# IP address for the `wifibox0` network interface.  For example,
+# adding the following line to rc.conf(5) will implement this.
+#
+#     ifconfig_wifibox0="inet 10.0.0.1/24"
+#
+# The specified address could be then set for `gateway` at the
+# definition of `eth0`.
 
 iface eth0 inet static
   gateway 10.0.0.1
