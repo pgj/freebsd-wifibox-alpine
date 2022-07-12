@@ -1,9 +1,9 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw89'
-pkgver=20220421
-pkgrel=3
-_gitrev='da9d01e4f08cdaa862bff0ec5dad73600016a4dc'
+pkgver=20220630
+pkgrel=0
+_gitrev='f3ea32728b688c44e040cf2fb98329fae5a130f5'
 pkgdesc='Driver for Realtek 8852AE, an 802.11ax device'
 arch="x86_64"
 url='https://github.com/lwfinger/rtw89'
@@ -29,5 +29,5 @@ package() {
 }
 
 sha512sums="
-fabd29e642082543de1671dfd56f60543b6e81ad1e75abd48c45c19fe998596268f1b1986f2a84167d497c9a83780b4d0321d60b0c87cc28baef7de025550055  da9d01e4f08cdaa862bff0ec5dad73600016a4dc.zip
+4d7ecf047ba32d24a16cbb7a908e4447e5011b9d3b92ff7184b85756e419a148ee70276e6a90ab0c38d0bc285bbf197423ce1cb2937abc7b355bb84f68675075  f3ea32728b688c44e040cf2fb98329fae5a130f5.zip
 "
