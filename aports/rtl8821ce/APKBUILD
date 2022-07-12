@@ -1,0 +1,32 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname='rtl8821ce'
+pkgver=20220601
+pkgrel=0
+_gitrev='be733dc86781c68571650b395dd0fa6b53c0a039'
+pkgdesc='Driver for Realtek 8821CE, an 802.11ac device'
+arch="x86_64"
+url='https://github.com/tomaspinho/rtl8821ce'
+license="GPL-2.0"
+makedepends="linux-lts-dev xz"
+depends="linux-lts"
+install=
+options="!check !strip"
+source="https://github.com/tomaspinho/rtl8821ce/archive/${_gitrev}.zip"
+
+_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d | sed 's!./linux-headers-!!')
+_kbase="/lib/modules/${_kver}"
+_srcdir="$srcdir/rtl8821ce-$_gitrev"
+
+build() {
+  make -C "$_srcdir" -j8 KVER="$_kver"
+}
+
+package() {
+  xz "$_srcdir"/*.ko
+  install -p -D -m 644 "$_srcdir"/*.ko.xz -t "$pkgdir"/lib/modules/"$_kver"/kernel/drivers/net/wireless/realtek/rtl8821ce
+}
+
+sha512sums="
+74bebce71b33fc17e7317b32a3699bbc9eb74424ac0376acadb36bc707466667d87fb087f405911a421b130406e836ed2f7c2cae1f2fbc223743e509da8bfe4d  be733dc86781c68571650b395dd0fa6b53c0a039.zip
+"
