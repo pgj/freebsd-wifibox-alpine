@@ -1,4 +1,4 @@
-.Dd June 16, 2022
+.Dd September 17, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -14,10 +14,12 @@ of this setup, this has to be a system with a low resource footprint
 and easy to manage.
 .Pp
 This solution is derived from Alpine Linux, which is an actively
-maintained, security-oriented, lightweight distribution, based on musl
-libc and busybox.  For more information and introduction to the tools
-that are going to be used in the sections below, please visit the
-following sites:
+maintained, security-oriented, lightweight distribution, based on
+.Sy musl libc
+and
+.Sy busybox.
+For more information and introduction to the tools that are going to
+be used in the sections below, please visit the following sites:
 .Pp
 .Bl -bullet -compact
 .It
@@ -70,7 +72,7 @@ the host.
 .Pp
 The image can host either
 .Sy wpa_supplicant
-for connecting to wirelss networks, or
+for connecting to wireless networks, or
 .Sy hostapd
 for creating wireless access points, depending how it was built.  Each
 application-specific detail is going to be included below.
@@ -119,7 +121,7 @@ guest.
 .Sy udhcpd
 works with the
 .Pa appliance/udhcpd.conf
-file and it can implements a DHCP server for either
+file and it can implement a DHCP server for either
 .Sy eth0
 or
 .Sy wlan0
@@ -129,8 +131,10 @@ or the clients on the wireless network
 .Sy ( hostapd ) ,
 and can set itself the default gateway for forwarding the network
 traffic.  It also manages the distribution of information about the
-name servers.  This is utilized only when dynamic IP addresses are in
-use.
+name servers, in cooperation with
+.Sy udhcpc
+(DHCP client) when required. This is utilized only when dynamic IP
+addresses are in use.
 .It
 .Sy uds_passthru
 is an optional service for managing the forwarding of control sockets
@@ -175,9 +179,9 @@ is used directly from this location by
 .Pa /media/etc/udhcpd.conf
 is mapped to
 .Pa /etc/udhcpd.conf
-where
+which will be used to generate the configuration file that
 .Sy udhcpd
-will read its contents.
+will read.
 .It
 .Pa /media/etc/uds_passthru.conf
 is used directly from this location by
