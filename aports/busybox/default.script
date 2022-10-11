@@ -7,6 +7,7 @@ UDHCPC="/etc/udhcpc"
 UDHCPC_CONF="$UDHCPC/udhcpc.conf"
 
 RESOLV_CONF="/etc/resolv.conf"
+UDHCPD_CONF="no"
 [ -f $UDHCPC_CONF ] && . $UDHCPC_CONF
 
 export broadcast
@@ -102,14 +103,10 @@ routes() {
 
 resolvconf() {
 	local i
-	[ -n "$IF_PEER_DNS" ] && [ "$IF_PEER_DNS" != "yes" ] && return
 	if [ "$RESOLV_CONF" = "no" ] || [ "$RESOLV_CONF" = "NO" ] \
 			|| [ -z "$RESOLV_CONF" ] || [ -z "$dns" ]; then
 		return
 	fi
-	for i in $NO_DNS; do
-		[ "$i" = "$interface" ] && return
-	done
 	echo -n > "$RESOLV_CONF.$$"
 	if [ -n "$search" ]; then
 		echo "search $search" >> "$RESOLV_CONF.$$"
@@ -123,11 +120,33 @@ resolvconf() {
 	mv "$RESOLV_CONF.$$" "$RESOLV_CONF"
 }
 
+udhcpd_conf() {
+	if [ "$UDHCPD_CONF" = "no" ] || [ "$UDHCPD_CONF" = "NO" ] \
+			|| [ -z "$UDHCPD_CONF" ]; then
+		return
+	fi
+	cat $UDHCPD_CONF_TEMPLATE \
+		| sed "s!%%DNS%%!$dns!" \
+		> $UDHCPD_CONF
+	chmod a+r "$UDHCPD_CONF"
+	service udhcpd --ifstarted restart
+}
+
+propagate_dns() {
+	local i
+	[ -n "$IF_PEER_DNS" ] && [ "$IF_PEER_DNS" != "yes" ] && return
+	for i in $NO_DNS; do
+		[ "$i" = "$interface" ] && return
+	done
+	resolvconf
+	udhcpd_conf
+}
+
 bound() {
 	ip -4 addr add $ip/$mask ${broadcast:+broadcast $broadcast} dev $interface
 	ip -4 link set dev $interface up
 	routes
-	resolvconf
+	propagate_dns
 }
 
 renew() {
@@ -145,12 +164,12 @@ renew() {
 	done
 
 	if ! grep "^search $domain"; then
-		resolvconf
+		propagate_dns
 		return
 	fi
 	for i in $dns; do
 		if ! grep "^nameserver $i"; then
-			resolvconf
+			propagate_dns
 			return
 		fi
 	done
