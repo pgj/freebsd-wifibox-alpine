@@ -2,7 +2,7 @@
 
 pkgname=baselayout
 pkgver=3.2.0
-pkgrel=20 # base: 22
+pkgrel=20 # base: 23
 pkgdesc="Base dir structure and init scripts (Alpine Linux)"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="all"
@@ -160,6 +160,13 @@ package() {
 		tmpfs      /tmp       tmpfs    size=128K                                     0 0
 		config     /media/etc 9p       trans=virtio,ro,noatime,nodiratime,norelatime 0 0
 		var        /var       9p       trans=virtio,rw                               0 0
+	EOF
+	cat > "$pkgdir"/etc/nsswitch.conf <<-EOF
+		# musl itself does not support NSS, however some third-party DNS
+		# implementations use the nsswitch.conf file to determine what
+		# policy to follow.
+		# Editing this file is not recommended.
+		hosts: files dns
 	EOF
 
 	install -m644 \
