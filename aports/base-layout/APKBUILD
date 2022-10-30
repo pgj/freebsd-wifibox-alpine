@@ -2,7 +2,7 @@
 
 pkgname=baselayout
 pkgver=3.2.0
-pkgrel=20 # base: 23
+pkgrel=21 # base: 23
 pkgdesc="Base dir structure and init scripts (Alpine Linux)"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="all"
@@ -103,7 +103,6 @@ package() {
 		"$srcdir"/locale.sh \
 		"$pkgdir"/etc/profile.d/
 
-	echo "wifibox" > "$pkgdir"/etc/hostname
 	cat > "$pkgdir"/etc/hosts <<-EOF
 		127.0.0.1	localhost localhost.localdomain
 		::1		localhost localhost.localdomain
@@ -187,6 +186,7 @@ package() {
 	ln -s /proc/mounts "$pkgdir"/etc/mtab
 	ln -s /var/mail "$pkgdir"/var/spool/mail
 	ln -s /tmp/resolv.conf "$pkgdir"/etc/resolv.conf
+	ln -s /media/etc/hostname "$pkgdir"/etc/hostname
 }
 
 sha512sums="
