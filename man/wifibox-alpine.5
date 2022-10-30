@@ -1,4 +1,4 @@
-.Dd September 17, 2022
+.Dd October 30, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -93,6 +93,13 @@ system for the same purpose, and their Linux version is utilized here
 to make it possible to reuse the configuration files of the same
 format from the host.
 .It
+.Sy hostname
+sets the hostname on boot from the
+.Pa applicance/hostname
+file.  This is the name that is going to be visible for others on the
+local network.  Changing the hostname requires updating this file and
+restarting the guest.
+.It
 .Sy ifup
 and
 .Sy ifdown
@@ -163,6 +170,11 @@ directory where the
 9P (VirtFS) share is mounted in read-only mode.  From there, the files
 are hooked up in the system in the following ways.
 .Bl -bullet
+.It
+.Pa /media/etc/hostname
+is mapped to
+.Pa /etc/hostname
+and used verbatim.
 .It
 .Pa /media/etc/interfaces.conf
 is directly included as part of
