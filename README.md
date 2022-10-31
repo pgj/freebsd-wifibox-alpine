@@ -15,7 +15,9 @@ be useful and inspiring for others.*
 For building the virtual disk image, the following third-party
 software is employed, which must be installed beforehand.
 
-- [Squashfs-tools] or the `sysutils/squashfs-tools` FreeBSD package.
+- [SquashFS Tools NG] or the `sysutils/squashfs-tools-ng` FreeBSD
+  package.
+- [GNU Tar] or the `archivers/gtar` FreeBSD package.
 - [PatchELF] or the `sysutils/patchelf` FreeBSD package.
 
 Note that the build process also uses native 64-bit Linux binaries,
@@ -125,8 +127,9 @@ used once installed.
 
 [FreeBSD Wifibox]: https://github.com/pgj/freebsd-wifibox
 [Alpine Linux]: https://alpinelinux.org/
-[Squashfs-tools]: https://github.com/plougher/squashfs-tools
+[SquashFS Tools NG]: https://infraroot.at/projects/squashfs-tools-ng/
+[GNU Tar]: https://www.gnu.org/software/tar/
 [PatchELF]: https://github.com/NixOS/patchelf
 [Linuxulator]: https://docs.freebsd.org/en/books/handbook/linuxemu/
-[freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/tree/squashfs-root
+[freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/
 [OpenRC]: https://github.com/OpenRC/openrc

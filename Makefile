@@ -26,8 +26,9 @@ ENV=/usr/bin/env
 MKDIR=/bin/mkdir
 CP=/bin/cp
 SED=/usr/bin/sed
-TAR=/usr/bin/tar
+TAR=$(LOCALBASE)/bin/gtar
 FIND=/usr/bin/find
+GREP=/usr/bin/grep
 RM=/bin/rm
 LN=/bin/ln
 LS=/bin/ls
@@ -40,7 +41,7 @@ TRUE=/usr/bin/true
 GIT=$(LOCALBASE)/bin/git
 PATCHELF=$(LOCALBASE)/bin/patchelf
 BRANDELF=/usr/bin/brandelf
-MKSQUASHFS=$(LOCALBASE)/bin/mksquashfs
+TAR2SQFS=$(LOCALBASE)/bin/tar2sqfs
 
 UID!=			$(ID) -u
 
@@ -129,39 +130,37 @@ $(GUESTDIR)/.done:
 
 image-contents: $(GUESTDIR)/.done
 
-EXCLUDE_FIRMWARE_FILES=	$(WORKDIR)/exclude_firmware.files
+EXCLUSIONS=	$(WORKDIR)/exclusions
 
 .if defined(FIRMWARE_FILES)
 .for fw_file in $(FIRMWARE_FILES)
 __FW_FILES+=		-name ${fw_file} -or
 .endfor
 _FW_FILES=		-not \( ${__FW_FILES:S/ -or$//W} \)
-_EXCLUDE_FW_FILES= 	-ef $(EXCLUDE_FIRMWARE_FILES)
-.else
-_EXCLUDE_FW_FILES=
 .endif
 
 $(SQUASHFS_IMG): image-contents
+	(cd $(GUESTDIR) \
+		&& $(FIND) . \
+		| $(GREP) -E "[.]/((dev|proc|run|sys|tmp|var)/.*|boot|[.]done)" \
+		> $(EXCLUSIONS))
 .if defined(_FW_FILES)
 	(cd $(GUESTDIR) \
-		&& $(FIND) lib/firmware -not -type d -and $(_FW_FILES) \
-		> $(EXCLUDE_FIRMWARE_FILES))
+		&& $(FIND) ./lib/firmware -not -type d -and $(_FW_FILES) \
+		>> $(EXCLUSIONS))
 .endif
-	$(MKSQUASHFS) \
-		$(GUESTDIR) \
-		$(SQUASHFS_IMG) \
-		-all-root \
-		-comp $(SQUASHFS_COMP) \
-		-wildcards \
-		$(_EXCLUDE_FW_FILES) \
-		-e boot \
-		-e "dev/*" \
-		-e "proc/*" \
-		-e "run/*" \
-		-e "sys/*" \
-		-e "tmp/*" \
-		-e "var/*" \
-		-e .done
+	$(TAR) \
+		--create \
+		--file - \
+		--directory $(GUESTDIR) \
+		--owner 0 \
+		--group 0 \
+		--no-wildcards \
+		--exclude-from $(EXCLUSIONS) \
+		. \
+		| $(TAR2SQFS) \
+			--compressor $(SQUASHFS_COMP) \
+			$(SQUASHFS_IMG)
 
 _TARGETS=	$(SQUASHFS_IMG)
 
