@@ -1,0 +1,1 @@
+MDNSRESPONDERPOSIX_OPTS="-f /media/etc/mdnsd-services.conf"

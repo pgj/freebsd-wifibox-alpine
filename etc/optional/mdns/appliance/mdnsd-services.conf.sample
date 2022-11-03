@@ -1,0 +1,13 @@
+This is a service definition file for exposing service over multicast
+DNS with mDNSResponder.  The entries are partitioned into small groups
+where each describe a service, separeted by blank lines.  See
+https://zeroconf.org/ for the details.
+
+The file should start below the line, it cannot contain any comments
+like this so please remove them before use.  Also, ensure that there
+are not any extraneous whitespaces at the ends of the lines in this
+file, otherwise it will not work.
+-----------------------------------------------------------------------
+Service Name
+_http._tcp.
+8080

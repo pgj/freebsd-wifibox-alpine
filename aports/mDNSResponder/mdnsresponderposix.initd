@@ -1,0 +1,15 @@
+#!/sbin/openrc-run
+
+supervisor=supervise-daemon
+name="Multicast and Unicast DNS responder"
+description="Responder for Multicast DNS and DNS Service Discovery"
+
+pidfile="/var/run/$SVCNAME.pid"
+command=/usr/bin/mDNSResponderPosix
+command_args="-P ${pidfile} $MDNSRESPONDERPOSIX_OPTS "
+command_args_background="-b"
+
+depend() {
+	need net mdnsd
+	after firewall
+}

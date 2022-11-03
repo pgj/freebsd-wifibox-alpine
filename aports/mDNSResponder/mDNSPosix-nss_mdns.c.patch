@@ -1,0 +1,13 @@
+--- mDNSResponder-1310.140.1/mDNSPosix/nss_mdns.c.orig
++++ mDNSResponder-1310.140.1/mDNSPosix/nss_mdns.c
+@@ -87,6 +87,10 @@
+ #define BIND_8_COMPAT 1
+ #include <arpa/nameser.h>
+ 
++#if !defined(NETDB_INTERNAL)
++#  define NETDB_INTERNAL (-1)
++#endif
++
+ #include <dns_sd.h>
+ 
+ 

@@ -1,0 +1,78 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname='mDNSResponder'
+pkgver=1310.140.1
+pkgrel=0
+pkgdesc='Bonjour (zero-configuration networking) by Apple'
+arch="x86_64"
+url='https://opensource.apple.com/tarballs/mDNSResponder/'
+license="APACHE-2.0 BSD3"
+makedepends="musl-nscd-dev"
+depends=""
+install=
+options="!check !strip"
+source="https://opensource.apple.com/tarballs/$pkgname/$pkgname-$pkgver.tar.gz
+	Clients-dns-sd.c.patch
+	mDNSPosix-nss_mdns.c.patch
+	mDNSShared-dnsextd_parser.y.patch
+	mdnsd.initd
+	mdnsresponderposix.initd
+	mdnsresponderposix.confd"
+
+build() {
+	make -j 1 -C "$srcdir"/"$pkgname"-"$pkgver"/mDNSPosix all dnsextd os=linux
+}
+
+_srcdir="$srcdir"/"$pkgname"-"$pkgver"
+_libs="libdns_sd.so
+       libnss_mdns-0.2.so"
+_bins="mDNSClientPosix
+       mDNSNetMonitor
+       mDNSProxyResponderPosix
+       mDNSResponderPosix"
+_clients=dns-sd
+_sbins="dnsextd
+        mdnsd"
+
+package() {
+	mkdir -p \
+		"$pkgdir"/usr/bin \
+		"$pkgdir"/usr/lib \
+		"$pkgdir"/usr/sbin \
+		"$pkgdir"/etc/conf.d \
+		"$pkgdir"/etc/init.d
+	cd "$_srcdir"/mDNSPosix/build/prod
+	for i in $_libs; do
+		install -m644 "$i" "$pkgdir"/usr/lib/"$i" || return 1
+	done
+	for i in $_bins; do
+		install -m755 "$i" "$pkgdir"/usr/bin/"$i" || return 1
+		strip "$pkgdir"/usr/bin/"$i" || return 1
+	done
+	for i in $_sbins; do
+		install -m755 "$i" "$pkgdir"/usr/sbin/"$i" || return 1
+		strip "$pkgdir"/usr/sbin/"$i" || return 1
+	done
+	cd "$_srcdir"/Clients/build
+	for i in $_clients; do
+		install -m755 "$i" "$pkgdir"/usr/bin/"$i" || return 1
+		strip "$pkgdir"/usr/bin/"$i" || return 1
+	done
+	cd "$srcdir"
+	for i in *.initd; do
+		install -m755 "$i" "$pkgdir"/etc/init.d/"${i%.*}" || return 1
+	done
+	for i in *.confd; do
+		install -m644 "$i" "$pkgdir"/etc/conf.d/"${i%.*}" || return 1
+	done
+}
+
+sha512sums="
+8ebf7ccb9cc40f0165c6570e190c5491834d6f36c8699605e86797e13adf60e4b7083867624bdd5a3241eb2c7cdf9adbee168783bd72f5f482c7553c1cd9a33e  mDNSResponder-1310.140.1.tar.gz
+e9aa4cfb315ac41ab0f3e90574d750dd04c33e1b2a167c02599313fbe0f58297ba0ff0e0686d9c7381acd0c2830b6bca17c330a27b5b109c738bbce8ccddd14f  Clients-dns-sd.c.patch
+f1032d803681478186a32574575d8dd360484dfc8e1d3bbec7faf1e5dd458f663228584eb935c3db14c1849d4ef5242ea92bdc057fdf9d9606f1b3b57ec855d5  mDNSPosix-nss_mdns.c.patch
+39436034052ccee9affacdbdf9b4cfe66cc75e070d61e3bfd3a43b568797129804a32da8a49ef86488dc84f1952a7a473e0a25ce4c0c0054d7813934faaafbe8  mDNSShared-dnsextd_parser.y.patch
+1a041d16545dbe1636acfe3bb084bfd8407f757e2fb13674d0035eec08a4107aa6679b28db34b6ea6db3d31b7cbaee712f51d593201bb0a8951dc8cd1f524c3c  mdnsd.initd
+6de992b3a3147039033312e1b5a256ff5d90246503615743d75d24c7e2d5e05c8af2dc63bc90bb2a2c8edbc7f657f13e1d2b87ee0fc6c71192a2010f52c43ab1  mdnsresponderposix.initd
+b53af6a0a1351bd328a54fc8826350340371ad3134fc4131d3a8d1b0e016cf074141a89e515054b2119dc0eff84c609a0b7c422669c3fa00a17d2460140bc24f  mdnsresponderposix.confd
+"

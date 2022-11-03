@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+
+name="Multicast and Unicast DNS daemon"
+description="Daemon for Multicast DNS and DNS Service Discovery"
+
+command="/usr/sbin/$SVCNAME"
+pidfile="/var/run/$SVCNAME.pid"
+
+depend() {
+	need net
+	after firewall
+}

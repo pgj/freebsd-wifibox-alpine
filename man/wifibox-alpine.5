@@ -1,4 +1,4 @@
-.Dd October 30, 2022
+.Dd November 3, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -47,6 +47,21 @@ iw:
 .ft B
 https://wireless.wiki.kernel.org/en/users/documentation/iw
 .ft R
+.It
+wpa_supplicant:
+.ft B
+https://w1.fi/wpa_supplicant/
+.ft R
+.It
+hostapd:
+.ft B
+https://w1.fi/hostapd/
+.ft R
+.It
+mdnsd:
+.ft B
+https://opensource.apple.com/source/mDNSResponder/
+.ft R
 .El
 .Sh IMPLEMENTATION
 The guest is created with a
@@ -74,7 +89,10 @@ The image can host either
 .Sy wpa_supplicant
 for connecting to wireless networks, or
 .Sy hostapd
-for creating wireless access points, depending how it was built.  Each
+for creating wireless access points, depending how it was built.  In
+addition to that,
+.Sy mdnsd
+could be deployed to handle multicast DNS requests.  Each
 application-specific detail is going to be included below.
 .Pp
 For the ease of management, the host shares configuration files with
@@ -124,6 +142,15 @@ interfaces.  The configuration file describes the flow of the network
 packets through the interfaces.  It is loaded once at launching the
 respective service, usually on boot, and cannot be modified from the
 guest.
+.It
+.Sy mdnsd
+works with the
+.Pa appliance/mdnsd-services.conf
+file and it can handle multicast DNS query packets on UDP port 5353.
+The advertised services can be described by its configuration file so
+that others on the network could see them.  Note that this is optional
+component, and its presence depends on the configuration options of
+the guest image.
 .It
 .Sy udhcpd
 works with the
@@ -187,6 +214,13 @@ and
 .Pa /media/etc/iptables
 is used directly from this location by
 .Sy iptables .
+.It
+.Pa /media/etc/mdnsd-services.conf
+is used directly from this location by
+.Sy mdnsd ,
+when
+.Sy mdnsd
+is in use.
 .It
 .Pa /media/etc/udhcpd.conf
 is mapped to
