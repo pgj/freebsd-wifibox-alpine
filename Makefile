@@ -173,7 +173,9 @@ install:
 	$(SED) ${_SUB_LIST_EXP} share/grub.cfg > $(SHAREDIR)/grub.cfg
 
 	$(MKDIR) -p $(ETCDIR)
-	$(CP) -R $(ETC_SRCS)/* $(ETCDIR)/
+.for srcs in $(ETC_SRCS)
+	$(CP) -R ${srcs}/* $(ETCDIR)/
+.endfor
 
 	$(MKDIR) -p $(MANDIR)/man5
 	$(SED) ${_SUB_LIST_EXP} man/wifibox-alpine.5 \
