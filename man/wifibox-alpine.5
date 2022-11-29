@@ -1,4 +1,4 @@
-.Dd November 3, 2022
+.Dd November 29, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -62,6 +62,11 @@ mdnsd:
 .ft B
 https://opensource.apple.com/source/mDNSResponder/
 .ft R
+.It
+socat:
+.ft B
+http://www.dest-unreach.org/socat/
+.ft R
 .El
 .Sh IMPLEMENTATION
 The guest is created with a
@@ -92,8 +97,11 @@ for connecting to wireless networks, or
 for creating wireless access points, depending how it was built.  In
 addition to that,
 .Sy mdnsd
-could be deployed to handle multicast DNS requests.  Each
-application-specific detail is going to be included below.
+could be deployed to handle multicast DNS requests, and
+.Sy forwarding
+could be configured to pass traffic between originally isolated inner
+and outer networks, such as UDP broadcasts.  Each application-specific
+detail is going to be included below.
 .Pp
 For the ease of management, the host shares configuration files with
 the services that are responsible for implementing the domain logic.
@@ -110,6 +118,15 @@ file.  These are the same tools that are used in the FreeBSD base
 system for the same purpose, and their Linux version is utilized here
 to make it possible to reuse the configuration files of the same
 format from the host.
+.It
+.Sy forwarding
+works with the
+.Pa appliance/forwarding.conf
+file.  It uses the syntax of the
+.Sy socat
+address specifications but it is limited to work with UDP and TCP
+ports only.  Note that this is optional component, and its presence
+depends on the configuration of the guest image.
 .It
 .Sy hostname
 sets the hostname on boot from the
@@ -197,6 +214,11 @@ directory where the
 9P (VirtFS) share is mounted in read-only mode.  From there, the files
 are hooked up in the system in the following ways.
 .Bl -bullet
+.It
+.Pa /media/etc/forwarding.conf
+is used directly from this location by
+.Sy forwarding ,
+when it is configured to use.
 .It
 .Pa /media/etc/hostname
 is mapped to
@@ -359,6 +381,32 @@ The file exported this way could be then used as the main
 configuration by moving it to the location from where the
 .Pa /media/etc
 directory is mounted.
+.Sh DEALING WITH UDP PACKETS
+By design, UDP packets are not meant to passed between the
+.Sy eth0
+and
+.Sy wlan0
+interfaces which may cause certain application fail to work.  A
+possible way to address this shortcoming is to deploy the proper
+handlers to the user space and configure
+.Sy iptables
+to use them.  This can be requested by the
+.Sy RETURN
+target, which can be inserted in the
+.Sy PREROUTING
+chain for the NAT rules.  For example, in case of
+.Sy mdnsd ,
+the packet filtering rules have to explicitly be configured to pass
+every UDP packet on port 5353 to the application for further
+processing.
+.Bd -literal -offset indent
+-A PREROUTING -p udp --dport 5353 -j RETURN
+.Ed
+.Pp
+For other similar uses, the
+.Sy forwarding
+service can be set up and the ports that are forwarded that way could
+be linked to the network packet filtering logic in the same manner.
 .Sh WIRELESS DIAGNOSTICS
 Details of wireless configuration can be learned through the use of
 the

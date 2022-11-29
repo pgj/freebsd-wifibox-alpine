@@ -1,0 +1,26 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=forwarding
+pkgver=0.1.0
+pkgrel=0
+pkgdesc="Forwarding management service for Wifibox"
+url="https://github.com/pgj/freebsd-wifibox-alpine"
+arch="all"
+license="BSD2"
+depends="socat"
+install=""
+subpackages=
+options="!check"
+arch="noarch"
+source="forwarding.initd
+	forwarding
+"
+
+package() {
+	install -D -m755 "$srcdir"/forwarding.initd "$pkgdir"/etc/init.d/forwarding
+	install -D -m755 "$srcdir"/forwarding "$pkgdir"/sbin/forwarding
+}
+sha512sums="
+4df2661906f5f1c3bc93ef29f2e9265e5391ae1a24a990e7bf70b4687b65cfae5afe4be481214e9fa2646137b37c9fe688074d0e4ebe1c2a5a73a3ec8fbb0098  forwarding.initd
+ffc13f4384e896e59c695826a659e5ab5df06e08a0b418e67cebf0fe43ac22dfb57489031db7e9bef4465cd6f6cdf188606ad2b02c945acfcd1911fd21ee4a1e  forwarding
+"

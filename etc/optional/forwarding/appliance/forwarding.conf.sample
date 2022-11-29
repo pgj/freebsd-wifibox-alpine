@@ -1,0 +1,9 @@
+# With the help of this configuration file, forwarding of traffic
+# between the different networks could be implemented via socat(1).
+# It should hold the parameters to be passed for socat(1), consult its
+# manual page for the details.
+#
+# Example configurations:
+#
+# UDP4-RECV:11223,broadcast,reuseaddr UDP4:10.0.0.2:11223
+# UDP-LISTEN:11224,broadcast,fork,reuseaddr UDP:10.0.0.2:11224

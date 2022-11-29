@@ -104,8 +104,8 @@ _block=$!
 log info "Waiting for PID ${_block} to stop."
 wait "${_block}"
 
-_socats=$(/usr/bin/pgrep socat)
-log info "Stopping, socat processes: [${_socats}]"
+_socats=$(/usr/bin/pgrep -P $$ socat)
+log info "Stopping, own socat processes: [${_socats}]"
 
 # shellcheck disable=SC2086
 [ -n "${_socats}" ] && /bin/kill -TERM ${_socats}

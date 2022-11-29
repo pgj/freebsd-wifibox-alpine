@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+
+supervisor=supervise-daemon
+name="Forwarding service"
+description="Forwarding support"
+
+command=/sbin/forwarding
+command_background=true
+
+depend() {
+	need net
+	after firewall
+}

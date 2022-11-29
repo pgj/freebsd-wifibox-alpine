@@ -1,0 +1,65 @@
+#!/bin/sh
+# shellcheck disable=SC2034,SC3043,SC3060
+
+log() {
+    local _level="$1"
+    local _message="$2"
+
+    /usr/bin/logger -p "daemon.${_level}" -t "forwarding[$$]" "${_message}"
+}
+
+capture_output() {
+    local _type="$1"
+    local _id="$2"
+
+    while read -r message; do
+	log "${_type}" "[${_id}] ${message}"
+    done
+}
+
+_block=
+
+terminate() {
+    local _sleep
+
+    if [ -n "${_block}" ]; then
+	log info "Received signal for termination, stopping PID ${_block}."
+	/bin/kill -KILL "${_block}"
+	log debug "Killed: $?"
+	_sleep=$(/bin/ps -o ppid,comm,pid \
+		     | /bin/grep -F "1 sleep" \
+		     | /usr/bin/head -1 \
+		     | /bin/sed "s@[ ]*1[ ]*sleep[ ]*@@")
+	log info "Stopping the orphaned sleep as PID ${_sleep}."
+	/bin/kill -KILL "${_sleep}"
+	log debug "Killed: $?"
+    else
+	log warn "Nothing is blocked, nothing to do."
+    fi
+}
+
+trap terminate TERM
+
+while read -r _line; do
+    _parameters=$(echo "${_line}" | /bin/sed '/^[[:blank:]]*#/d;s/#.*//')
+
+    [ -z "${_parameters}" ] && continue
+
+    log info "Launching socat with parameters: [${_parameters}]"
+    /usr/bin/socat ${_parameters} 2>&1 \
+	| capture_output debug socat &
+done < /media/etc/forwarding.conf
+
+(while /bin/true; do /bin/sleep 365d; done) &
+_block=$!
+
+log info "Waiting for PID ${_block} to stop."
+wait "${_block}"
+
+_socats=$(/usr/bin/pgrep -P $$ socat)
+log info "Stopping, own socat processes: [${_socats}]"
+
+# shellcheck disable=SC2086
+[ -n "${_socats}" ] && /bin/kill -TERM ${_socats}
+
+log info "Finished."

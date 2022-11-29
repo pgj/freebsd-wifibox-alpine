@@ -2,7 +2,7 @@
 
 pkgname=socat
 pkgver=1.7.4.3
-pkgrel=0 # base: 0
+pkgrel=1 # base: 0
 pkgdesc="Multipurpose relay for binary protocols"
 options="!check"
 url="http://www.dest-unreach.org/socat/"
@@ -34,7 +34,6 @@ build() {
 		--disable-rawip \
 		--disable-genericsocket \
 		--disable-interface \
-		--disable-udp \
 		--disable-sctp \
 		--disable-vsock \
 		--disable-socks4 \
