@@ -1,9 +1,9 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw89'
-pkgver=20221010
+pkgver=20221210
 pkgrel=0
-_gitrev='f11fadeab69a1e747318b1d7fd2ad58fa9518ab1'
+_gitrev='e834edfe8bee6e27e31c2f783817a9c13ff45665'
 pkgdesc='Driver for Realtek 8852AE, an 802.11ax device'
 arch="x86_64"
 url='https://github.com/lwfinger/rtw89'
@@ -25,9 +25,8 @@ build() {
 package() {
   xz "$_srcdir"/*.ko
   install -p -D -m 644 "$_srcdir"/*.ko.xz -t "$pkgdir"/lib/modules/"$_kver"/kernel/drivers/net/wireless/realtek/rtw89 
-  install -p -D -m 644 "$_srcdir"/rtw8852a_fw.bin -t "$pkgdir"/lib/firmware/rtw89
 }
 
 sha512sums="
-7945db2501ce89fa2fe9867b56bea5d5cc0b66c21a14feae1dec6b5beda5dd9225e2c2aa75aef63bcf53020f78c8f006ca3ca5d747d5516c4806b03a642d4237  f11fadeab69a1e747318b1d7fd2ad58fa9518ab1.zip
+f91036196d03cbcee4c48e65d8212249156e2ccd9402c388f0835dbadfe650cc6ad885621e783d9fe3044796320c2e5ef2153f7020d9a6eea9464b9d3b6cb125  e834edfe8bee6e27e31c2f783817a9c13ff45665.zip
 "
