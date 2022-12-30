@@ -4,16 +4,17 @@
 # The value of `interface` should match with the one defined in the
 # interfaces.conf file: `interface` should be exactly the same,
 # `router` should correspond to `address` and `subnet` is the
-# `netmask`.  According to these settings below, the IP addresses are
-# handed out for the 10.0.0.0/24 network.  In the `opt dns` line, the
-# `%%DNS%%` variable would be replaced with the IP addresses of the
-# DNS servers as provided by the wireless network (wifibox extension).
+# `netmask`.  According to these settings below, a single IP address
+# (10.0.0.2) is handed out, since only one is expected.  In the `opt
+# dns` line, the `%%DNS%%` variable would be replaced with the IP
+# addresses of the DNS servers as provided by the wireless network
+# (wifibox extension).
 #
 # Change these only if this is not suitable.
 
 start		10.0.0.2
-end		10.0.0.254
-max_leases	64
+end		10.0.0.2
+max_leases	1
 interface	eth0
 opt	subnet	255.255.255.0
 opt	router	10.0.0.1
