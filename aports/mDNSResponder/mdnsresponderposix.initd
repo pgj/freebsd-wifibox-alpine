@@ -10,6 +10,6 @@ command_args="-P ${pidfile} $MDNSRESPONDERPOSIX_OPTS "
 command_args_background="-b"
 
 depend() {
-	need net mdnsd
+	need net
 	after firewall
 }
