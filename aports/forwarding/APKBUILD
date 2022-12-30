@@ -2,12 +2,12 @@
 
 pkgname=forwarding
 pkgver=0.1.0
-pkgrel=0
+pkgrel=1
 pkgdesc="Forwarding management service for Wifibox"
 url="https://github.com/pgj/freebsd-wifibox-alpine"
 arch="all"
 license="BSD2"
-depends="socat"
+depends="socat-with-udp"
 install=""
 subpackages=
 options="!check"
