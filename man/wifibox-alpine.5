@@ -1,4 +1,4 @@
-.Dd November 29, 2022
+.Dd December 30, 2022
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -58,7 +58,7 @@ hostapd:
 https://w1.fi/hostapd/
 .ft R
 .It
-mdnsd:
+mDNSResponder:
 .ft B
 https://opensource.apple.com/source/mDNSResponder/
 .ft R
@@ -96,7 +96,7 @@ for connecting to wireless networks, or
 .Sy hostapd
 for creating wireless access points, depending how it was built.  In
 addition to that,
-.Sy mdnsd
+.Sy mDNSResponder
 could be deployed to handle multicast DNS requests, and
 .Sy forwarding
 could be configured to pass traffic between originally isolated inner
@@ -160,7 +160,7 @@ packets through the interfaces.  It is loaded once at launching the
 respective service, usually on boot, and cannot be modified from the
 guest.
 .It
-.Sy mdnsd
+.Sy mDNSResponder
 works with the
 .Pa appliance/mdnsd-services.conf
 file and it can handle multicast DNS query packets on UDP port 5353.
@@ -239,9 +239,9 @@ is used directly from this location by
 .It
 .Pa /media/etc/mdnsd-services.conf
 is used directly from this location by
-.Sy mdnsd ,
+.Sy mDNSResponder ,
 when
-.Sy mdnsd
+.Sy mDNSResponder
 is in use.
 .It
 .Pa /media/etc/udhcpd.conf
@@ -395,7 +395,7 @@ to use them.  This can be requested by the
 target, which can be inserted in the
 .Sy PREROUTING
 chain for the NAT rules.  For example, in case of
-.Sy mdnsd ,
+.Sy mDNSResponder ,
 the packet filtering rules have to explicitly be configured to pass
 every UDP packet on port 5353 to the application for further
 processing.
