@@ -1,18 +1,20 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=hostapd
 pkgver=2.10
-pkgrel=1 # base: 1
+pkgrel=2 # base: 5
 pkgdesc="daemon for wireless software access points"
 url="https://w1.fi/hostapd/"
 arch="all"
 license="BSD-3-Clause"
-makedepends="openssl1.1-compat-dev libnl3-dev linux-headers"
+makedepends="openssl-dev>3 libnl3-dev linux-headers"
 subpackages=
 source="https://w1.fi/releases/hostapd-$pkgver.tar.gz
 	$pkgname.initd
 	$pkgname.confd
+	0001-hostapd-Add-the-missing-CONFIG_SAE-option-to-the-def.patch
 	"
 options="!check" #no testsuite
+patch_args="-p2"
 builddir="$srcdir"/$pkgname-$pkgver/hostapd
 
 # secfixes:
@@ -40,46 +42,51 @@ builddir="$srcdir"/$pkgname-$pkgver/hostapd
 #     - CVE-2017-13088
 
 prepare() {
-	cd "$builddir"
+	default_prepare
+
 	sed -i -e "s:/etc/hostapd:/etc/hostapd/hostapd:g" \
 		hostapd.conf
 
 	# toolchain setup
-	sed \
-		-e '/^#CONFIG_DRIVER_NL80211=y/s/^#//' \
-		-e '/^#CONFIG_RADIUS_SERVER=y/s/^#//' \
-		-e '/^#CONFIG_DRIVER_WIRED=y/s/^#//' \
-		-e '/^#CONFIG_DRIVER_NONE=y/s/^#//' \
-		-e '/^#CONFIG_IEEE80211N=y/s/^#//' \
-		-e '/^#CONFIG_IEEE80211R=y/s/^#//' \
-		-e '/^#CONFIG_IEEE80211AC=y/s/^#//' \
-		-e '/^#CONFIG_IEEE80211AX=y/s/^#//' \
-		-e '/^#CONFIG_FULL_DYNAMIC_VLAN=y/s/^#//' \
-		-e '/^#CONFIG_LIBNL32=y/s/^#//' \
-		-e '/^#CONFIG_ACS=y/s/^#//' \
-		-e '/^#CONFIG_WEP=y/s/^#//' \
-		defconfig >> .config
-	echo "CC ?= ${CC:-gcc}" >> .config
-	echo "CFLAGS += -I/usr/include/libnl3" >> .config
-	echo "LIBS += -L/usr/lib" >> .config
+	{
+		sed \
+			-e '/^#CONFIG_DRIVER_NL80211=y/s/^#//' \
+			-e '/^#CONFIG_RADIUS_SERVER=y/s/^#//' \
+			-e '/^#CONFIG_DRIVER_WIRED=y/s/^#//' \
+			-e '/^#CONFIG_DRIVER_NONE=y/s/^#//' \
+			-e '/^#CONFIG_IEEE80211N=y/s/^#//' \
+			-e '/^#CONFIG_IEEE80211R=y/s/^#//' \
+			-e '/^#CONFIG_IEEE80211AC=y/s/^#//' \
+			-e '/^#CONFIG_IEEE80211AX=y/s/^#//' \
+			-e '/^#CONFIG_FULL_DYNAMIC_VLAN=y/s/^#//' \
+			-e '/^#CONFIG_LIBNL32=y/s/^#//' \
+			-e '/^#CONFIG_ACS=y/s/^#//' \
+			-e '/^#CONFIG_WEP=y/s/^#//' \
+			defconfig
+
+		echo "CC ?= ${CC:-gcc}"
+		echo "CFLAGS += -I/usr/include/libnl3"
+		echo "LIBS += -L/usr/lib"
+	} >> .config
 }
 
 build() {
-	cd "$builddir"
+	export CFLAGS="$CFLAGS -flto=auto"
+
 	make
 }
 
 package() {
-	cd "$builddir"
-
-	install -Dm755 hostapd "$pkgdir"/usr/sbin/hostapd \
-		&& install -Dm755 "$srcdir"/hostapd.initd \
-			"$pkgdir"/etc/init.d/hostapd \
-		&& install -Dm644 "$srcdir"/hostapd.confd \
-			"$pkgdir"/etc/conf.d/hostapd
+	install -Dm755 hostapd \
+		-t "$pkgdir"/usr/sbin/
+	install -Dm755 "$srcdir"/hostapd.initd \
+		"$pkgdir"/etc/init.d/hostapd
+	install -Dm644 "$srcdir"/hostapd.confd \
+		"$pkgdir"/etc/conf.d/hostapd
 }
 sha512sums="
 243baa82d621f859d2507d8d5beb0ebda15a75548a62451dc9bca42717dcc8607adac49b354919a41d8257d16d07ac7268203a79750db0cfb34b51f80ff1ce8f  hostapd-2.10.tar.gz
-b54b7c6aa17e5cb86a9b354a516eb2dbefb544df18471339c61d82776de447011a2ac290bea1e6c8beae4b6cebefafb8174683ea42fb773e9e8fe6c679f33ba3  hostapd.initd
-0882263bbd7c0b05bf51f51d66e11a23a0b8ca7da2a3b8a30166d2c5f044c0c134e6bccb1d02c9e81819ca8fb0c0fb55c7121a08fe7233ccaa73ff8ab9a238fe  hostapd.confd
+adeca34c6254ac6fccd84e6f08f8c394225e1b89e2c8771b46da5c85fe3fdabc568628530c39da3ab30b72e98891b07bbdb63f74217e79d6afb9796715d822f1  hostapd.initd
+95a80f5ceafd70da3d11207e591300d0e4f03d48724147cf3572420b177d50687524b715fe2001d826020e8b28959fa8c7b8334a5cbbfeec7c82d1db9a0b333a  hostapd.confd
+7cde99c431f1cf746473ae53c3009735c2a718e7038c3bc1629fc45ca85a191d799e975960da96e3cf14a56389ba06eee78453a9dd457941d6af758b730cbd05  0001-hostapd-Add-the-missing-CONFIG_SAE-option-to-the-def.patch
 "

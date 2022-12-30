@@ -2,18 +2,20 @@
 
 pkgname=wpa_supplicant
 pkgver=2.10
-pkgrel=0 # base: 1
+pkgrel=1 # base: 4
 pkgdesc="utility providing key negotiation for WPA wireless networks"
 url="https://w1.fi/wpa_supplicant/"
 arch="all"
 options="!check" # has no tests
 license="BSD-3-Clause"
 subpackages=
-makedepends="linux-headers openssl1.1-compat-dev dbus-dev libnl3-dev pcsc-lite-dev"
+makedepends="linux-headers openssl-dev>3 dbus-dev libnl3-dev pcsc-lite-dev"
 source="https://w1.fi/releases/wpa_supplicant-$pkgver.tar.gz
 	wpa_supplicant.initd
 	wpa_supplicant.confd
 	eloop.patch
+	unsafe-renegotiation-1.patch
+	unsafe-renegotiation-2.patch
 	no-tools.patch
 	config"
 
@@ -55,6 +57,7 @@ prepare() {
 }
 
 build() {
+	export CFLAGS="$CFLAGS -flto=auto"
 	cd "$builddir"/wpa_supplicant
 	make LIBDIR=/lib BINDIR=/sbin
 }
@@ -75,6 +78,8 @@ sha512sums="
 92c4cbaa9776a354275640c9411d2f547f4c0e00415af4ab30039f1a0be6a11082d49e2514905010f0abcc4a9276353276da9864e3d5f7264a0f0767c8cc9d78  wpa_supplicant.initd
 c7e4041fe41743c5e63a07edc9234d0c44c4c0f193a180b27342b43f3be45fb87b42ee0f9e4a20614cf6ad58cf64d25f74d1e75e2e1d521c2f6d45cdc5737eae  wpa_supplicant.confd
 2be055dd1f7da5a3d8e79c2f2c0220ddd31df309452da18f290144d2112d6dbde0fc633bb2ad02c386a39d7785323acaf5f70e5969995a1e8303a094eb5fe232  eloop.patch
+9528735924faf876a7094de46760605e5e66e265187421a668be06dbf03d7b4db6b84cbad793fcd6bd614e3ba540f82f1f80660d75e8a6070eeb7e9abb54ed28  unsafe-renegotiation-1.patch
+a92ba3ed3f41022a8af9396d2b703ee47f78aa05c1fddb42919a7fe6a6fad71e3515c63457e97e252ae0a32c6c34d67ea6efe0278df1e141cf36e650237e5295  unsafe-renegotiation-2.patch
 3278eff7118f9dc9e177adc3ed91cad562a8edde396af8619321ac8552a86e9c7de25212d5578ea17cbe4b6dc928d83cd6e9a7f0d41e07576656e6e9274107d6  no-tools.patch
-0e1af7084026c3b50b3a77636758f1ce3c1004e1e6d7eb71038e42c5c63866e2bbee3b0933b1131b80a6f2f6848983847a017ba2555a3162f0ccd3aa57fcf257  config
+021d7d192b2e8e6bc89457ce4c8ada7eb897b3c4e8202697da44bde4cab49c0424156569c7a04dc58cae26e0e83e5f56421946679629535d0a749cda31f890c5  config
 "

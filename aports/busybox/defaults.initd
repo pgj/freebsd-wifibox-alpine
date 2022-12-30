@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+
+description="Sets service-specific defaults."
+
+start() {
+        ebegin "Setting defaults"
+	. /etc/udhcpc/udhcpc.conf
+        if [ ! -s "$UDHCPD_CONF" ] ; then
+		sed 's|%%DNS%%||' < "$UDHCPD_CONF_TEMPLATE" > "$UDHCPD_CONF"
+        fi
+        eend $?
+}

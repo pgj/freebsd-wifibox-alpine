@@ -1,13 +1,13 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=busybox
 pkgver=1.35.0
-pkgrel=2 # base: 17, -initscripts: 4.2-r0
+pkgrel=3 # base: 29
 pkgdesc="Size optimized toolbox of many common UNIX utilities"
 url="https://busybox.net/"
 arch="all"
 license="GPL-2.0-only"
 makedepends_build="perl"
-makedepends_host="linux-headers openssl-dev"
+makedepends_host="linux-headers openssl-dev>3"
 # Only build with UTMPS support if we are not bootstrapping.
 # skalibs-static is needed for utmps-static
 [ -z "$BOOTSTRAP" ] && makedepends_host="$makedepends_host utmps-dev utmps-static skalibs-static"
@@ -17,6 +17,14 @@ provides="/bin/sh"
 install=
 subpackages=
 options="!check"
+
+_openrc_files="acpid.initd
+	crond.confd crond.initd
+	defaults.initd
+	syslog.confd syslog.initd
+	udhcpd.confd udhcpd.initd"
+_mdev_openrc_files="mdev.initd"
+
 source="https://busybox.net/downloads/busybox-$pkgver.tar.bz2
 	0001-nologin-Install-applet-to-sbin-instead-of-usr-sbin.patch
 	0001-adduser-default-to-sbin-nologin-as-shell-for-system-.patch
@@ -37,34 +45,29 @@ source="https://busybox.net/downloads/busybox-$pkgver.tar.bz2
 	0015-ed-don-t-use-memcpy-with-overlapping-memory-regions.patch
 	0016-ash-don-t-read-past-end-of-var-in-subvareval-for-bas.patch
 	0017-ash-Fix-use-after-free-on-idx-variable.patch
+	0018-ash-fix-ifs-cleanup-on-error-paths.patch
+
 	0001-ash-add-built-in-BB_ASH_VERSION-variable.patch
+
 	0001-pgrep-add-support-for-matching-against-UID-and-RUID.patch
+
 	0001-avoid-redefined-warnings-when-building-with-utmps.patch
+
 	0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch
 	0002-nslookup-sanitize-all-printed-strings-with-printable.patch
 	0001-modinfo-add-k-option-for-kernel-version.patch
 	CVE-2022-30065.patch
+	0001-sed-check-errors-writing-file-with-sed-i.patch
 
 	acpid.logrotate
 	config
 	default.script
-
-	acpid.initd
-	crond.initd
-	mdev.initd
-	syslog.initd
-	udhcpd.initd
-	defaults.initd
-
-	crond.confd
-	syslog.confd
-	udhcpd.confd
-	mdev.conf
-	persistent-storage
-	"
+	$_openrc_files
+	$_mdev_openrc_files
+"
 
 # secfixes:
-#   1.35.0-r15:
+#   1.35.0-r17:
 #     - CVE-2022-30065
 #   1.35.0-r7:
 #     - ALPINE-13661
@@ -108,6 +111,12 @@ prepare() {
 }
 
 build() {
+	local _extra_cflags= _extra_libs=
+	if [ -z "$BOOTSTRAP" ] ; then
+		_extra_cflags="$(pkg-config --cflags --static utmps)"
+		_extra_libs="$(pkg-config --libs --static utmps)"
+	fi
+
 	cd "$srcdir"/build
 	echo "COPIED CONFIG to $(pwd)/.config"
 	cp "$srcdir"/config .config
@@ -115,16 +124,25 @@ build() {
 		-e "s/CONFIG_EXTRA_COMPAT=y/CONFIG_EXTRA_COMPAT=n/" \
 		.config
 	make -C "$builddir" O="$PWD" silentoldconfig
-	make
+	make CONFIG_EXTRA_CFLAGS="$_extra_cflags" CONFIG_EXTRA_LDLIBS="$_extra_libs"
 }
 
 package() {
-	local i
+	local file
+
+	mkdir -p "$pkgdir"/usr/sbin "$pkgdir"/usr/bin "$pkgdir"/tmp \
+		"$pkgdir"/var/cache/misc "$pkgdir"/bin "$pkgdir"/sbin \
+		"$pkgdir"/etc/conf.d "$pkgdir"/etc/init.d
+	chmod 1777 "$pkgdir"/tmp
+	cd "$srcdir"
+	for file in *.confd; do
+		install -D -m 0644 ${file} "$pkgdir"/etc/conf.d/${file%%\.confd}
+	done
+	for file in *.initd; do
+		install -D -m 0755 ${file} "$pkgdir"/etc/init.d/${file%%\.initd}
+	done
 
 	cd "$srcdir"/build
-	mkdir -p "$pkgdir"/usr/sbin "$pkgdir"/usr/bin "$pkgdir"/tmp \
-		"$pkgdir"/var/cache/misc "$pkgdir"/bin "$pkgdir"/sbin
-	chmod 1777 "$pkgdir"/tmp
 	install -m755 busybox "$pkgdir"/bin/busybox
 
 	for target in $("$pkgdir"/bin/busybox --list-full | sort); do
@@ -162,27 +180,12 @@ EOF
 	install -Dm755 "$srcdir"/default.script \
 		"$pkgdir"/usr/share/udhcpc/default.script
 
-	# deploy init scripts
 	cd "$srcdir"
 
-	mkdir -p "$pkgdir"/etc/conf.d "$pkgdir"/etc/init.d "$pkgdir"/lib/mdev\
-		"$pkgdir"/etc/acpi/PWRF
-	for i in *.initd; do
-		install -m755 "$srcdir"/$i "$pkgdir"/etc/init.d/${i%.*} || return 1
-	done
-	for i in *.confd; do
-		install -m644 "$srcdir"/$i "$pkgdir"/etc/conf.d/${i%.*} || return 1
-	done
-	install -m644 mdev.conf "$pkgdir"/etc
-	install -m755 persistent-storage \
-		"$pkgdir"/lib/mdev/
-
+	mkdir -p "$pkgdir"/etc/acpi/PWRF
 	# poweroff script for acpid
-	cat >"$pkgdir"/etc/acpi/PWRF/00000080 <<EOF
-#!/bin/sh
-poweroff
-EOF
-	chmod +x "$pkgdir"/etc/acpi/PWRF/00000080
+	{ echo '#!/bin/sh'; echo poweroff ; } > "$pkgdir"/etc/acpi/PWRF/00000080
+	chmod 0755 "$pkgdir"/etc/acpi/PWRF/00000080
 }
 
 sha512sums="
@@ -193,7 +196,7 @@ a2787a3ecaf6746dadef62166e8ee6ecaa166147e5ad8b917c5838536057c875bab5f9cf40c3e05e
 0cac9b944928500293e366b42e03211d4159d05b622da60664825e5ee87c9bf6d5a8ea5e794584713f7464efb4cdc431e02f439c717b7e62b1864a228bc8cbac  0001-modutils-check-ELF-header-before-calling-finit_module.patch
 d8694293edc8cd55cecafeb902f03c01af318e13966f399365cf792b840793891ac086bb67ef83e7a5a2e01b246497a6c6511cb6a856834f6672dee4bca76896  0002-fsck-resolve-LABEL-.-UUID-.-spec-to-device.patch
 8c34dd5ce9a6e84279fa6494cbae0b254778976f341af1d0ccc2a3afb405fb22d374e9623ea83d1500da77c7463db2ed5218d2c9f49350a21114bd0bb17fd87d  0003-ash-exec-busybox.static.patch
-a8fc2ccced4054f5eff6ea00389906a543a1716202b19ab71fda1de0e6860c8377ed3c306ffb9efabe9fb16779a306da6770b871229f6bd1d725a84fdaa03fef  0004-app-location-for-cpio-vi-and-lspci.patch
+f9745497abd4d04621f089c62d9f2104c30d54f342125f597292253f2974d385c5f4a46e7d87a5d1b641b11b34ba5221183dd5dad1e3bbe74a787fb8d6a994b7  0004-app-location-for-cpio-vi-and-lspci.patch
 f12916e70f7cc1ef4f6d85d09b9a496a52a494e6318029fdce9a9c812ab5c7b2a046c33b66834127bf809f243c91a53c3c5e27efca026a96fe6b03421de26e60  0005-udhcpc-set-default-discover-retries-to-5.patch
 89215c328a46afc686c458a133dd88dcda817586df60eb041a694715e73dc78a297fc0f9a92e8ee7d0a39ce7f6053a6b8e38f3ee078ff90ed13fac2608510105  0006-ping-make-ping-work-without-root-privileges.patch
 7873b98c676a92faea61511d50c1efac1220354d20afd53de19e2c8f1472559cb333b9dd4e0d6432616d8c5f59885f1503c448c86a912e8031c9bfed628c2db1  0007-fbsplash-support-console-switching.patch
@@ -206,25 +209,25 @@ ecbe5c890d966f09280c7eb534109f785c68e292765f17ed7ff62fcc61d20f61443c4155add0a1eb
 0040800382a6e3adcc6a8094b821488c7e297fc80304afba23a4fca43b7b26ac699378dfbd930ebbf9985336b3e431301f7ca93e2d041a071902a48740d263ef  0015-ed-don-t-use-memcpy-with-overlapping-memory-regions.patch
 4c95dc4bf6aff9018bfb52b400f6d8375a1d22493b44ea516cb12dba6556f12797a3cba55768d2e59ff57c0f3247ec1ff95edb8f17561f3d37ec18d83ca47eb0  0016-ash-don-t-read-past-end-of-var-in-subvareval-for-bas.patch
 ccdf098fb15eaa316708181469a1193d6eec7067131e7b7645e0219bf03cfd07f4f79e8f62c1e560f6146dcc38186a29bdee08aaa39f290e11d020b8f07d2f65  0017-ash-Fix-use-after-free-on-idx-variable.patch
+3abdbd25f1f0daa24b0aabe92880c28dc2d3b59eb29fad357dfaf2b78bb895466bbf4495e2185370d9219d65b22e65e525769e369e50fb1fdfd71b5229a4f429  0018-ash-fix-ifs-cleanup-on-error-paths.patch
 6d100fe44da2b97c2cbdda253d0504b487212d195144d9315cddbe8c51d18fae3745701923b170b40e35f54b592f94f02cadbffd9cb716661c12a7f1da022763  0001-ash-add-built-in-BB_ASH_VERSION-variable.patch
 e33dbc27d77c4636f4852d5d5216ef60a9a4343484e4559e391c13c813bf65c782b889914eff2e1f038d74cf02cb0d23824ebbb1044b5f8c86260d5a1bbc4e4d  0001-pgrep-add-support-for-matching-against-UID-and-RUID.patch
-b4b8195390da70c96503e66e18420b8aea5754f64300082632fcaccd4ebe86cb771d6d4b912f5162e0538e6f756a9377689ad9a138f683cd729c3f54770304bf  0001-avoid-redefined-warnings-when-building-with-utmps.patch
+7608fbb9deddc9268ba53bc5b762a00fa16744d595f6f8a2f5a857339e754ea0c3da084a1e48269c8281553e9171d2bb29b8530fbe85e6a934f97c3cfcdbe31b  0001-avoid-redefined-warnings-when-building-with-utmps.patch
 b52050678e79e4da856956906d07fcb620cbf35f2ef6b5a8ee3b8d244ea63b4b98eef505451184d5b4937740d91eef154ed748c30d329ac485be51b37626f251  0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch
 ead4ad65d270d8659e1898fa16f76b6cbcf567d8aba238eacccda3764edb4362240d9359d6389873bedc126d405f805fc6dfce653a7181618ebcc67c94bd08d2  0002-nslookup-sanitize-all-printed-strings-with-printable.patch
 4f6ddd59d6096943f617b0938fca428114190b8b37732d6783faab291451a2c30c452ed39299db22d1d9679d007022f87d43e93b38a4f6ced64a8659e9233773  0001-modinfo-add-k-option-for-kernel-version.patch
 22e2fa8f7a6105fd9990f93b71c235980fd4eab62269939a0e3a920fe517ee4f913c6bd0148a554b67fe01d1660bf0fd76a80e9dcac290b4b8b2c304ef6080a9  CVE-2022-30065.patch
+d1a2fcbf9de623531953e7ad869e41e896aa79a0917983e6f0d20ddf7393e11220dda8be93c796b7abbf34006d8f03e871a6ab293988267df5aadb74cbd8aeb1  0001-sed-check-errors-writing-file-with-sed-i.patch
 aa93095e20de88730f526c6f463cef711b290b9582cdbd8c1ba2bd290019150cbeaa7007c2e15f0362d5b9315dd63f60511878f0ea05e893f4fdfb4a54af3fb1  acpid.logrotate
 0b92eafab0722a6c9cc4880e3be4976de9713e1e1c715c6c727a948cbd68268fce01ce308291834f70d0cf3328f7c8a44cbdb5b7c70d90f91b15efcb5b90acb3  config
 e063599f412df919b75584fee9501925418ef21689232792e9d61178f4e34a65c3cff8a3b1b4cf3e5be61efea2065cc303db35c53ec07b361d3a65e888247544  default.script
 dd548670114a92404b8e35fb915fdbe5994498b05b0a418583271c3dd72fb7800950e42c095c902a014eb198c046b8a346d43dccd8e7a158048ae33767c572ed  acpid.initd
-c9d0fb0f8cc27d661d3b4e58c56eb598ca368890576e18ffffd42efdf68ba35537656be9be319b2e2818aa0152d3ca8611bece2433512fbfcd4eed7988765549  crond.initd
-1aed59fb048f0636ee8a095a089a20554a20eda84c70485a894ae60b0f97b792b7ce8e832557457258f59a2750735c4a25e247364ccf1180e9652b292a5f9e8d  mdev.initd
-acfd45bda4526ab551a30faec1742ad1569aa85e0d315959c3e3a3d6a693f94c74efeb57a00b8791524651e8a61d3f7ea3e3e08a4b0291ec46309f594ee8124c  syslog.initd
-1d4574ec7cc6d7e9952bb50b4fcb10a910868688da03a25aede492835313c686247bde1faa17f50243d61a93bfc1d8fa54cf821d7be908581e365b0f1b6a5588  udhcpd.initd
-23ef7f32447f239b617d5ae221b024c7b47ca4faa9a27f80a4a6a473fd148cb4339a728fee3bb55ce67d531a141ec07c66dca533138652058d3a6a936b68d3c7  defaults.initd
 34c6f3197064bb91619b899b28a201bd4d920b18bded3845440b2cb36dc6f16cabf447c96878349b16e46c30184cbe48bac00a01c5f7cf1be038c0b7136064c5  crond.confd
+c9d0fb0f8cc27d661d3b4e58c56eb598ca368890576e18ffffd42efdf68ba35537656be9be319b2e2818aa0152d3ca8611bece2433512fbfcd4eed7988765549  crond.initd
+23ef7f32447f239b617d5ae221b024c7b47ca4faa9a27f80a4a6a473fd148cb4339a728fee3bb55ce67d531a141ec07c66dca533138652058d3a6a936b68d3c7  defaults.initd
 bf8173ee33a5d2b61cbdbc1b070e599a17a21e5433a0d8aa9beef71e4ac831304076af8e7e58dc594cdee61562329793afdc57af91e5496bf5fffb9b734a3d9c  syslog.confd
+acfd45bda4526ab551a30faec1742ad1569aa85e0d315959c3e3a3d6a693f94c74efeb57a00b8791524651e8a61d3f7ea3e3e08a4b0291ec46309f594ee8124c  syslog.initd
 2947b23728d3ad6839f660fee11fc4c86d0d1a3fc450ceff85480932b0699e7b7293eb7258cf0e957542ed3c7a4416376ebb284992e6682aede61f48069b1043  udhcpd.confd
-634fa067629febcdd8ba9516fbaafddd5be2d38ac37bff9eccfacce0fcf3b259426c12ff967b179bd93b2962401a4a2f15709d32da0623bd078688b8611817cd  mdev.conf
-2873ec2ba41fe96b010b14fe3fc87d347b71eb6079c12e05ac72eac6c7f146e25096c0b29b2b9d69cbe6840e16dbf4a93ee81132de9fac497e41ab5e8bce2243  persistent-storage
+1d4574ec7cc6d7e9952bb50b4fcb10a910868688da03a25aede492835313c686247bde1faa17f50243d61a93bfc1d8fa54cf821d7be908581e365b0f1b6a5588  udhcpd.initd
+6ce0b2a8fe69cc7ea657c5b9076aba51c8f0beeaafa4a887d8673bcc9f9cf8ee40f4b07d2d901ec7a1a1e4f29c150c496559559e803595d0bd487dec56b530a2  mdev.initd
 "

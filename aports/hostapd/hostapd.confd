@@ -1,5 +1,4 @@
-# Space separated list of configuration files
-CONFIGS="/etc/hostapd/hostapd.conf"
-
-# Extra options to pass to hostapd, see hostapd(8)
-OPTIONS=""
+cfgfile="/etc/hostapd/hostapd.conf"
+command_args=""
+# Uncomment to run with process supervisor.
+# supervisor="supervise-daemon"

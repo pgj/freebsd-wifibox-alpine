@@ -1,0 +1,1 @@
+UDHCPD_OPTS="-S /tmp/udhcpd.conf"

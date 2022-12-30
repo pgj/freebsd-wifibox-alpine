@@ -2,7 +2,7 @@
 
 pkgname=iptables
 pkgver=1.8.8
-pkgrel=0 # base: 1
+pkgrel=0 # base: 2
 pkgdesc="Linux kernel firewall, NAT and packet mangling tools"
 url="https://www.netfilter.org/projects/iptables/index.html"
 arch="all"
