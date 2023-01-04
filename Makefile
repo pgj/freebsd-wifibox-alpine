@@ -25,6 +25,7 @@ ECHO=/bin/echo
 ENV=/usr/bin/env
 MKDIR=/bin/mkdir
 CP=/bin/cp
+SH=/bin/sh
 SED=/usr/bin/sed
 TAR=$(LOCALBASE)/bin/gtar
 FIND=/usr/bin/find
@@ -36,6 +37,7 @@ GZIP=/usr/bin/gzip
 INSTALL_DATA=/usr/bin/install -m $(SHAREMODE)
 ID=/usr/bin/id
 UMOUNT=/sbin/umount
+STAT=/usr/bin/stat
 TOUCH=/usr/bin/touch
 TRUE=/usr/bin/true
 GIT=$(LOCALBASE)/bin/git
@@ -126,6 +128,12 @@ $(GUESTDIR)/.done:
 		>> $(GUESTDIR)/etc/fstab
 .endfor
 .endif
+	# fix symbolic links
+	$(FIND) . -type l -exec stat -f "%N___%Y" {} \; \
+		| $(GREP) /compat/linux \
+		| $(SED) -E 's!(.*)___/compat/linux(.*)!rm \1 \&\& ln -s \2 \1!' \
+		| $(SH)
+	# mark the process done
 	$(TOUCH) $(GUESTDIR)/.done
 
 image-contents: $(GUESTDIR)/.done
