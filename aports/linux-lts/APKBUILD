@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-lts
-pkgver=5.15.85
+pkgver=5.15.90
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -11,7 +11,8 @@ pkgdesc="Linux LTS kernel"
 url="https://www.kernel.org"
 depends=
 _depends_dev="perl gmp-dev mpc1-dev mpfr-dev elfutils-dev bash flex bison zstd"
-makedepends="$_depends_dev perl flex bison elfutils-dev sed installkernel bc linux-headers linux-firmware-any openssl1.1-compat-dev diffutils findutils zstd xz"
+makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev>3 mawk
+	diffutils findutils zstd"
 options="!strip"
 install=
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
@@ -162,7 +163,7 @@ _dev() {
 
 sha512sums="
 d25ad40b5bcd6a4c6042fd0fd84e196e7a58024734c3e9a484fd0d5d54a0c1d87db8a3c784eff55e43b6f021709dc685eb0efa18d2aec327e4f88a79f405705a  linux-5.15.tar.xz
-94cda531cdfc6337a19cde9888a2fde07b478756ddbd78039bde93e74e1677b2272995119b6f037f5b7a39305a41483d12b89933fce61f120c5f864b5d92d74c  config-lts.x86_64
+2e088cf7d8f3a823f459f27ab5448fe474cc0afd766dd14f23676e3637b734d0088a4f6d59648ede042faf7d105763a4b13e4d1f59124c5dab6c29d0707a2589  config-lts.x86_64
 65504e60731f7254079caa997cd44585f8b9608aa66e0879e677872f89b91aa77b67f28617eddef7fe9932a73a5942466c12c733432405ee7e42944daadef6d4  0001-mt76-mt7921-add-support-for-PCIe-ID-0x0608.patch
-aa7d75ab949a266495391728a93096e30d0579ec490ee97b3a5f7cb4ef4268c17fbc3ba337a289e14c3bebc7e7be4dc7656abe86abc3cb8d691e2d5f21a480b5  patch-5.15.85.xz
+1517f49f719771940ae8d2b3a3193bd3c976155bc38199eb70413c50076facfd5ddb190b52d77ea9144dd917161bbccd9db65f5b76e725d92f081ebeb21801d9  patch-5.15.90.xz
 "
