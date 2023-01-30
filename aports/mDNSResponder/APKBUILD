@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='mDNSResponder'
-pkgver=1790.60.25
+pkgver=1790.80.10
 pkgrel=0
 pkgdesc='Bonjour (zero-configuration networking) by Apple'
 arch="x86_64"
@@ -42,7 +42,7 @@ package() {
 }
 
 sha512sums="
-b2f9c6c79c6e8855a326379f97b1c7efe3fd971e28357035a85482e441d9024a3deb0bd34818749ac3bd3768dc4ce0da733617fe70209449d4ffa6e8db37acc4  mDNSResponder-1790.60.25.tar.gz
+3386f2dd7c40a675dbb6518afcd8c26944a32e5d5e52eb16b89d853d0e5d93bdab102a4bdfe486c1719f89fd6a8dd16fb950461d3c75eb822e2817f0cdfa0d17  mDNSResponder-1790.80.10.tar.gz
 d2f8359164f4aa1d4c881a5ad4b9a53a44df71ab6c7a57adbeda42cfd7339a7d1f860850df894d9a1f74d1989d012c83733ebfb9a891bdf410cd45fcf47ec1a6  mdnsresponderposix.initd
 b53af6a0a1351bd328a54fc8826350340371ad3134fc4131d3a8d1b0e016cf074141a89e515054b2119dc0eff84c609a0b7c422669c3fa00a17d2460140bc24f  mdnsresponderposix.confd
 "
