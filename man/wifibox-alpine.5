@@ -1,4 +1,4 @@
-.Dd January 5, 2023
+.Dd February 1, 2023
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -67,6 +67,11 @@ socat:
 .ft B
 http://www.dest-unreach.org/socat/
 .ft R
+.It
+tcpdump:
+.ft B
+https://www.tcpdump.org/
+.ft R
 .El
 .Sh IMPLEMENTATION
 The guest is created with a
@@ -100,7 +105,9 @@ addition to that,
 could be deployed to handle multicast DNS requests, and
 .Sy forwarding
 could be configured to pass traffic between originally isolated inner
-and outer networks, such as UDP broadcasts.  Each application-specific
+and outer networks, such as UDP broadcasts.  For packet analysis,
+.Sy tcpdump
+is provided as an optional component.  Each application-specific
 detail is going to be included below.
 .Pp
 For the ease of management, the host shares configuration files with
@@ -381,6 +388,33 @@ The file exported this way could be then used as the main
 configuration by moving it to the location from where the
 .Pa /media/etc
 directory is mounted.
+.Sh TROUBLESHOOTING NETWORK ISSUES
+To verify the flow of network traffic, the
+.Sy iptables
+utility can be asked to list the rules in a more verbose manner.  This
+will include the number of packets that matched each of the rules, so
+their effect becomes observable.
+.Bd -literal -offset indent
+# iptables -L -nv
+.Ed
+.Pp
+For finding the right configuration parameters for the rules of
+network packet filtering, it is possible to additionally install the
+.Sy tcpdump
+utility.  It can be used to capture all the packets that are flowing
+through all the networking interfaces and determine the proper IP
+addresses and ports.  When invoked without any parameters, it will
+start dumping all the traffic-related information to the standard
+output.  For all the features and options, please consult the
+documentation.
+.Bd -literal -offset indent
+# tcpdump
+.Ed
+.Pp
+Mind that this facility is not available by default, the guest image
+has to be explicitly configured to include this as it is security
+risk.  For the same reason, its removal is recommended once the
+analysis is concluded.
 .Sh DEALING WITH UDP PACKETS
 By design, UDP packets are not meant to passed between the
 .Sy eth0
