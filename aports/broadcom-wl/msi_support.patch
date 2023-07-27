@@ -1,0 +1,79 @@
+--- a/src/wl/sys/wl_linux.c
++++ b/src/wl/sys/wl_linux.c
+@@ -504,6 +504,7 @@
+ #if defined(USE_CFG80211)
+ 	struct device *parentdev;
+ #endif
++	bool msi_supported;
+ 
+ 	unit = wl_found + instance_base;
+ 	err = 0;
+@@ -529,6 +530,7 @@
+ 	}
+ 	bzero(wl, sizeof(wl_info_t));
+ 
++	wl->pdev = (struct pci_dev *) btparam;
+ 	wl->osh = osh;
+ 	wl->unit = unit;
+ 	atomic_set(&wl->callbacks, 0);
+@@ -654,9 +656,28 @@
+ 
+ 	tasklet_init(&wl->tx_tasklet, wl_tx_tasklet, (ulong)wl);
+ 
++	msi_supported = !wl->pdev->no_msi;
++	pci_info(wl->pdev, "MSI supported: %s\n", msi_supported ? "true" : "false");
++
++	if (msi_supported) {
++		int ret;
++
++		ret = pci_alloc_irq_vectors(wl->pdev, 1, 1, PCI_IRQ_MSI);
++		if (ret < 0) {
++			WL_ERROR(("wl%d: pci_alloc_irq_vectors() failed, ret %d\n", unit, ret));
++			goto fail;
++		}
++		pci_info(wl->pdev, "(MSI) allocated %d IRQ vectors", ret);
++		irq = pci_irq_vector(wl->pdev, 0);
++		pci_info(wl->pdev, "(MSI) requesting IRQ: %d\n", irq);
++	}
++
+ 	{
+-		if (request_irq(irq, wl_isr, IRQF_SHARED, dev->name, wl)) {
+-			WL_ERROR(("wl%d: request_irq() failed\n", unit));
++               int ret;
++
++		ret = request_irq(irq, wl_isr, IRQF_SHARED, dev->name, wl);
++		if (ret < 0) {
++			WL_ERROR(("wl%d: request_irq() failed, ret %d\n", unit, ret));
+ 			goto fail;
+ 		}
+ 		dev->irq = irq;
+@@ -996,8 +1017,10 @@
+ 
+ 	WL_TRACE(("wl: wl_free\n"));
+ 	{
+-		if (wl->dev && wl->dev->irq)
++		if (wl->dev && wl->dev->irq) {
+ 			free_irq(wl->dev->irq, wl);
++			pci_free_irq_vectors(wl->pdev);
++		}
+ 	}
+ 
+ #if defined(WL_CONFIG_RFKILL)
+--- a/src/wl/sys/wl_linux.h
++++ b/src/wl/sys/wl_linux.h
+@@ -21,6 +21,7 @@
+ #ifndef _wl_linux_h_
+ #define _wl_linux_h_
+ 
++#include <linux/pci.h>
+ #include <wlc_types.h>
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
+ #include <wlc_pub.h>
+@@ -85,6 +86,7 @@
+ 	void		*wlc;		
+ 	osl_t		*osh;		
+ 	struct net_device *dev;		
++	struct pci_dev *pdev;	
+ 
+ 	struct semaphore sem;		
+ 	spinlock_t	lock;		

@@ -2,7 +2,7 @@
 
 pkgname=wpa_supplicant
 pkgver=2.10
-pkgrel=3 # base: 5
+pkgrel=4 # base: 5
 pkgdesc="utility providing key negotiation for WPA wireless networks"
 url="https://w1.fi/wpa_supplicant/"
 arch="all"
@@ -11,6 +11,7 @@ license="BSD-3-Clause"
 subpackages=
 makedepends="linux-headers openssl-dev>3 dbus-dev libnl3-dev pcsc-lite-dev"
 source="https://w1.fi/releases/wpa_supplicant-$pkgver.tar.gz
+	0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
 	wpa_supplicant.initd
 	wpa_supplicant.confd
 	eloop.patch
@@ -76,6 +77,7 @@ package() {
 
 sha512sums="
 021c2a48f45d39c1dc6557730be5debaee071bc0ff82a271638beee6e32314e353e49d39e2f0dc8dff6e094dcc7008cfe1c32d0c7a34a1a345a12a3f1c1e11a1  wpa_supplicant-2.10.tar.gz
+fb328872087268056b035802f71df2f7af8d11699822fe68611201a07dc693c4fdb8c50dd4fd509ed6db4cca89f6003ce3303770951686a35633977f466f4fb5  0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
 92c4cbaa9776a354275640c9411d2f547f4c0e00415af4ab30039f1a0be6a11082d49e2514905010f0abcc4a9276353276da9864e3d5f7264a0f0767c8cc9d78  wpa_supplicant.initd
 c7e4041fe41743c5e63a07edc9234d0c44c4c0f193a180b27342b43f3be45fb87b42ee0f9e4a20614cf6ad58cf64d25f74d1e75e2e1d521c2f6d45cdc5737eae  wpa_supplicant.confd
 2be055dd1f7da5a3d8e79c2f2c0220ddd31df309452da18f290144d2112d6dbde0fc633bb2ad02c386a39d7785323acaf5f70e5969995a1e8303a094eb5fe232  eloop.patch
