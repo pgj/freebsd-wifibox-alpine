@@ -487,6 +487,39 @@ command.
 .Bd -literal -offset indent
 # iw dev wlan0 station dump
 .Ed
+.Sh BLOCKED WIRELESS DEVICES
+Sometimes it happens that even if the driver has successfully detected
+the wireless device, it is not yet ready to be used.  That is because
+the use of the device might be blocked either by software or hardware
+means, i.e. by a physical switch. The image contains the
+.Sy rfkill
+tool as part of BusyBox to unblock the wireless device.  Use the
+.Sy list
+command to see if
+.Sy rfkill
+is usable and list the available interfaces.
+.Bd -literal -offset indent
+# rfkill list
+.Ed
+.Pp
+If the interface is shown to be blocked, use the
+.Sy unblock
+command to unblock it.  This can be done either by function or index.
+.Bd -literal -offset indent
+# rfkill unblock wlan
+.Ed
+.Pp
+Or:
+.Bd -literal -offset indent
+# rfkill unblock 0
+.Ed
+.Pp
+Note that \(lqhard\(rq block status cannot be changed this way, as it
+is typically performed by the hardware switch or it is implemented by
+the firmware itself.  For example, the computer might be configured to
+turn off the wireless device when the wired networking interface card
+is activate and the LAN cable is inserted.
+
 .Sh SUPPORTED HARDWARE
 There are a number of Linux drivers available as kernel modules.  Note
 that not all of them could be used immediately because there might be
