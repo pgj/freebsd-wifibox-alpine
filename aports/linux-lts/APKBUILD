@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-lts
-pkgver=5.15.104
+pkgver=6.1.53
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -12,14 +12,15 @@ url="https://www.kernel.org"
 depends=
 _depends_dev="perl gmp-dev mpc1-dev mpfr-dev elfutils-dev bash flex bison zstd"
 makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev>3 mawk
-	diffutils findutils zstd"
+	diffutils findutils zstd pahole>=1.25 python3"
 options="!strip"
 install=
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
+	awk.patch
 	config-lts.x86_64
-	0001-mt76-mt7921-add-support-for-PCIe-ID-0x0608.patch
 	"
 subpackages="$pkgname-dev:_dev:$CBUILD_ARCH"
+builddir="$srcdir"/linux-"$_kernver"
 
 if [ "${pkgver%.0}" = "$pkgver" ]; then
 	source="$source
@@ -27,91 +28,80 @@ if [ "${pkgver%.0}" = "$pkgver" ]; then
 fi
 
 arch="x86_64"
-license="GPL-2.0"
+license="GPL-2.0-only"
 
 prepare() {
-	local _patch_failed=
-	cd "$srcdir"/linux-$_kernver
 	if [ "$_kernver" != "$pkgver" ]; then
 		msg "Applying patch-$pkgver.xz"
 		unxz -c < "$srcdir"/patch-$pkgver.xz | patch -p1 -N
 	fi
 
-	# first apply patches in specified order
-	for i in $source; do
-		case $i in
-		*.patch)
-			msg "Applying $i..."
-			if ! patch -s -p1 -N -i "$srcdir"/$i; then
-				echo $i >>failed
-				_patch_failed=1
-			fi
-			;;
-		esac
-	done
-
-	if ! [ -z "$_patch_failed" ]; then
-		error "The following patches failed:"
-		cat failed
-		return 1
-	fi
+	default_prepare
 
 	# remove localversion from patch if any
 	rm -f localversion*
-	oldconfig
 }
 
-oldconfig() {
-	local _config=config-lts.x86_64
+_prepareconfig() {
+	local _config="config-lts.x86_64"
 	local _builddir="$srcdir"/build-lts.x86_64
 	mkdir -p "$_builddir"
-	echo "-$pkgrel-lts" > "$_builddir"/localversion-alpine \
-		|| return 1
+	echo "-$pkgrel-lts" > "$_builddir"/localversion-alpine
 
-	cp "$srcdir"/$_config "$_builddir"/.config
-	make -C "$srcdir"/linux-$_kernver \
+	cp "$srcdir"/"$_config" "$_builddir"/.config
+	msg "Configuring the kernel"
+	make -C "$srcdir"/linux-"$_kernver" \
 		O="$_builddir" \
-		ARCH="x86_64" \
-		listnewconfig oldconfig
+		ARCH=x86_64 \
+		olddefconfig
 }
 
 build() {
 	unset LDFLAGS
+	# for some reason these sometimes leak into the kernel build,
+	# -Werror=format-security breaks some stuff
+	unset CFLAGS CPPFLAGS CXXFLAGS
 	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+	_prepareconfig
+	msg "Building the kernel"
 	cd "$srcdir"/build-lts.x86_64
-	make ARCH="x86_64" CC="${CC:-gcc}" \
+	make ARCH="x86_64" \
+		CC="${CC:-gcc}" \
+		AWK="${AWK:-mawk}" \
 		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
 }
 
 package() {
 	local _outdir="$pkgdir"
-	local _abi_release=${pkgver}-${pkgrel}-lts
 	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
 	cd "$srcdir"/build-lts.x86_64
+	local _abi_release="$(make -s kernelrelease)"
 	# modules_install seems to regenerate a defect Modules.symvers on s390x. Work
 	# around it by backing it up and restore it after modules_install
 	cp Module.symvers Module.symvers.backup
 
 	mkdir -p "$_outdir"/boot "$_outdir"/lib/modules
 
-	make -j1 modules_install install \
+	make modules_install install \
 		ARCH="x86_64" \
 		INSTALL_MOD_PATH="$_outdir" \
+		INSTALL_MOD_STRIP=1 \
 		INSTALL_PATH="$_outdir"/boot \
 		INSTALL_DTBS_PATH="$_outdir/boot/dtbs-lts"
 
 	cp Module.symvers.backup Module.symvers
 
-	rm -f "$_outdir"/lib/modules/${_abi_release}/build \
-		"$_outdir"/lib/modules/${_abi_release}/source \
+	rm -f "$_outdir"/lib/modules/"$_abi_release"/build \
+		"$_outdir"/lib/modules/"$_abi_release"/source \
 		"$_outdir"/boot/System.map-lts \
 		"$_outdir"/boot/config-lts
 	rm -rf "$_outdir"/lib/firmware
 }
 
 _dev() {
-	local _abi_release=${pkgver}-${pkgrel}-lts
+	local _builddir="$srcdir"/build-lts.x86_64
+	local _abi_release="$(make -C "$_builddir" -s kernelrelease)"
 	# copy the only the parts that we really need for build 3rd party
 	# kernel modules and install those as /usr/src/linux-headers,
 	# simlar to what ubuntu does
@@ -121,17 +111,20 @@ _dev() {
 	#
 	pkgdesc="Headers and script for third party modules for lts kernel"
 	depends="$_depends_dev"
-	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
+	local dir="$subpkgdir"/usr/src/linux-headers-"$_abi_release"
 	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
 	# first we import config, run prepare to set up for building
 	# external modules, and create the scripts
 	mkdir -p "$dir"
-	cp "$srcdir"/config-lts.x86_64 "$dir"/.config
-	echo "-$pkgrel-lts" > "$dir"/localversion-alpine
+	cp -a "$_builddir"/.config "$_builddir"/localversion-alpine \
+		"$dir"/
 
-	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" ARCH="x86_64" \
-		syncconfig prepare modules_prepare scripts
+	make -C "$srcdir"/linux-"$_kernver" \
+		O="$dir" \
+		ARCH="x86_64" \
+		AWK="${AWK:-mawk}" \
+		prepare modules_prepare scripts
 
 	# remove the stuff that points to real sources. we want 3rd party
 	# modules to believe this is the soruces
@@ -141,7 +134,7 @@ _dev() {
 	#
 	# this is taken from ubuntu kernel build script
 	# http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
-	cd "$srcdir"/linux-$_kernver
+	cd "$srcdir"/linux-"$_kernver"
 	find .  -path './include/*' -prune \
 		-o -path './scripts/*' -prune -o -type f \
 		\( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
@@ -150,20 +143,26 @@ _dev() {
 
 	cp -a scripts include "$dir"
 
-	find $(find arch -name include -type d -print) -type f \
-		| cpio -pdm "$dir"
+	find arch/x86 -name include -type d -print | while IFS='' read -r folder; do
+		find "$folder" -type f
+	done | sort -u | cpio -pdm "$dir"
 
 	install -Dm644 "$srcdir"/build-lts.$CARCH/Module.symvers \
 		"$dir"/Module.symvers
 
-	mkdir -p "$subpkgdir"/lib/modules/${_abi_release}
-	ln -sf /usr/src/linux-headers-${_abi_release} \
-		"$subpkgdir"/lib/modules/${_abi_release}/build
+	# remove unneeded things
+	msg "Removing documentation..."
+	rm -rf "$dir"/Documentation
+	find "$dir" -type f -name '*.o' -printf 'Removing %P\n' -delete
+	
+	mkdir -p "$subpkgdir"/lib/modules/"$_abi_release"
+	ln -sf /usr/src/linux-headers-"$_abi_release" \
+		"$subpkgdir"/lib/modules/"$_abi_release"/build
 }
 
 sha512sums="
-d25ad40b5bcd6a4c6042fd0fd84e196e7a58024734c3e9a484fd0d5d54a0c1d87db8a3c784eff55e43b6f021709dc685eb0efa18d2aec327e4f88a79f405705a  linux-5.15.tar.xz
-eba6a9c78a065c08f2dfd98b8373df78f9fc80f5770c9111b7ef80cc1d3dceb42d344813df461dcf62de74e7e114f5e9cd3bcc7780c3ec3ac11e4ea4da16612c  config-lts.x86_64
-65504e60731f7254079caa997cd44585f8b9608aa66e0879e677872f89b91aa77b67f28617eddef7fe9932a73a5942466c12c733432405ee7e42944daadef6d4  0001-mt76-mt7921-add-support-for-PCIe-ID-0x0608.patch
-8c534f15a45372c3f1a07b74c7790105b1f4deecca726184f80ec75a196cf199294f61c2e81634245b96a950d037037f0e08ee049e71fb560300ea13987e3b37  patch-5.15.104.xz
+6ed2a73c2699d0810e54753715635736fc370288ad5ce95c594f2379959b0e418665cd71bc512a0273fe226fe90074d8b10d14c209080a6466498417a4fdda68  linux-6.1.tar.xz
+3816cfc8dd14d1c5ced05bbf19b099472c9bbbd1abced32cbb4b6b5baecfaa28c345e4e522648837d98e5bc7c311810cae9160f4c91019bb857a3857076b8e0e  awk.patch
+4084cfdfca1a3dd85816be4f59c30f0f6f8e007ce2a063d11385a841d879dc096b0ab60e2ef36e0ef9ea7dbe60aa03a84bbbd7a369cd4a4c3a2433f034ebde2a  config-lts.x86_64
+b5442dead51ac824dde986f08a62371e94a6743f7d27ed40410a30d2da9e31602068a8929cc693a15b7b2d41d23e09e702f2ddd5e0485ec1bbf5750765eba2e0  patch-6.1.53.xz
 "

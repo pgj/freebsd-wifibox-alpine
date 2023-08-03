@@ -2,12 +2,12 @@
 
 pkgname='mDNSResponder'
 pkgver=1790.80.10
-pkgrel=0
+pkgrel=1
 pkgdesc='Bonjour (zero-configuration networking) by Apple'
 arch="x86_64"
 url='https://opensource.apple.com/tarballs/mDNSResponder/'
 license="APACHE-2.0 BSD3"
-makedepends="musl-nscd-dev mbedtls-dev"
+makedepends="linux-headers musl-nscd-dev mbedtls-dev"
 depends=
 install=
 options="!check !strip"

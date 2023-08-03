@@ -2,7 +2,7 @@
 
 pkgname=wpa_supplicant
 pkgver=2.10
-pkgrel=4 # base: 5
+pkgrel=5 # base: 7
 pkgdesc="utility providing key negotiation for WPA wireless networks"
 url="https://w1.fi/wpa_supplicant/"
 arch="all"
@@ -11,15 +11,19 @@ license="BSD-3-Clause"
 subpackages=
 makedepends="linux-headers openssl-dev>3 dbus-dev libnl3-dev pcsc-lite-dev"
 source="https://w1.fi/releases/wpa_supplicant-$pkgver.tar.gz
-	0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
 	wpa_supplicant.initd
 	wpa_supplicant.confd
+
 	eloop.patch
 	unsafe-renegotiation-1.patch
 	unsafe-renegotiation-2.patch
+
+	0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
+	0002-AP-guard-FT-SAE-code-with-CONFIG_IEEE80211R_AP.patch
 	lower-security-level-for-tls-1.patch
 	no-tools.patch
-	config"
+	config
+	"
 
 # secfixes:
 #   2.9-r13:
@@ -77,12 +81,13 @@ package() {
 
 sha512sums="
 021c2a48f45d39c1dc6557730be5debaee071bc0ff82a271638beee6e32314e353e49d39e2f0dc8dff6e094dcc7008cfe1c32d0c7a34a1a345a12a3f1c1e11a1  wpa_supplicant-2.10.tar.gz
-fb328872087268056b035802f71df2f7af8d11699822fe68611201a07dc693c4fdb8c50dd4fd509ed6db4cca89f6003ce3303770951686a35633977f466f4fb5  0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
 92c4cbaa9776a354275640c9411d2f547f4c0e00415af4ab30039f1a0be6a11082d49e2514905010f0abcc4a9276353276da9864e3d5f7264a0f0767c8cc9d78  wpa_supplicant.initd
 c7e4041fe41743c5e63a07edc9234d0c44c4c0f193a180b27342b43f3be45fb87b42ee0f9e4a20614cf6ad58cf64d25f74d1e75e2e1d521c2f6d45cdc5737eae  wpa_supplicant.confd
 2be055dd1f7da5a3d8e79c2f2c0220ddd31df309452da18f290144d2112d6dbde0fc633bb2ad02c386a39d7785323acaf5f70e5969995a1e8303a094eb5fe232  eloop.patch
 9528735924faf876a7094de46760605e5e66e265187421a668be06dbf03d7b4db6b84cbad793fcd6bd614e3ba540f82f1f80660d75e8a6070eeb7e9abb54ed28  unsafe-renegotiation-1.patch
 a92ba3ed3f41022a8af9396d2b703ee47f78aa05c1fddb42919a7fe6a6fad71e3515c63457e97e252ae0a32c6c34d67ea6efe0278df1e141cf36e650237e5295  unsafe-renegotiation-2.patch
+fb328872087268056b035802f71df2f7af8d11699822fe68611201a07dc693c4fdb8c50dd4fd509ed6db4cca89f6003ce3303770951686a35633977f466f4fb5  0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
+f8a5f5e18509b61ad6fb7ce78207c039fccfca6b71f494cbe9853bcb1b09025364554a45b6129a5b992f6327f72c8a97b660088d9c542f0e62a1c370a3c628a8  0002-AP-guard-FT-SAE-code-with-CONFIG_IEEE80211R_AP.patch
 b1217eff6fbdba5a4c7302ea33bec64290d26745967b24e825c100de9b0e9b6400f0769c3cfac3c761596bb01079c31b632f14bd3374735200385f38557d8cad  lower-security-level-for-tls-1.patch
 3278eff7118f9dc9e177adc3ed91cad562a8edde396af8619321ac8552a86e9c7de25212d5578ea17cbe4b6dc928d83cd6e9a7f0d41e07576656e6e9274107d6  no-tools.patch
 310ee960c3d8beab80169bedf43ff9dfbf49f808c5a32accac2f41e54fff6d047a6136488de72cbcfa66c5205a3b68019dff6e7f2ebb87e00bbcdc509fca95ee  config
