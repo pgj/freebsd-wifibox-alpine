@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=hostapd
 pkgver=2.10
-pkgrel=2 # base: 5
+pkgrel=3 # base: 6
 pkgdesc="daemon for wireless software access points"
 url="https://w1.fi/hostapd/"
 arch="all"
@@ -62,6 +62,7 @@ prepare() {
 			-e '/^#CONFIG_LIBNL32=y/s/^#//' \
 			-e '/^#CONFIG_ACS=y/s/^#//' \
 			-e '/^#CONFIG_WEP=y/s/^#//' \
+			-e '/^#CONFIG_SAE=y/s/^#//' \
 			defconfig
 
 		echo "CC ?= ${CC:-gcc}"
