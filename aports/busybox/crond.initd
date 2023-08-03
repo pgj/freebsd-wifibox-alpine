@@ -2,8 +2,9 @@
 
 name="busybox $SVCNAME"
 command="/usr/sbin/$SVCNAME"
-pidfile="/var/run/$SVCNAME.pid"
-command_args="$CRON_OPTS"
+pidfile="/run/$SVCNAME.pid"
+command_args="$CRON_OPTS -f"
+command_background=true
 
 depend() {
 	need localmount
