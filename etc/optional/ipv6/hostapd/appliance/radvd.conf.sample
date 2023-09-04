@@ -1,0 +1,20 @@
+# This is the radvd(8) configuration file, which is the IPv6 Router
+# Advertisement Daemon. It listens to router solicitations and sends
+# router advertisements as described in "Neighbor Discovery for IP
+# Version 6 (IPv6)" (RFC 4861).  See https://manpages.org/radvdconf/5
+# for more information on the details.
+
+interface wlan0
+{
+        AdvSendAdvert on;
+        AdvManagedFlag on;
+        prefix ::/64
+        {
+	        AdvOnLink on;
+                AdvAutonomous on;
+                AdvRouterAddr on;
+        };
+
+	RDNSS 2001:4860:4860::8888 2001:4860:4860::8844 {
+	};
+};
