@@ -1,0 +1,25 @@
+# This is an iface stanza for interfaces(5) with relatively sane
+# defaults.  Consult http://manpages.org/etc-network-interfaces/5 for
+# more.
+#
+# The `eth0` networking interface represents the virtual Ethernet card
+# of the guest, which would be the default gateway for the host.
+# Change these values only if the 10.0.0.0/24 IPv4 network is not
+# suitable.
+
+iface eth0 inet static
+  address 10.0.0.1
+  netmask 255.255.255.0
+
+# This is the default IPv6 address and prefix for `eth0`.  Change this
+# value only if the fd00::/64 IPv6 network is not suitable.
+
+iface eth0 inet6 static
+  address fd00::ffff/64
+
+# The `wlan0` networking interface is associated with the wireless
+# networking card as it is exposed by the driver.  By this default
+# configuration, the corresponding IP address is obtained through the
+# use of DHCP.  This should just work for most of the cases.
+
+iface wlan0 dhcp

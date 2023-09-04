@@ -1,0 +1,10 @@
+# This is the configuration file for dhcpcd(8), an RFC-2131-compliant
+# DHCP client.  This program is to automatically configure the
+# wireless interface for working with both IPv4 an IPv6.  Consult
+# https://manpages.org/dhcpcdconf/5 for more.
+
+duid
+noipv6rs
+
+interface wlan0
+  ipv6rs
