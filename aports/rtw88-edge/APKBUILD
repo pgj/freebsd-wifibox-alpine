@@ -1,0 +1,39 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname='rtw88-edge'
+pkgver=20230913
+pkgrel=0
+_gitrev='d0f932dba10827bae07cb7044854651565591b87'
+pkgdesc='Backport of the Realtek Wifi 5 drivers from the wireless-next repo (edge)'
+arch="x86_64"
+url='https://github.com/lwfinger/rtw88'
+license="GPL-2.0"
+makedepends="linux-edge-dev xz"
+depends="linux-edge"
+install=
+options="!check !strip"
+source="Makefile.patch
+	https://github.com/lwfinger/rtw88/archive/${_gitrev}.zip"
+
+_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-edge' | sed 's!./linux-headers-!!')
+_kbase="/lib/modules/${_kver}"
+_srcdir="$srcdir/rtw88-$_gitrev"
+builddir="$_srcdir"
+
+prepare() {
+	default_prepare
+}
+
+build() {
+	make -C "$_srcdir" -j8 KVER="$_kver"
+}
+
+package() {
+	xz "$_srcdir"/*.ko
+	install -p -D -m 644 "$_srcdir"/*.ko.xz -t "$pkgdir"/lib/modules/"$_kver"/kernel/drivers/net/wireless/realtek/rtw88
+}
+
+sha512sums="
+4a33c7cace66437d422816c74810bd637f846be5d7935ef8aaae70971e35cf04640e10d71b3c62e6e951809188bd6c6846f2ebf1d90dd9bb45aedcfdf833bc8b  Makefile.patch
+8d1aaaa1942230cb5f1ca82123fda020760ff71a281be3826b4bafacee442c0b647928a4bccab1c70fe559d91550962b23998710ac7ab8b995f335230519281c  d0f932dba10827bae07cb7044854651565591b87.zip
+"

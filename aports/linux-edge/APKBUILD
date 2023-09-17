@@ -1,0 +1,166 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=linux-edge
+pkgver=6.5.3
+case $pkgver in
+	*.*.*)	_kernver=${pkgver%.*};;
+	*.*) _kernver=$pkgver;;
+esac
+pkgrel=0
+pkgdesc="Linux stable kernel"
+url="https://www.kernel.org"
+depends=
+_depends_dev="perl gmp-dev elfutils-dev flex bison"
+makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev>3
+	diffutils findutils"
+provides="linux"
+options="!strip"
+install=
+source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
+	config-edge.x86_64
+	"
+subpackages="$pkgname-dev:_dev:$CBUILD_ARCH"
+builddir="$srcdir"/linux-"$_kernver"
+
+if [ "${pkgver%.0}" = "$pkgver" ]; then
+	source="$source
+	https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/patch-$pkgver.xz"
+fi
+
+arch="x86_64"
+license="GPL-2.0-only"
+
+prepare() {
+	if [ "$_kernver" != "$pkgver" ]; then
+		msg "Applying patch-$pkgver.xz"
+		unxz -c < "$srcdir"/patch-$pkgver.xz | patch -p1 -N
+	fi
+
+	default_prepare
+
+	# remove localversion from patch if any
+	rm -f localversion*
+}
+
+_prepareconfig() {
+	local _config="config-edge.x86_64"
+	local _builddir="$srcdir"/build-edge.x86_64
+	mkdir -p "$_builddir"
+	echo "-$pkgrel-edge" > "$_builddir"/localversion-alpine
+
+	cp "$srcdir"/"$_config" "$_builddir"/.config
+	msg "Configuring the kernel"
+	make -C "$srcdir"/linux-"$_kernver" \
+		O="$_builddir" \
+		ARCH=x86_64 \
+		olddefconfig
+}
+
+build() {
+	unset LDFLAGS
+	# for some reason these sometimes leak into the kernel build,
+	# -Werror=format-security breaks some stuff
+	unset CFLAGS CPPFLAGS CXXFLAGS
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+	_prepareconfig
+	msg "Building the kernel"
+	cd "$srcdir"/build-edge.x86_64
+	make ARCH="x86_64" \
+		DTC_FLAGS="-@" \
+		CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
+}
+
+package() {
+	local _outdir="$pkgdir"
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+
+	cd "$srcdir"/build-edge.x86_64
+	local _abi_release="$(make -s kernelrelease)"
+	# modules_install seems to regenerate a defect Modules.symvers on s390x. Work
+	# around it by backing it up and restore it after modules_install
+	cp Module.symvers Module.symvers.backup
+
+	mkdir -p "$_outdir"/boot "$_outdir"/lib/modules
+
+	make modules_install install \
+		ARCH="x86_64" \
+		INSTALL_MOD_PATH="$_outdir" \
+		INSTALL_MOD_STRIP=1 \
+		INSTALL_PATH="$_outdir"/boot \
+		INSTALL_DTBS_PATH="$_outdir/boot/dtbs-edge"
+
+	cp Module.symvers.backup Module.symvers
+
+	rm -f "$_outdir"/lib/modules/"$_abi_release"/build \
+		"$_outdir"/lib/modules/"$_abi_release"/source \
+		"$_outdir"/boot/System.map-edge \
+		"$_outdir"/boot/config-edge
+	rm -rf "$_outdir"/lib/firmware
+}
+
+_dev() {
+	local _builddir="$srcdir"/build-edge.x86_64
+	local _abi_release="$(make -C "$_builddir" -s kernelrelease)"
+	# copy the only the parts that we really need for build 3rd party
+	# kernel modules and install those as /usr/src/linux-headers,
+	# simlar to what ubuntu does
+	#
+	# this way you dont need to install the 300-400 kernel sources to
+	# build a tiny kernel module
+	#
+	pkgdesc="Headers and script for third party modules for the kernel"
+	depends="$_depends_dev"
+	local dir="$subpkgdir"/usr/src/linux-headers-"$_abi_release"
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+
+	# first we import config, run prepare to set up for building
+	# external modules, and create the scripts
+	mkdir -p "$dir"
+	cp -a "$_builddir"/.config "$_builddir"/localversion-alpine \
+		"$dir"/
+
+	make -C "$srcdir"/linux-"$_kernver" \
+		O="$dir" \
+		ARCH="x86_64" \
+		prepare modules_prepare scripts
+
+	# remove the stuff that points to real sources. we want 3rd party
+	# modules to believe this is the soruces
+	rm "$dir"/Makefile "$dir"/source
+
+	# copy the needed stuff from real sources
+	#
+	# this is taken from ubuntu kernel build script
+	# http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
+	cd "$srcdir"/linux-"$_kernver"
+	find .  -path './include/*' -prune \
+		-o -path './scripts/*' -prune -o -type f \
+		\( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
+		   -name '*.sh' -o -name '*.pl' -o -name '*.lds' -o -name 'Platform' \) \
+		-print | cpio -pdm "$dir"
+
+	cp -a scripts include "$dir"
+
+	find arch/x86 -name include -type d -print | while IFS='' read -r folder; do
+		find "$folder" -type f
+	done | sort -u | cpio -pdm "$dir"
+
+	install -Dm644 "$srcdir"/build-edge.$CARCH/Module.symvers \
+		"$dir"/Module.symvers
+
+	# remove unneeded things
+	msg "Removing documentation..."
+	rm -rf "$dir"/Documentation
+	find "$dir" -type f -name '*.o' -printf 'Removing %P\n' -delete
+
+	mkdir -p "$subpkgdir"/lib/modules/"$_abi_release"
+	ln -sf /usr/src/linux-headers-"$_abi_release" \
+		"$subpkgdir"/lib/modules/"$_abi_release"/build
+}
+
+sha512sums="
+1b59dc5e65d4922c3217a8c8f19022dfd6595ae89747861d825bfeb51a4ae6c85449d05db69635a712bef7b355b80318195665582d8933b1fed6ba582f6ff257  linux-6.5.tar.xz
+b95330e8bc3437fb197741bfa02c674e87e3bfbe03880a6996e425f2acf0155dd0ead178f3610943755ceb9dc4df9f6fb558268533bc0a230353ddf941010a9e  config-edge.x86_64
+84e5282053953bb35532d482e87dc9e7f1152e421b7da1fa5ef4bf0cfaadd4d36eaf8b0055aab95a3f68076abefca105710315fe1996a293c511739d2663a8dd  patch-6.5.3.xz
+"
