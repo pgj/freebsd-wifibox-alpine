@@ -1,0 +1,32 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname='rtw89-edge'
+pkgver=20230913
+pkgrel=0
+_gitrev='12837647e34f07e117d90b25708a4f8baa772f50'
+pkgdesc='Driver for Realtek 8852AE, an 802.11ax device (edge)'
+arch="x86_64"
+url='https://github.com/lwfinger/rtw89'
+license="GPL-2.0"
+makedepends="linux-edge-dev xz bash"
+depends="linux-edge"
+install=
+options="!check !strip"
+source="https://github.com/lwfinger/rtw89/archive/${_gitrev}.zip"
+
+_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d | sed 's!./linux-headers-!!')
+_kbase="/lib/modules/${_kver}"
+_srcdir="$srcdir/rtw89-$_gitrev"
+
+build() {
+  make -C "$_srcdir" -j8 KVER="$_kver"
+}
+
+package() {
+  xz "$_srcdir"/*.ko
+  install -p -D -m 644 "$_srcdir"/*.ko.xz -t "$pkgdir"/lib/modules/"$_kver"/kernel/drivers/net/wireless/realtek/rtw89
+}
+
+sha512sums="
+7a5318149da92925736cc5fa7746940c83c60ada07442c5e362fe7ee2bb67c3b5de1905f39a7e08be8c752aef23b0807f5e0202d665ed8dcc66149a4983fdb52  12837647e34f07e117d90b25708a4f8baa772f50.zip
+"

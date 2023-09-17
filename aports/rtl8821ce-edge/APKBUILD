@@ -1,20 +1,20 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
-pkgname='rtl8821ce'
+pkgname='rtl8821ce-edge'
 pkgver=20230915
 pkgrel=0
 _gitrev='0d2c745d7ef023bccd63cf79e98556f0b5a39024'
-pkgdesc='Driver for Realtek 8821CE, an 802.11ac device'
+pkgdesc='Driver for Realtek 8821CE, an 802.11ac device (edge)'
 arch="x86_64"
 url='https://github.com/tomaspinho/rtl8821ce'
 license="GPL-2.0"
-makedepends="linux-lts-dev xz"
-depends="linux-lts"
+makedepends="linux-edge-dev xz"
+depends="linux-edge"
 install=
 options="!check !strip"
 source="https://github.com/tomaspinho/rtl8821ce/archive/${_gitrev}.zip"
 
-_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-lts' | sed 's!./linux-headers-!!')
+_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-edge' | sed 's!./linux-headers-!!')
 _kbase="/lib/modules/${_kver}"
 _srcdir="$srcdir/rtl8821ce-$_gitrev"
 
