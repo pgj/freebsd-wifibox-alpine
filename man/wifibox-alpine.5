@@ -43,6 +43,16 @@ iptables:
 https://www.netfilter.org/projects/iptables/index.html
 .ft R
 .It
+dhcpcd:
+.ft B
+https://roy.marples.name/projects/dhcpcd
+.ft R
+.It
+radvd:
+.ft B
+https://radvd.litech.org/
+.ft R
+.It
 iw:
 .ft B
 https://wireless.wiki.kernel.org/en/users/documentation/iw
@@ -100,7 +110,11 @@ The image can host either
 for connecting to wireless networks, or
 .Sy hostapd
 for creating wireless access points, depending how it was built.  In
-addition to that,
+addition to that, a combination of
+.Sy dhcpcd
+and
+.Sy radvd
+could be used to support IPv6 traffic,
 .Sy mDNSResponder
 could be deployed to handle multicast DNS requests, and
 .Sy forwarding
@@ -167,6 +181,18 @@ packets through the interfaces.  It is loaded once at launching the
 respective service, usually on boot, and cannot be modified from the
 guest.
 .It
+.Sy ip6tables
+is the IPv6-enabled version of
+.Sy iptables
+which uses the
+.Pa appliance/ip6tables
+configuration file.  Its purpose is exactly the same as for its
+sibling, it bridges the
+.Sy eth0
+and
+.Sy wlan0
+networking interfaces with the help of NAT.
+.It
 .Sy mDNSResponder
 works with the
 .Pa appliance/mdnsd-services.conf
@@ -193,6 +219,35 @@ name servers, in cooperation with
 .Sy udhcpc
 (DHCP client) when required. This is utilized only when dynamic IP
 addresses are in use.
+.It
+.Sy dhcpcd
+is an alternative to
+.Sy udhcpc
+and it is used only when IPv6 is optionally configured.  In that case,
+it takes over the role of
+.Sy udhcpc
+and manages both IPv4 and IPv6 addresses.  It works with the
+.Pa appliance/dhcpcd.conf
+file which often holds only a handful of overrides for the default
+options because otherwise they work well.
+.Sy dhcpcd
+is pre-configured to automatically keep
+.Sy udhcpd
+updated about name servers and it is employed only for
+.Sy wpa_supplicant .
+.It
+.Sy radvd
+works with the
+.Pa appliance/radvd.conf
+configuration file and this is the IPv6 Routing Advertisement Daemon
+that implements the routing functionality in case IPv6 is enabled.  It
+sends Router Advertisement messages, specified by RFC 2461, towards
+the host
+.Sy ( wpa_supplicant )
+or the clients
+.Sy ( hostapd ) ,
+and sending a Router Solicitation message when requested.  These
+messages are required for IPv6 stateless autoconfiguration (SLAAC).
 .It
 .Sy uds_passthru
 is an optional service for managing the forwarding of control sockets
@@ -222,6 +277,13 @@ directory where the
 are hooked up in the system in the following ways.
 .Bl -bullet
 .It
+.Pa /media/etc/dhcpcd.conf
+is mapped to
+.Pa /etc/dhcpcd.conf
+which will be used by
+.Sy dhcpcd ,
+when configured.
+.It
 .Pa /media/etc/forwarding.conf
 is used directly from this location by
 .Sy forwarding ,
@@ -241,8 +303,13 @@ and
 .Sy ifdown .
 .It
 .Pa /media/etc/iptables
-is used directly from this location by
-.Sy iptables .
+and
+.Pa /media/etc/ip6tables
+are used directly from these locations by
+.Sy iptables
+and
+.Sy ip6tables ,
+respectively.
 .It
 .Pa /media/etc/mdnsd-services.conf
 is used directly from this location by
@@ -250,6 +317,13 @@ is used directly from this location by
 when
 .Sy mDNSResponder
 is in use.
+.It
+.Pa /media/etc/radvd.conf
+is mapped to
+.Pa /etc/radvd.conf
+which will be used to generate the configuration file that
+.Sy radvd
+will read, when enabled.
 .It
 .Pa /media/etc/udhcpd.conf
 is mapped to
@@ -362,9 +436,14 @@ respective services in case of failures.
 .Sh CONFIGURATION OF NETWORK PACKET FILTERING
 The network packet filtering rules are managed by the
 .Sy iptables
-service, which needs to be restarted so that the changes in the
+and
+.Sy ip6tables
+services, which need to be restarted so that the changes in either the
 .Pa iptables
-file can take effect.
+or the
+.Pa ip6tables
+file can take effect.  For example, in case of
+.Sy iptables :
 .Bd -literal -offset indent
 # rc-service iptables restart
 .Ed
@@ -390,12 +469,23 @@ The file exported this way could be then used as the main
 configuration by moving it to the location from where the
 .Pa /media/etc
 directory is mounted.
+.Pp
+The same set of commands apply for
+.Sy ip6tables ,
+where
+.Sy iptables-save
+has to be written as
+.Sy ip6tables-save .
 .Sh TROUBLESHOOTING NETWORK ISSUES
 To verify the flow of network traffic, the
 .Sy iptables
-utility can be asked to list the rules in a more verbose manner.  This
-will include the number of packets that matched each of the rules, so
-their effect becomes observable.
+or the
+.Sy ip6tables
+(for IPv6) utility can be asked to list the rules in a more verbose
+manner.  This will include the number of packets that matched each of
+the rules, so their effect becomes observable.  For example, in case
+of
+.Sy iptables :
 .Bd -literal -offset indent
 # iptables -L -nv
 .Ed
