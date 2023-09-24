@@ -2,7 +2,7 @@
 
 pkgname=broadcom-wl-edge
 pkgver=6.30.223.271
-pkgrel=12
+pkgrel=13
 pkgdesc='Broadcom 802.11 Linux STA wireless driver (edge)'
 arch="x86_64"
 url='https://www.broadcom.com/support/download-search/?pf=Wireless+LAN+Infrastructure'
@@ -33,7 +33,7 @@ source="broadcom-wl.conf
         https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz
 	"
 
-_kernver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d | sed 's!./linux-headers-!!')
+_kernver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-edge' | sed 's!./linux-headers-!!')
 _kbase="/lib/modules/${_kernver}"
 
 prepare() {

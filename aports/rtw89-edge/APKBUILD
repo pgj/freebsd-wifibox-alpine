@@ -2,7 +2,7 @@
 
 pkgname='rtw89-edge'
 pkgver=20230913
-pkgrel=0
+pkgrel=1
 _gitrev='12837647e34f07e117d90b25708a4f8baa772f50'
 pkgdesc='Driver for Realtek 8852AE, an 802.11ax device (edge)'
 arch="x86_64"
@@ -14,7 +14,7 @@ install=
 options="!check !strip"
 source="https://github.com/lwfinger/rtw89/archive/${_gitrev}.zip"
 
-_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d | sed 's!./linux-headers-!!')
+_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-edge' | sed 's!./linux-headers-!!')
 _kbase="/lib/modules/${_kver}"
 _srcdir="$srcdir/rtw89-$_gitrev"
 
