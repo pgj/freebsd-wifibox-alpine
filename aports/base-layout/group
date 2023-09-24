@@ -46,3 +46,5 @@ utmp:x:406:
 ping:x:999:
 nogroup:x:65533:
 nobody:x:65534:
+dhcpcd:x:102:dhcpcd
+radvd:x:103:radvd
