@@ -8,5 +8,11 @@ start() {
         if [ ! -s "$UDHCPD_CONF" ] ; then
 		sed 's|%%DNS%%||' < "$UDHCPD_CONF_TEMPLATE" > "$UDHCPD_CONF"
         fi
+        if [ -f /etc/conf.d/radvd ]; then
+                . /etc/conf.d/radvd
+                if [ ! -s "$CONFIGFILE" ]; then
+                        sed 's|%%DNS%%||' < "$CONFIGFILE_TEMPLATE" > "$CONFIGFILE"  
+                fi
+        fi
         eend $?
 }

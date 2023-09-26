@@ -4,3 +4,5 @@
 
 # Extra options to pass to radvd
 OPTIONS=""
+CONFIGFILE_TEMPLATE="/etc/radvd.conf"
+CONFIGFILE="/tmp/radvd.conf"
