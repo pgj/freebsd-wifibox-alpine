@@ -1,0 +1,14 @@
+#!/sbin/openrc-run
+
+supervisor=supervise-daemon
+name="bluetoothctl-proxy"
+description="bluetoothctl proxy"
+
+command=/usr/bin/socat
+command_args="TCP4-LISTEN:1300,reuseaddr,fork EXEC:/usr/bin/bluetoothctl"
+command_background=true
+
+depend() {
+	need net bluetooth
+	after firewall
+}

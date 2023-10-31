@@ -48,3 +48,4 @@ nogroup:x:65533:
 nobody:x:65534:
 dhcpcd:x:102:dhcpcd
 radvd:x:103:radvd
+messagebus:x:104:messagebus

@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+
+name="Bluetooth"
+command="/usr/lib/bluetooth/bluetoothd"
+pidfile="/run/bluetoothd.pid"
+command_background=true
+
+depend() {
+	after coldplug udev-postmount
+	need dbus localmount hostname
+}
+

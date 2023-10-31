@@ -1,0 +1,90 @@
+# Contributor: Sergey Lukin <sergej.lukin@gmail.com>
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+# Contributor: Natanael Copa <ncopa@alpinelinux.org>
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+pkgname=icu
+pkgver=73.2
+pkgrel=0 # base: 2
+pkgdesc="International Components for Unicode library"
+url="https://icu.unicode.org/"
+arch="all"
+license="ICU"
+depends_dev="$pkgname=$pkgver-r$pkgrel"
+makedepends="python3 py3-yaml"
+options="!check"
+source="https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-src.tgz
+	https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-data.zip
+	https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-data-bin-b.zip
+	https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-data-bin-l.zip
+	cal-regression.patch
+	standardize-vtzone-output.patch
+	data-filter-en.yml
+	"
+builddir="$srcdir/icu/source"
+
+# secfixes:
+#   66.1-r0:
+#     - CVE-2020-21913
+#   65.1-r1:
+#     - CVE-2020-10531
+#   57.1-r1:
+#     - CVE-2016-6293
+#   58.1-r1:
+#     - CVE-2016-7415
+#   58.2-r2:
+#     - CVE-2017-7867
+#     - CVE-2017-7868
+
+_icudtfile=icudt${pkgver%%.*}l.dat
+
+prepare() {
+	default_prepare
+
+	rm -rf data
+	mv "$srcdir"/data .
+}
+
+build() {
+	_yaml2json "$srcdir"/data-filter-en.yml > data-filter-en.json
+	export ICU_DATA_FILTER_FILE="./data-filter-en.json"
+
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--with-data-packaging=archive \
+		--disable-samples \
+		--enable-static \
+		--mandir=/usr/share/man
+	make
+}
+
+package() {
+	make -j1 DESTDIR="$pkgdir" install
+	chmod +x "$pkgdir"/usr/bin/icu-config
+	install -Dm644 "$srcdir"/icu/license.html -t "$pkgdir"/usr/share/licenses/icu/
+
+	# Strip
+	rm -rf \
+		"$pkgdir"/usr/bin \
+		"$pkgdir"/usr/sbin \
+		"$pkgdir"/usr/include \
+		"$pkgdir"/usr/lib/icu \
+		"$pkgdir"/usr/lib/pkgconfig \
+		"$pkgdir"/usr/share/man
+}
+
+_yaml2json() {
+	python3 -c 'import sys, yaml, json; json.dump(yaml.safe_load(sys.stdin), sys.stdout)' <"$1"
+}
+
+sha512sums="
+76dd782db6205833f289d7eb68b60860dddfa3f614f0ba03fe7ec13117077f82109f0dc1becabcdf4c8a9c628b94478ab0a46134bdb06f4302be55f74027ce62  icu4c-73_2-src.tgz
+7f25816de4062fe79eaf350cb5230747643b9bb08c60443b4e1b2d79eb1ce3192ae9a767107171b85bda4cfc1969035ce09cebc81add0590eb4d61ca33aa0730  icu4c-73_2-data.zip
+8512947da7b2a927627abed6bd7e04218cd4fcd02d44eb72a82ffa87aedabfc3be5d3152e9fba33a769ef35e2db55764c2ab8f5bd65b4e89aa9c15b33392e078  icu4c-73_2-data-bin-b.zip
+420c2f5090927dab13f5449da3b0ec7bf86a91ea8723f177aca2907a8eea9bcb4c3475b66c54355ae320001813db57a00afdab00bd85b8c36d39adedcab80bfc  icu4c-73_2-data-bin-l.zip
+09dd560bf5cfa5c32fc6f1f04b209446fa3b5306e9c237ee78afeea4588030bac1e3daf03a1e7f6273c85ecfacd9b938518fc194c11d7f5259e2b7730fc2a56d  cal-regression.patch
+c76fd529f92a7b27a45a307c8bb91c109910d012478414b08983af3320e29fbe76e03d8434c4efbde68ecaa56a86130d6514428c5a1085985634bc3650e8e96e  standardize-vtzone-output.patch
+609541c1ac10c12b2b52f7800a2057d5c97e49dc9a1774a1b53e13d88599128baa7637f1a63b4de52dfe58b1038c7f3462ef29ad223dbe2ecb2862e3249a1cf4  data-filter-en.yml
+"

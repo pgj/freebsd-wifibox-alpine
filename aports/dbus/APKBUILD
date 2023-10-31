@@ -1,0 +1,68 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+pkgname=dbus
+pkgver=1.14.8
+pkgrel=0 # base: 0
+pkgdesc="Freedesktop.org message bus system"
+url="https://www.freedesktop.org/Software/dbus"
+arch="all"
+license="AFL-2.1 OR GPL-2.0-or-later"
+depends_dev="util-linux-dev"
+makedepends="
+	$depends_dev
+	expat-dev
+	glib-dev
+	libsm-dev
+	libx11-dev
+	meson
+	xmlto
+	"
+
+source="https://dbus.freedesktop.org/releases/dbus/dbus-$pkgver.tar.xz
+	$pkgname.initd
+	$pkgname.confd
+	"
+options="!check" # fail on 1.14
+
+# secfixes:
+#   1.14.4-r0:
+#     - CVE-2022-42010
+#     - CVE-2022-42011
+#     - CVE-2022-42012
+#   1.12.18-r0:
+#     - CVE-2020-12049
+#   1.12.16-r0:
+#     - CVE-2019-12749
+
+build() {
+	CFLAGS="$CFLAGS -flto=auto" \
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--localstatedir=/var \
+		--sysconfdir=/etc \
+		--with-system-pid-file=/run/dbus/dbus.pid \
+		--disable-checks \
+		--disable-assertions \
+		--without-x
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	install -Dm755 "$srcdir"/dbus.initd "$pkgdir"/etc/init.d/dbus
+	install -Dm644 "$srcdir"/dbus.confd "$pkgdir"/etc/conf.d/dbus
+
+	# can't  install tmpfs
+	rm -r "$pkgdir"/var/run
+
+	# Remove manual pages
+	rm -rf "$pkgdir"/usr/share/man/man1
+}
+
+sha512sums="
+f3dfc73da28cbe20449d15bbe4166c3574f0e551dfd15fca7cce2b8c71e778360ed2dd391ee5c414a7a47ff4b958727b26ef4cabfee70564f8d0a34bf5ad2386  dbus-1.14.8.tar.xz
+86c7b317fd490564bcdf4c35398e231d354dff6e8cfdaea0cdf23701ece32e4ac72587ee12a85e76861251848a9ffea3e9928f91143874fcada7593bcc99df20  dbus.initd
+3f063efa672a900ed04bc7224ba31b3ced91bb98ae096a3ce12552a0b6e2c38ddb445edb4876518f9be4140a5d901dc62080e95aab4346d89dbf329ebec33cb3  dbus.confd
+"

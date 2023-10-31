@@ -1,0 +1,22 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=bluetoothctl-proxy
+pkgver=0.1
+pkgrel=0
+pkgdesc="Bluetoothctl proxy for Wifibox"
+url="https://github.com/pgj/freebsd-wifibox-alpine"
+arch="all"
+license="BSD2"
+depends="socat"
+install=""
+subpackages=
+options="!check"
+arch="noarch"
+source=bluetoothctl-proxy.initd
+
+package() {
+	install -D -m755 "$srcdir"/bluetoothctl-proxy.initd "$pkgdir"/etc/init.d/bluetoothctl-proxy
+}
+sha512sums="
+18539dd51eff5ffdd0c6585fd9fddc10cd737a9a7bb249b1274d7d4bec69261dd9a9cce091cbe4cf5746d66f61215f5b41d33d20de0da10c82e71184699d9eb1  bluetoothctl-proxy.initd
+"
