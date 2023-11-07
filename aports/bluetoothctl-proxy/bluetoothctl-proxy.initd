@@ -4,8 +4,10 @@ supervisor=supervise-daemon
 name="bluetoothctl-proxy"
 description="bluetoothctl proxy"
 
+_port=${port:-1300}
+
 command=/usr/bin/socat
-command_args="TCP4-LISTEN:1300,reuseaddr,fork EXEC:/usr/bin/bluetoothctl"
+command_args="TCP4-LISTEN:${_port},reuseaddr,fork EXEC:/usr/bin/bluetoothctl"
 command_background=true
 
 depend() {
