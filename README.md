@@ -8,7 +8,8 @@ guest based on [Alpine Linux].
 
 *This is a work-in-progress experimental software project without any
 guarantees or warranties.  It is shared in the hope that is going to
-be useful and inspiring for others.*
+be useful and inspiring for others.  Please report issues at the
+[FreeBSD Wifibox] repository directly.*
 
 ## Prerequisites
 
