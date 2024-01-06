@@ -106,11 +106,9 @@ $(GUESTDIR)/.done:
 	$(ENV) LD_LIBRARY_PATH=$(BOOTSTRAPDIR)/lib \
 		$(_BUSYBOX) \
 		depmod -A -b $(GUESTDIR) $$($(LS) $(GUESTDIR)/lib/modules)
-	# try umounting `linprocfs` if that was mounted (on FreeBSD 13
-	# or later), usually happens for `root`
-.if $(UID) == 0
+	# try unmounting `linprocfs` if that was mounted (on FreeBSD 13
+	# or later)
 	$(UMOUNT) $(GUESTDIR)/proc || $(TRUE)
-.endif
 	# install extra files manually
 .if exists($(PWD)/guest)
 	$(CP) -R $(PWD)/guest/ $(GUESTDIR)
