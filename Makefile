@@ -10,7 +10,7 @@ ETC_SRCS?=$(PWD)/etc/wpa_supplicant
 ROOT=$(PREFIX)/share/wifibox
 SHAREDIR=$(DESTDIR)$(ROOT)
 ETCDIR=$(DESTDIR)$(PREFIX)/etc/wifibox
-MANDIR=$(DESTDIR)$(PREFIX)/man
+MANDIR=$(DESTDIR)$(PREFIX)/share/man
 RUNDIR=$(DESTDIR)/var/run/wifibox
 
 WORKDIR?=$(PWD)/work
