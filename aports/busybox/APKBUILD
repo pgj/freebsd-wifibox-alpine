@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=busybox
 pkgver=1.36.1
-pkgrel=1 # base: 2
+pkgrel=2 # base: 15
 pkgdesc="Size optimized toolbox of many common UNIX utilities"
 url="https://busybox.net/"
 arch="all"
@@ -59,11 +59,14 @@ source="https://busybox.net/downloads/busybox-$pkgver.tar.bz2
 	acpid.logrotate
 	config
 	default.script
+	udhcpc.conf
 	$_openrc_files
 	$_mdev_openrc_files
 "
 
 # secfixes:
+#   1.36.1-r2:
+#     - CVE-2022-48174
 #   1.35.0-r17:
 #     - CVE-2022-30065
 #   1.35.0-r7:
@@ -163,14 +166,11 @@ package() {
 		"$pkgdir"/etc/udhcpc
 
 	ln -s /media/etc/udhcpd.conf "$pkgdir"/etc
+	install -Dm644 "$srcdir"/udhcpc.conf "$pkgdir"/etc/udhcpc/udhcpc.conf
+
 	cat >"$pkgdir"/etc/securetty <<EOF
 console
 ttyS0
-EOF
-	cat >"$pkgdir"/etc/udhcpc/udhcpc.conf <<EOF
-RESOLV_CONF="/tmp/resolv.conf"
-UDHCPD_CONF_TEMPLATE="/etc/udhcpd.conf"
-UDHCPD_CONF="/tmp/udhcpd.conf"
 EOF
 
 	# script for udhcpc
@@ -217,8 +217,9 @@ d3bd84c42487de573c0c5165a847fd233ddcd4d53a61b1e03c30a46b6dba3993e741f12daf167b83
 5f8c1a848f28aff2b28085950c561e1a51dfcea043da455e3daf9b960025dd8789ecfe43370553cb727d4ec239aa23c42e3ae5f6ef1cd5768d69c80c31b8f39e  0029-awk-fix-use-after-realloc-CVE-2021-42380-closes-1560.patch
 28748a431718f270b2d0023d09f059e6a32501afb9fd243c4b127fec28bc9312ffb7fdcc1563544a2cb29bed66383ecfea7957d557f7b21402ec3bdb6938004f  0030-shell-avoid-segfault-on-0-0-0-09J-.-Closes-15216.patch
 aa93095e20de88730f526c6f463cef711b290b9582cdbd8c1ba2bd290019150cbeaa7007c2e15f0362d5b9315dd63f60511878f0ea05e893f4fdfb4a54af3fb1  acpid.logrotate
-b1e13a736eaf8a621b648d97c2526fe72215a5bfb13277a58c7d631bcee08cbcea20dd3d11ea8a97e545ec137adc41bd75f5f6dcbcfae96934fe6b3d14c94b46  config
+b0b65c0b2955bc4ff7848df58eedec7807c48abf0c3c4f057276068a706568385fdce94b7a68ea9845d11dc7c0d410adc34545d8aa1926b18704db82e4def246  config
 6c1d25c733fd9ac6ba7d3c7f474c836fbfd41d8f1753ec9c21c08d57cd6249023a0b16f81da4d2ec5d56d14509f7ba1fffadf691504f0670f90017aaf1ed564b  default.script
+21fbd1fbe2e77922c5d465aace694cf69835a159361eb56571780d67168338bf34565f48158303ce39438fe03ffee2f64f9637e97c3d0a74fd25b0c200b1e392  udhcpc.conf
 fcb532233fd7ba8cad302d037b88cff00ee8b96b37c90b34fc823479208cf7cdda48818c972ce2c4703b7283fd58e99ba8a724818f884f3b09eaa7e2d6ffad21  acpid.initd
 34c6f3197064bb91619b899b28a201bd4d920b18bded3845440b2cb36dc6f16cabf447c96878349b16e46c30184cbe48bac00a01c5f7cf1be038c0b7136064c5  crond.confd
 f3a104095c659eef79925e8df850cdac499f6c7756fb9647088a24b98dc72f37413c3869da6113bcc578c2178c1c2e5ab8d31a50ad2e472c06aaf408e8924d6a  crond.initd

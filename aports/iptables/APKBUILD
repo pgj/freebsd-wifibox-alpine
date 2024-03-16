@@ -1,15 +1,14 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=iptables
-pkgver=1.8.9
-pkgrel=1 # base: 2
+pkgver=1.8.10
+pkgrel=0 # base: 3
 pkgdesc="Linux kernel firewall, NAT and packet mangling tools"
 url="https://www.netfilter.org/projects/iptables/index.html"
 arch="all"
 license="GPL-2.0-or-later"
 makedepends="libnftnl-dev bison flex autoconf automake"
 source="https://www.netfilter.org/projects/iptables/files/iptables-$pkgver.tar.xz
-	format-security.patch
 	use-sh-iptables-apply.patch
 	iptables.initd
 	iptables.confd
@@ -57,10 +56,9 @@ package() {
 }
 
 sha512sums="
-e367bf286135e39b7401e852de25c1ed06d44befdffd92ed1566eb2ae9704b48ac9196cb971f43c6c83c6ad4d910443d32064bcdf618cfcef6bcab113e31ff70  iptables-1.8.9.tar.xz
-9501cd8572d37a680d46ee0b1e95ede3b3d79ff5e347ca32afb0e5e16b3717ed085c96d2214a3b2e08e10619c3295561d86e18089f18026b7ef20daeeb094587  format-security.patch
+71e6ed2260859157d61981a4fe5039dc9e8d7da885a626a4b5dae8164c509a9d9f874286b9468bb6a462d6e259d4d32d5967777ecefdd8a293011ae80c00f153  iptables-1.8.10.tar.xz
 ac78898c2acbe66ed8d32a06f41ff08cde7c22c3df6dfec6bc89a912d2cef2bde730de19d25a5407886d567cb0972a0b7bde7e6b18a34c4511495b4dad3b90ad  use-sh-iptables-apply.patch
-a37c17a5382c756fcfb183af73af2283f0d09932c5a767241cbab5d784738f6f587f287a0cdf13b4fa74724ecd3a2063a9689ccee84c1bda02e730f63480f74d  iptables.initd
+e82fcf10e9fffba37b7e4a11bc901b57d60214f5de4865c61df4add04057b9cb2c1d159b2af809b22e017197f2717b330f05a34a7e97589f48de65606060b1db  iptables.initd
 85bb1660c2452fdede5ae0a483489a3648a8b327ea658839a1ad8c6405f6526bdf842a62d4df3f6e3cbbb9ad59137d37b39266cee21e252814191964d4c50f44  iptables.confd
 1783557fea7350ab43b050e632ccd62eb490f1f2b3ad48e7e3fd53cc66c1a9b93c8df4dd692aca3a0d17658f53eb8b668e60055b113fa3091319f81294a1783b  ip6tables.confd
 "

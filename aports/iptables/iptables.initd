@@ -8,22 +8,26 @@ description_save="Save firewall state"
 description_panic="Drop all packets"
 description_reload="Reload configuration"
 
-extra_commands="save panic"
+extra_commands="check save panic"
 extra_started_commands="reload"
 
 iptables_name=${SVCNAME}
-if [ "${iptables_name}" != "iptables" -a "${iptables_name}" != "ip6tables" ] ; then
-	iptables_name="iptables"
-fi
+case "$iptables_name" in
+	iptables|ip6tables) ;;
+	*) iptables_name="iptables" ;;
+esac
 
 iptables_bin="/sbin/${iptables_name}"
 case ${iptables_name} in
-	iptables)  iptables_proc="/proc/net/ip_tables_names"
-	           iptables_save=${IPTABLES_SAVE}
-		   sysctl_ipfwd=net.ipv4.ip_forward;;
-	ip6tables) iptables_proc="/proc/net/ip6_tables_names"
-	           iptables_save=${IP6TABLES_SAVE}
-		   sysctl_ipfwd=net.ipv6.conf.all.forwarding;;
+	iptables)
+		#shellcheck disable=SC2153
+		iptables_save="${IPTABLES_SAVE}"
+		sysctl_ipfwd=net.ipv4.ip_forward
+		;;
+	ip6tables)
+		iptables_save="${IP6TABLES_SAVE}"
+		sysctl_ipfwd=net.ipv6.conf.all.forwarding
+		;;
 esac
 
 depend() {
@@ -43,18 +47,15 @@ set_table_policy() {
 	esac
 	local chain
 	for chain in ${chains} ; do
-		${iptables_bin} -w 5 -t ${table} -P ${chain} ${policy}
+		${iptables_bin} --wait 5 --table "${table}" --policy "${chain}" "${policy}"
 	done
 }
 
-checkkernel() {
-	if [ ! -e ${iptables_proc} ] ; then
-		eerror "Your kernel lacks ${iptables_name} support, please load"
-		eerror "appropriate modules and try again."
-		return 1
-	fi
-	return 0
+get_tables() {
+	# shellcheck disable=SC2086
+	${iptables_bin}-save | /bin/sed -n 's/^\*//p'
 }
+
 checkconfig() {
 	if [ ! -f ${iptables_save} ] ; then
 		eerror "Not starting ${iptables_name}.  First create some rules then run:"
@@ -67,6 +68,7 @@ checkconfig() {
 start() {
 	checkconfig || return 1
 	ebegin "Loading ${iptables_name} state and starting firewall"
+	# shellcheck disable=SC2086
 	${iptables_bin}-restore ${SAVE_RESTORE_OPTIONS} < "${iptables_save}"
 	eend $?
 	if yesno "${IPFORWARD}"; then
@@ -85,51 +87,73 @@ stop() {
 	if yesno "${SAVE_ON_STOP}"; then
 		save || return 1
 	fi
-	checkkernel || return 1
 	ebegin "Stopping firewall"
 	local a
-	for a in $(cat ${iptables_proc}) ; do
-		set_table_policy $a ACCEPT
+	for a in $(get_tables) ; do
+		set_table_policy "$a" ACCEPT
 
-		${iptables_bin} -w 5 -F -t $a
-		${iptables_bin} -w 5 -X -t $a
+		${iptables_bin} --wait 5 --flush --table "$a"
+		${iptables_bin} --wait 5 --delete-chain --table "$a"
 	done
 	eend $?
 }
 
 reload() {
-	checkkernel || return 1
+	checkrules || return 1
 	ebegin "Flushing firewall"
 	local a
-	for a in $(cat ${iptables_proc}) ; do
-		${iptables_bin} -w 5 -F -t $a
-		${iptables_bin} -w 5 -X -t $a
+	for a in $(get_tables) ; do
+		${iptables_bin} --wait 5 --flush --table "$a"
+		${iptables_bin} --wait 5 --delete-chain --table "$a"
 	done
 	eend $?
 
 	start
 }
 
-save() {
-	ebegin "Saving ${iptables_name} state"
-	checkpath -fm 0600 "${iptables_save}"
-	${iptables_bin}-save ${SAVE_RESTORE_OPTIONS} > "${iptables_save}"
+checkrules() {
+	ebegin "Checking rules"
+	# shellcheck disable=SC2086
+	${iptables_bin}-restore --test ${SAVE_RESTORE_OPTIONS} < "${iptables_save}"
 	eend $?
 }
 
+check() {
+	# Short name for users of init.d script.
+	checkrules
+}
+
+save() {
+	ebegin "Saving ${iptables_name} state"
+	checkpath -fm 0600 "${iptables_save}"
+	local exitcode tmp
+
+	tmp="$(mktemp)"
+	# shellcheck disable=SC2086
+	${iptables_bin}-save ${SAVE_RESTORE_OPTIONS} > "${tmp}"
+	exitcode=$?
+	if [ "$exitcode" -eq 0 ]; then
+		# command succeeded, so overwrite
+		mv "${tmp}" "${iptables_save}"
+	else
+		ewarn "${iptables_bin}-save failed!"
+		rm -f "${tmp}"
+	fi
+	eend $exitcode
+}
+
 panic() {
-	checkkernel || return 1
-	if service_started ${iptables_name}; then
-		rc-service ${iptables_name} stop
+	if service_started "${iptables_name}"; then
+		rc-service "${iptables_name}" stop
 	fi
 
 	local a
 	ebegin "Dropping all packets"
-	for a in $(cat ${iptables_proc}) ; do
-		${iptables_bin} -w 5 -F -t $a
-		${iptables_bin} -w 5 -X -t $a
+	for a in $(get_tables) ; do
+		${iptables_bin} --wait 5 --flush --table "$a"
+		${iptables_bin} --wait 5 --delete-chain --table "$a"
 
-		set_table_policy $a DROP
+		set_table_policy "$a" DROP
 	done
 	eend $?
 }

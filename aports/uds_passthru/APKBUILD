@@ -2,7 +2,7 @@
 
 pkgname=uds_passthru
 pkgver=0.1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Unix Domain Socket pass-through for Wifibox"
 url="https://github.com/pgj/freebsd-wifibox-alpine"
 arch="all"
