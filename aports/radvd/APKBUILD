@@ -2,11 +2,11 @@
 #
 pkgname=radvd
 pkgver=2.19
-pkgrel=0 # base: 3
+pkgrel=1 # base: 4
 pkgdesc="IPv6 router advertisement daemon"
 url="http://www.litech.org/radvd"
 arch="all"
-license="BSD with advertising"
+license="BSD-Advertising-Acknowledgement"
 makedepends="flex bison linux-headers"
 install=
 source="http://www.litech.org/radvd/dist/radvd-$pkgver.tar.xz

@@ -1,45 +1,72 @@
---- socat-1.7.4.2/Makefile.in.orig	2022-04-01 22:07:25.284535646 +0000
-+++ socat-1.7.4.2/Makefile.in	2022-04-01 22:09:04.484450962 +0000
-@@ -57,7 +57,7 @@
+--- socat-1.8.0.0/Makefile.in.orig
++++ socat-1.8.0.0/Makefile.in
+@@ -58,9 +58,9 @@
+ XIOOBJS = $(XIOSRCS:.c=.o)
+ UTLSRCS = error.c dalan.c procan.c procan-cdefs.c hostan.c fdname.c sysutils.c utils.c nestlex.c vsnprintf_r.c snprinterr.c @FILAN@ sycls.c @SSLCLS@
  UTLOBJS = $(UTLSRCS:.c=.o)
- CFILES = $(XIOSRCS) $(UTLSRCS) socat.c procan_main.c filan_main.c
+-CFILES = $(XIOSRCS) $(UTLSRCS) socat.c procan_main.c filan_main.c
++CFILES = $(XIOSRCS) $(UTLSRCS) socat.c
  OFILES = $(CFILES:.c=.o)
 -PROGS = socat procan filan
 +PROGS = socat
  
  HFILES = sycls.h sslcls.h error.h dalan.h procan.h filan.h hostan.h sysincludes.h xio.h xioopen.h sysutils.h utils.h nestlex.h vsnprintf_r.h snprinterr.h compat.h \
  	xioconfig.h mytypes.h xioopts.h xiodiag.h xiohelp.h xiosysincludes.h \
-@@ -87,7 +87,7 @@
- 	Config/Makefile.MacOSX-10-5 Config/config.MacOSX-10-5.h \
- 	Config/Makefile.DragonFly-2-8-2 Config/config.DragonFly-2-8-2.h
+@@ -82,7 +82,7 @@
+ TESTFILES = test.sh socks4echo.sh proxyecho.sh readline-test.sh \
+ 	proxy.sh socks4a-echo.sh
  
 -all: progs doc
 +all: progs
  
  scmclean: gitclean
  
-@@ -131,19 +131,12 @@
+@@ -107,10 +107,10 @@
+ 	makedepend $(SYSDEFS) $(CFILES)
+ 
+ socat: socat.o libxio.a
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ socat.o libxio.a $(CLIBS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(CLIBS)
+ 
+ procan.o: procan.c
+-	$(CC) $(CFLAGS) -c -D CC=\"$(CC)\" -o $@ procan.c
++	$(CC) $(CFLAGS) -c -D CC=\"$(CC)\" -o $@ $^
+ 
+ PROCAN_OBJS=procan_main.o procan.o procan-cdefs.o hostan.o error.o sycls.o sysutils.o utils.o vsnprintf_r.o snprinterr.o
+ procan: $(PROCAN_OBJS)
+@@ -128,29 +128,12 @@
  strip: progs
  	strip $(PROGS)
  
 -install: progs $(srcdir)/doc/socat.1
 +install: progs
  	mkdir -p $(DESTDIR)$(BINDEST)
- 	$(INSTALL) -m 755 socat $(DESTDIR)$(BINDEST)
+-	$(INSTALL) -m 755 socat $(DESTDIR)$(BINDEST)/socat1
+-	ln -sf socat1 $(DESTDIR)$(BINDEST)/socat
+-	$(INSTALL) -m 755 socat-chain.sh  $(DESTDIR)$(BINDEST)
+-	$(INSTALL) -m 755 socat-mux.sh    $(DESTDIR)$(BINDEST)
+-	$(INSTALL) -m 755 socat-broker.sh $(DESTDIR)$(BINDEST)
 -	$(INSTALL) -m 755 procan $(DESTDIR)$(BINDEST)
 -	$(INSTALL) -m 755 filan $(DESTDIR)$(BINDEST)
 -	mkdir -p $(DESTDIR)$(MANDEST)/man1
--	$(INSTALL) -m 644 $(srcdir)/doc/socat.1 $(DESTDIR)$(MANDEST)/man1/
+-	$(INSTALL) -m 644 $(srcdir)/doc/socat.1 $(DESTDIR)$(MANDEST)/man1/socat1.1
+-	ln -sf socat1.1 $(DESTDIR)$(MANDEST)/man1/socat.1
++	$(INSTALL) -m 755 socat $(DESTDIR)$(BINDEST)/socat
  
  uninstall:
  	rm -f $(DESTDIR)$(BINDEST)/socat
+-	rm -f $(DESTDIR)$(BINDEST)/socat1
+-	rm -f $(DESTDIR)$(BINDEST)/socat-chain.sh
+-	rm -f $(DESTDIR)$(BINDEST)/socat-mux.sh
+-	rm -f $(DESTDIR)$(BINDEST)/socat-broker.sh
 -	rm -f $(DESTDIR)$(BINDEST)/procan
 -	rm -f $(DESTDIR)$(BINDEST)/filan
 -	rm -f $(DESTDIR)$(MANDEST)/man1/socat.1
+-	rm -f $(DESTDIR)$(MANDEST)/man1/socat1.1
  
  # make a GNU-zipped tar ball of the source files
  dist: socat.tar.gz socat.tar.bz2
-@@ -165,7 +158,7 @@
+@@ -172,7 +155,7 @@
  	rm -r $(TARDIR)
  
  clean:

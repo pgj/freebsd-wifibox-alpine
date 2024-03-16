@@ -1,6 +1,14 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -57,59 +57,26 @@
+@@ -31,7 +31,6 @@
+ 
+ EXTRA_CFLAGS += -O2
+ EXTRA_CFLAGS += -DCONFIG_RTW88_8822BE=1
+-EXTRA_CFLAGS += -DCONFIG_RTW88_8821CE=1
+ EXTRA_CFLAGS += -DCONFIG_RTW88_8822CE=1
+ EXTRA_CFLAGS += -DCONFIG_RTW88_8723DE=1
+ EXTRA_CFLAGS += -DCONFIG_RTW88_DEBUG=1
+@@ -63,60 +62,24 @@
  obj-m      += rtw_8822be.o
  rtw_8822be-objs               := rtw8822be.o
  
@@ -37,9 +45,9 @@
  obj-m	+= rtw_8821c.o
  rtw_8821c-objs		:= rtw8821c.o rtw8821c_table.o
  
- obj-m	+= rtw_8821ce.o
- rtw_8821ce-objs		:= rtw8821ce.o
- 
+-obj-m	+= rtw_8821ce.o
+-rtw_8821ce-objs		:= rtw8821ce.o
+-
 -obj-m	   += rtw_8821cs.o
 -rtw_8821cs-objs		:= rtw8821cs.o
 -
@@ -48,7 +56,7 @@
 -
  obj-m			+= rtw_pci.o
  rtw_pci-objs		:= pci.o
--
+ 
 -obj-m			+= rtw_sdio.o
 -rtw_sdio-objs		:= sdio.o
 -
@@ -57,6 +65,34 @@
 -
 -obj-m         += rtw_usb.o
 -rtw_usb-objs                := usb.o
- 
+-
  ccflags-y += -D__CHECK_ENDIAN__
+ 
+ all: 
+@@ -164,25 +127,14 @@
+ 	echo "Skipping key creation"
+ endif
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_pci.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_usb.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_sdio.ko
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_core.ko
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8723d.ko
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8723de.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8723du.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8723ds.ko
++	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8821c.ko
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822b.ko
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822be.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822bu.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822bs.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8821c.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8821ce.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8821cu.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8821cs.ko
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822c.ko
+ 	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822ce.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822cu.ko
+-	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der rtw_8822cs.ko
+ 
+ sign-install: all sign install
  
