@@ -2,6 +2,21 @@
 # /usr/share/examples/etc/wpa_supplicant.conf or import an existing one
 # from the /etc directory.
 
+# Wifibox/Alpine extensions:
+#
+# There is a new `mac_addr` policy, 3, which needs to be configured
+# along with `mac_value` that holds the pregenerated value of MAC
+# address to be used for given SSID.
+#
+# The main difference between this policy and policy 1 is the ability
+# to control persistence of the MAC address used.  For example, if
+# there is a requirement to always use the same (but random) MAC
+# address for given SSID (even if user removes/forgets the network)
+# this could be handled outside of WPA Supplicant by using some
+# SSID-based hashing scheme to generate MAC (or by just storing the
+# randomly generated one) and providing it to WPA Supplicant together
+# with the `mac_addr=3` policy setting.
+
 # Mind that the `ctrl_interface` parameter, when in use, has to be
 # kept in sync with UDS pass-through definitions in uds_passthru.conf.
 # The default values are aligned with these settings below.
