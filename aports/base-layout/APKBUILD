@@ -2,7 +2,7 @@
 
 pkgname=baselayout # base: alpine-baselayout, alpine-baselayout-data
 pkgver=3.4.3
-pkgrel=2 # base: 2
+pkgrel=3 # base: 2
 pkgdesc="Base dir structure and init scripts"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="noarch"
@@ -62,11 +62,9 @@ package() {
 		etc/periodic/monthly \
 		etc/periodic/weekly \
 		etc/profile.d \
-		etc/sysctl.d \
 		lib/firmware \
 		lib/mdev \
 		lib/modules-load.d \
-		lib/sysctl.d \
 		media/etc \
 		proc \
 		run \
@@ -115,53 +113,6 @@ package() {
 		/bin/sh
 		/bin/ash
 	EOF
-	cat > "$pkgdir"/etc/sysctl.conf <<-EOF
-		net.ipv4.ip_forward = 1
-		net.ipv6.conf.all.forwarding = 2
-		net.ipv6.conf.default.forwarding = 2
-		# Enable IPv6 Privacy Extensions
-		net.ipv6.conf.all.use_tempaddr = 2
-		net.ipv6.conf.default.use_tempaddr = 2
-		net.ipv6.conf.eth0.use_tempaddr = 2
-		net.ipv6.conf.wlan0.use_tempaddr = 2
-	EOF
-	cat > "$pkgdir"/lib/sysctl.d/00-alpine.conf <<-EOF
-		# Prevents SYN DOS attacks. Applies to ipv6 as well, despite name.
-		net.ipv4.tcp_syncookies = 1
-
-		# Prevents ip spoofing.
-		net.ipv4.conf.default.rp_filter = 1
-		net.ipv4.conf.all.rp_filter = 1
-
-		# Only groups within this id range can use ping.
-		net.ipv4.ping_group_range=999 59999
-
-		# Redirects can potentially be used to maliciously alter hosts
-		# routing tables.
-		net.ipv4.conf.all.accept_redirects = 0
-		net.ipv4.conf.all.secure_redirects = 1
-		net.ipv6.conf.all.accept_redirects = 0
-
-		# The source routing feature includes some known vulnerabilities.
-		net.ipv4.conf.all.accept_source_route = 0
-		net.ipv6.conf.all.accept_source_route = 0
-
-		# See RFC 1337
-		net.ipv4.tcp_rfc1337 = 1
-
-		## Enable IPv6 Privacy Extensions (see RFC4941 and RFC3041)
-		net.ipv6.conf.default.use_tempaddr = 2
-		net.ipv6.conf.all.use_tempaddr = 2
-
-		# Restarts computer after 120 seconds after kernel panic
-		kernel.panic = 120
-
-		# Users should not be able to create soft or hard links to files
-		# which they do not own. This mitigates several privilege
-		# escalation vulnerabilities.
-		fs.protected_hardlinks = 1
-		fs.protected_symlinks = 1
-	EOF
 	cat > "$pkgdir"/etc/fstab <<-EOF
 		tmpfs      /tmp       tmpfs    size=128K                                     0 0
 		config     /media/etc 9p       trans=virtio,ro,noatime,nodiratime,norelatime 0 0
@@ -194,6 +145,8 @@ package() {
 	ln -s /var/mail "$pkgdir"/var/spool/mail
 	ln -s /tmp/resolv.conf "$pkgdir"/etc/resolv.conf
 	ln -s /media/etc/hostname "$pkgdir"/etc/hostname
+	ln -s /media/etc/sysctl.conf "$pkgdir"/etc/sysctl.conf
+	ln -s /media/etc/sysctl.d "$pkgdir"/etc/sysctl.d
 }
 
 sha512sums="

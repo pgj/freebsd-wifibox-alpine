@@ -1,0 +1,43 @@
+# IP traffic forwarding.
+net.ipv4.ip_forward = 1
+
+# Prevents SYN DOS attacks. Applies to ipv6 as well, despite name.
+net.ipv4.tcp_syncookies = 1
+
+# Prevents ip spoofing.
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.rp_filter = 1
+
+# Only groups within this id range can use ping.
+net.ipv4.ping_group_range=999 59999
+
+# Redirects can potentially be used to maliciously alter hosts routing
+# tables.
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.secure_redirects = 1
+
+# The source routing feature includes some known vulnerabilities.
+net.ipv4.conf.all.accept_source_route = 0
+
+# See RFC 1337
+net.ipv4.tcp_rfc1337 = 1
+
+# Restart after 30 seconds after kernel panic
+kernel.panic = 30
+
+# Users should not be able to create soft or hard links to files
+# which they do not own. This mitigates several privilege
+# escalation vulnerabilities.
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+
+# Maximum number of network connections, which is 1024 per 128 MB.  If
+# the value is too low, network packets may get dropped.
+net.netfilter.nf_conntrack_max = 1048576
+net.nf_conntrack_max = 1048576
+
+# Only live IPTables connections are kept track of, dead connections
+# are removed by a timeout period.  By reducing this value, the
+# tracking table becomes lean which is optimal for high traffic.
+# Lowering this value might break long-running idle TCP connections.
+net.netfilter.nf_conntrack_tcp_timeout_established = 3600
