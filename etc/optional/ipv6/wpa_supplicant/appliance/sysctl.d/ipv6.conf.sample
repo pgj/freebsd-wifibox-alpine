@@ -1,0 +1,10 @@
+# Enable IPv6 Privacy Extensions (see RFC 4941 and RFC 3041)
+net.ipv6.conf.all.use_tempaddr = 2
+net.ipv6.conf.default.use_tempaddr = 2
+
+# Redirects can potentially be used to maliciously alter hosts routing
+# tables.
+net.ipv6.conf.all.accept_redirects = 0
+
+# The source routing feature includes some known vulnerabilities.
+net.ipv6.conf.all.accept_source_route = 0
