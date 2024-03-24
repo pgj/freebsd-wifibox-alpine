@@ -6,7 +6,7 @@ case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=0
+pkgrel=1
 pkgdesc="Linux LTS kernel"
 url="https://www.kernel.org"
 depends=
@@ -163,6 +163,6 @@ _dev() {
 sha512sums="
 458b2c34d46206f9b4ccbac54cc57aeca1eaecaf831bc441e59701bac6eadffc17f6ce24af6eadd0454964e843186539ac0d63295ad2cc32d112b60360c39a35  linux-6.6.tar.xz
 2956050bb332411d00a285e9656618f2e34b631492bbc19bef54d83a6e91b8531f4e18830b9313cfe52fbf8a8ca6fb76cf55b3ddd146ca3b977046cf2fd10cad  0004-objtool-respect-AWK-setting.patch
-05b1850bbb4debab6a22b810142caafc29e8b1f0331dc85e0be9ec92c08273224605473f3101059e96d2ba73c56a22b27d81909e2297754a92631ce68594b195  config-lts.x86_64
+280605906761940bf8dbb9a865c0cf9b40ee0f0f8db994accedac445f8c186c7477fc872e5cb5d392b99c6ed836e2221c9cf288b3fafd62cae343b60b23b4c1b  config-lts.x86_64
 c8fa43287ef9b4c3e08d9b89f927b2220c3cd7d62b2643f6f098daee2fcfbc9d42a417f449cc311fea960651ba97a4c8cf823baaaa27024611874ee6bf466f86  patch-6.6.22.xz
 "
