@@ -2,7 +2,7 @@
 
 pkgname='rtw89-edge'
 pkgver=20240310
-pkgrel=06080010000
+pkgrel=06080010100
 _gitrev='48680abfeb843330d385384bd8edde259a241147'
 pkgdesc='Driver for Realtek 8852AE, an 802.11ax device (edge)'
 arch="x86_64"

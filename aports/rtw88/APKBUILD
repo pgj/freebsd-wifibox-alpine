@@ -2,7 +2,7 @@
 
 pkgname='rtw88'
 pkgver=20231024
-pkgrel=06060220000
+pkgrel=06060220100
 _gitrev='ca9f4e199efbf8c377e8a1769ba5b05b23f92c82'
 pkgdesc='Backport of the Realtek Wifi 5 drivers from the wireless-next repo'
 arch="x86_64"

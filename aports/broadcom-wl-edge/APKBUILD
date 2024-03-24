@@ -2,7 +2,7 @@
 
 pkgname=broadcom-wl-edge
 pkgver=6.30.223.271
-pkgrel=06080010000
+pkgrel=06080010100
 pkgdesc='Broadcom 802.11 Linux STA wireless driver (edge)'
 arch="x86_64"
 url='https://www.broadcom.com/support/download-search/?pf=Wireless+LAN+Infrastructure'

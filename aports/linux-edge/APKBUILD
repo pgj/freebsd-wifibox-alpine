@@ -6,7 +6,7 @@ case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=0
+pkgrel=1
 pkgdesc="Linux stable kernel"
 url="https://www.kernel.org"
 depends=
@@ -161,6 +161,6 @@ _dev() {
 
 sha512sums="
 5c4eb4aa1d3f7d1ea01c0f7ddeadacdece6e144fd4bdfc16b2b925d3e10dc04de3a6db69320b79a96c3560052616f001d2c09e7a1bb4f7b731e2380a7ecce068  linux-6.8.tar.xz
-cf75485c89e50674bbadfc83089deead0ccb25ea1358cdb2d025f445e0986d8549bb2c6b5ecf1fcfad420dae0a9208c725064377b10d7de96c896fb17d92a247  config-edge.x86_64
+57e70eda2de2f82e5bd67eb6625a0af71d90236848db16960ef2c234a14bcbe1e222d45ffc852f6aa33e7c53e9f33d35f80e465c193c21deba0adb240b6bb07f  config-edge.x86_64
 33ddb70a2df5ce51e23a82616e02197e4b812e0c094d0c88dd6ea6e2f00d843c2ff124fc15548e0ae3853fc1a6ea605e6b94eff7aa49a34961d7b20b7d27ff6c  patch-6.8.1.xz
 "

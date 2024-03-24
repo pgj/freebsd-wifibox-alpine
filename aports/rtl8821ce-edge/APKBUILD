@@ -2,7 +2,7 @@
 
 pkgname='rtl8821ce-edge'
 pkgver=20240120
-pkgrel=06080010000
+pkgrel=06080010100
 _gitrev='66983b69120a13699acf40a12979317f29012111'
 pkgdesc='Driver for Realtek 8821CE, an 802.11ac device (edge)'
 arch="x86_64"
