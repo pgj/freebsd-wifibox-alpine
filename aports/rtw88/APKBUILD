@@ -1,9 +1,9 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw88'
-pkgver=20231024
+pkgver=20240316
 pkgrel=06060220100
-_gitrev='ca9f4e199efbf8c377e8a1769ba5b05b23f92c82'
+_gitrev='986b6e74f94b14369c6b528d7ae76255993c05a5'
 pkgdesc='Backport of the Realtek Wifi 5 drivers from the wireless-next repo'
 arch="x86_64"
 url='https://github.com/lwfinger/rtw88'
@@ -34,6 +34,6 @@ package() {
 }
 
 sha512sums="
-28dfab87e2768970c572df340e170dc451deb6a2c2cbc817e22f858c8ed627883977a9fffc5a8500e7b5c79bcbd40bc6ce14e45d6741cc9066046aad5e2baabc  Makefile.patch
-372e27570739e9d857e187bf39d008801d07aa534ce0db7f1ed5843df0803295d641f623ff4408ef45d26cbb3678f527d01c3e92e4bd2d25d22a6a9f600171ad  ca9f4e199efbf8c377e8a1769ba5b05b23f92c82.zip
+9450b2ac41745710f33d79f51d646707faf744e876ac69c3780ccec9684dd106046a08da3e59af4faa95c462bf8834a35c020da3124074b902d5d0d0c078e379  Makefile.patch
+7ec8d2381ec1cc05b3ecbca4fc472bbc52fc336da26ffa9e322ec104526791b6d512d350f9883ee31879316d02136b2fd56ae86f4477e1fcffa4ae4f54607c89  986b6e74f94b14369c6b528d7ae76255993c05a5.zip
 "
