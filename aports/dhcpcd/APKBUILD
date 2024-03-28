@@ -1,6 +1,6 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=dhcpcd
-pkgver=10.0.5
+pkgver=10.0.6
 pkgrel=0 # base: 0
 pkgdesc="RFC2131 compliant DHCP client"
 url="https://roy.marples.name/projects/dhcpcd"
@@ -46,7 +46,7 @@ package() {
 }
 
 sha512sums="
-8926a2b0c0d1f6f0798c24372e8b7881e0cc01970633d70f806bd11866239df8d43a3a5a9d0160fa78a2850ad133d9acba1143bb11eb88c1ed475e7cc658c979  dhcpcd-10.0.5.tar.gz
+e75bc3da7417463f354f5b74fd19751a6572192943bd58516c21539686166322e12c1cdee83ab385e8b783a07929638c84ad5f5c000ae2e5b3dfc591a2a6d94f  dhcpcd-10.0.6.tar.gz
 b6bdaac9fc0d5d2d7e8c5e30d1a45db1cff2284d01f92f8821b2f03aaff4e0dbd8cbfbced96d8d9d934dc11f22b792a8345d634d8e4e3b84f43016b7e866e302  busybox-logger.patch
 7fb44b82a6fa25ee6249fc4835853a4c1fc7d327653efabd9fde303b1f306b3aa6956b2621b55a24fc007ec7ad878ce50e7418ebff0b17fece76e2fdd9e5190d  dhcpcd.initd
 c3d551505e22e253bed29fda5c4766ab8b23f14883df0c342b04c835f7ed50d90714a053c86b281bb9924fd9a83cdc6015ecc51217852f0ab2c63058b5d625a5  99-udhcpd.conf
