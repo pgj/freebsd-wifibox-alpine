@@ -102,6 +102,8 @@ $(GUESTDIR)/.done:
 			--no-scripts \
 			--no-chown \
 			$(PACKAGES)
+	# remove APK metadata
+	$(RM) -rf $(GUESTDIR)/lib/apk
 	# rebuild module dependency data
 	$(ENV) LD_LIBRARY_PATH=$(BOOTSTRAPDIR)/lib \
 		$(_BUSYBOX) \
