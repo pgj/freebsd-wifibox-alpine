@@ -1,4 +1,4 @@
-.Dd June 1, 2024
+.Dd June 29, 2024
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -123,22 +123,23 @@ and outer networks, such as UDP broadcasts.  For packet analysis,
 .Sy tcpdump
 is provided as an optional component.  Each application-specific
 detail is going to be included below.
+.Sh SHARED CONFIGURATION FILES
 .Pp
-For the ease of management, the host shares configuration files with
-the services that are responsible for implementing the domain logic.
+For ease of management, the host shares configuration files with the
+services that are responsible for implementing the domain logic.  On
+the host, all the files are stored under
+.Pa %%LOCALBASE%%/etc/wifibox
+with additional subdirectories inside.
+.Pp
+The
+.Pa appliance
+subdirectory holds the generic configuration files.  On the guest,
+they are visible on the
+.Pa /media/etc
+directory where the
+.Sy config
+9P (VirtFS) share is mounted in read-only mode.
 .Bl -bullet
-.It
-.Sy wpa_supplicant
-works with the
-.Pa wpa_supplicant/wpa_supplicant.conf
-file, while
-.Sy hostapd
-works with the
-.Pa hostapd/hostapd.conf
-file.  These are the same tools that are used in the FreeBSD base
-system for the same purpose, and their Linux version is utilized here
-to make it possible to reuse the configuration files of the same
-format from the host.
 .It
 .Sy forwarding
 works with the
@@ -147,14 +148,21 @@ file.  It uses the syntax of the
 .Sy socat
 address specifications but it is limited to work with UDP and TCP
 ports only.  Note that this is an optional component, and its presence
-depends on the configuration of the guest image.
+depends on the configuration of the guest image.  The respective
+configuration file on the guest is
+.Pa /media/etc/forwarding.conf ,
+which is used directly from this location.
 .It
 .Sy hostname
 sets the hostname on boot from the
 .Pa applicance/hostname
 file.  This is the name that is going to be visible for others on the
 local network.  Changing the hostname requires updating this file and
-restarting the guest.
+restarting the guest.  The configuration file shows up on the guest as
+.Pa /media/etc/hostname ,
+which is mapped to
+.Pa /etc/hostname ,
+and used verbatim.
 .It
 .Sy ifup
 and
@@ -166,7 +174,11 @@ file to associate the internal network interfaces with IP addresses:
 is the wireless device and
 .Sy eth0
 is the virtual Ethernet device towards the host which are both
-configured according to the contents of the configuration file.
+configured according to the contents of the configuration file.  On
+the guest, this is
+.Pa /media/etc/interfaces.conf ,
+which is directly included as part of
+.Pa /etc/network/interfaces .
 .It
 .Sy iptables
 works with the
@@ -177,9 +189,10 @@ Translation, NAT) between the
 and
 .Sy wlan0
 interfaces.  The configuration file describes the flow of the network
-packets through the interfaces.  It is loaded once at launching the
-respective service, usually on boot, and cannot be modified from the
-guest.
+packets through the interfaces.  Using
+.Pa /media/etc/iptables
+directly, it is loaded once at launching the respective service,
+usually on boot, and cannot be modified from the guest.
 .It
 .Sy ip6tables
 is the IPv6-enabled version of
@@ -191,7 +204,9 @@ sibling, it bridges the
 .Sy eth0
 and
 .Sy wlan0
-networking interfaces with the help of NAT.
+networking interfaces with the help of NAT.  On the guest,
+.Pa /media/etc/ip6tables
+is used directly in this case.
 .It
 .Sy mDNSResponder
 works with the
@@ -200,7 +215,9 @@ file and it can handle multicast DNS query packets on UDP port 5353.
 The advertised services can be described by its configuration file so
 that others on the network could see them.  Note that this is optional
 component, and its presence depends on the configuration options of
-the guest image.
+the guest image.  On the guest, the
+.Pa /media/etc/mdnsd-services.conf
+configuration file is used directly.
 .It
 .Sy udhcpd
 works with the
@@ -218,7 +235,13 @@ traffic.  It also manages the distribution of information about the
 name servers, in cooperation with
 .Sy udhcpc
 (DHCP client) when required. This is utilized only when dynamic IP
-addresses are in use.
+addresses are in use.  On the guest, the configuration file becomes
+.Pa /media/etc/udhcpd.conf ,
+which is used to generate
+.Pa /etc/udhcpd.conf
+that
+.Sy udhcpd
+will eventually read.
 .It
 .Sy dhcpcd
 is an alternative to
@@ -235,6 +258,10 @@ is pre-configured to automatically keep
 .Sy udhcpd
 updated about name servers and it is employed only for
 .Sy wpa_supplicant .
+The corresponding file on the guest is
+.Pa /media/etc/dhcpcd.conf ,
+which is mapped to
+.Pa /etc/dhcpcd.conf .
 .It
 .Sy radvd
 works with the
@@ -248,6 +275,10 @@ or the clients
 .Sy ( hostapd ) ,
 and sending a Router Solicitation message when requested.  These
 messages are required for IPv6 stateless autoconfiguration (SLAAC).
+The corresponding configuration file on the guest is
+.Pa /media/etc/radvd.conf ,
+which is mapped to
+.Pa /etc/radvd.conf .
 .It
 .Sy uds_passthru
 is an optional service for managing the forwarding of control sockets
@@ -257,102 +288,49 @@ or
 .Sy hostapd .
 It works with the
 .Pa appliance/uds_passthru.conf
-file that is shared with the host.  This file is optional, and when it
-is present, it automatically implies that service is enabled.  The
-contents describe what sockets should be exposed over configured TCP
-ports with the help of
+file, which is optional, and when it is present, it automatically
+implies that the service is enabled.  The contents describe what
+sockets should be exposed over configured TCP ports with the help of
 .Sy socat ,
 which a heavily stripped-down version of the original tool to minimize
-the related security risks.
+the related security risks.  On the guest, the path of the
+configuration file is
+.Pa /media/etc/uds_passthru.conf ,
+from where it is used.
 .El
 .Pp
-The
-.Pa appliance
-directory on the host holds the generic configuration files.  They are
-read from the
-.Pa /media/etc
-directory where the
-.Sy config
-9P (VirtFS) share is mounted in read-only mode.  From there, the files
-are hooked up in the system in the following ways.
-.Bl -bullet
-.It
-.Pa /media/etc/dhcpcd.conf
-is mapped to
-.Pa /etc/dhcpcd.conf
-which will be used by
-.Sy dhcpcd ,
-when configured.
-.It
-.Pa /media/etc/forwarding.conf
-is used directly from this location by
-.Sy forwarding ,
-when it is configured to use.
-.It
-.Pa /media/etc/hostname
-is mapped to
-.Pa /etc/hostname
-and used verbatim.
-.It
-.Pa /media/etc/interfaces.conf
-is directly included as part of
-.Pa /etc/network/interfaces
-when managed by
-.Sy ifup
-and
-.Sy ifdown .
-.It
-.Pa /media/etc/iptables
-and
-.Pa /media/etc/ip6tables
-are used directly from these locations by
-.Sy iptables
-and
-.Sy ip6tables ,
-respectively.
-.It
-.Pa /media/etc/mdnsd-services.conf
-is used directly from this location by
-.Sy mDNSResponder ,
-when
-.Sy mDNSResponder
-is in use.
-.It
-.Pa /media/etc/radvd.conf
-is mapped to
-.Pa /etc/radvd.conf
-which will be used to generate the configuration file that
-.Sy radvd
-will read, when enabled.
-.It
-.Pa /media/etc/udhcpd.conf
-is mapped to
-.Pa /etc/udhcpd.conf
-which will be used to generate the configuration file that
-.Sy udhcpd
-will read.
-.It
-.Pa /media/etc/uds_passthru.conf
-is used directly from this location by
-.Sy uds_passthru .
-.El
-.Pp
-The
-.Pa wpa_supplicant/wpa_supplicant.conf
+Depending on the configuration, either the
+.Pa wpa_supplicant
 or
-.Pa hostapd/hostapd.conf
-configuration file is shared with the host through the
+.Pa hostapd
+subdirectory holds the configuration files that are used by either
+.Sy wpa_supplicant
+or
+.Sy hostapd ,
+respectively.  On the guest, they are published under the paths
 .Pa /etc/wpa_supplicant
-or the
+and
 .Pa /etc/hostapd
-directory respectively, where the
+where the
 .Sy app_config
-9P (VirtFS) share is mounted.  This will let
+9P (VirtFS) share is mounted as read-write.  This will let
 .Sy wpa_supplicant
 or
 .Sy hostapd
 change the contents when instructed to do so from the host through the
 forwarded control sockets and permitted by the configuration.
+.Pp
+.Sy wpa_supplicant
+works with the
+.Pa wpa_supplicant/wpa_supplicant.conf
+file, while
+.Sy hostapd
+works with the
+.Pa hostapd/hostapd.conf
+file.  These are the same tools that are used in the FreeBSD base
+system for the same purpose, and their Linux version is utilized here
+to make it possible to reuse the configuration files of the same
+format from the host.
 .Pp
 The variable data files under the guest's
 .Pa /var
@@ -366,10 +344,13 @@ directory, such as
 or
 .Pa /var/log/messages
 so that the internal state of the guest can be tracked by accessing
-these files on the host.  The contents of the
+these files on the host per the configuration of
+.Sy wifibox .
+The contents of the
 .Pa /var/run
 directory will not be visible on the host, as it is stored only in the
 memory.
+.Sh INTERNALS
 .Pp
 Further components of the guest that are not directly configurable or
 visible to the outside:
@@ -393,9 +374,9 @@ irrelevant modules were removed for security hardening.
 The base layout of the Alpine sytem is stripped down to the bare
 minimum, and for example, the guest does not have the
 .Sy apk
-package manager installed since it would be able to work.  Instead,
-the disk image itself should be constructed in a way that it includes
-all the needed applications.
+package manager installed since it would not be able to work.
+Instead, the disk image itself should be constructed in a way that it
+includes all the needed applications.
 .El
 .Sh STARTING, STOPPING, AND RESTARTING SERVICES
 Every service running on the guest can be managed by the
@@ -417,7 +398,7 @@ command.
 # rc-service wpa_supplicant status
 .Ed
 .Pp
-Similary to this, the
+Similarly to this, the
 .Cm start ,
 .Cm stop ,
 and
@@ -466,9 +447,9 @@ in this case.
 .Ed
 .Pp
 The file exported this way could be then used as the main
-configuration by moving it to the location from where the
-.Pa /media/etc
-directory is mounted.
+configuration by moving it under the
+.Pa %%LOCALBASE%%/etc/wifibox/appliance
+directory on the host, as discussed above.
 .Pp
 The same set of commands apply for
 .Sy ip6tables ,
@@ -610,7 +591,7 @@ Note that \(lqhard\(rq block status cannot be changed this way, as it
 is typically performed by the hardware switch or it is implemented by
 the firmware itself.  For example, the computer might be configured to
 turn off the wireless device when the wired networking interface card
-is activate and the LAN cable is inserted.
+is active and the LAN cable is inserted.
 
 .Sh SUPPORTED HARDWARE
 There are a number of Linux drivers available as kernel modules.  Note
