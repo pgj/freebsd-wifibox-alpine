@@ -2,7 +2,7 @@
 
 pkgname=wpa_supplicant
 pkgver=2.10
-pkgrel=7 # base: 10
+pkgrel=8 # base: 10
 pkgdesc="utility providing key negotiation for WPA wireless networks"
 url="https://w1.fi/wpa_supplicant/"
 arch="all"
@@ -86,7 +86,7 @@ package() {
 
 sha512sums="
 021c2a48f45d39c1dc6557730be5debaee071bc0ff82a271638beee6e32314e353e49d39e2f0dc8dff6e094dcc7008cfe1c32d0c7a34a1a345a12a3f1c1e11a1  wpa_supplicant-2.10.tar.gz
-8e5f0958f6086c465d7a13e793be7dedc021fae2162f0f3b29d00919c355f13e1c257744ae99ae063cca525fb8fa03abd5c117efe0ba9c6812b560ce62366846  wpa_supplicant.initd
+db0ae409f40c9a7397f5664b78d8b6917e194d35847b180e6de712175a3ea1556eebb6d76736f2d5856ad2354be3931dc0f06f9b8fea0b85390763a925506c99  wpa_supplicant.initd
 c7e4041fe41743c5e63a07edc9234d0c44c4c0f193a180b27342b43f3be45fb87b42ee0f9e4a20614cf6ad58cf64d25f74d1e75e2e1d521c2f6d45cdc5737eae  wpa_supplicant.confd
 955c219a9e4e3e89f7f880561755059ea9f1ea27f5a5ec9f6a5b7c29195b06123c8eecfba324f3695bdb8cb53c401745c3d030a97e133dd1730351dc36c92fec  CVE-2023-52160.patch
 9528735924faf876a7094de46760605e5e66e265187421a668be06dbf03d7b4db6b84cbad793fcd6bd614e3ba540f82f1f80660d75e8a6070eeb7e9abb54ed28  unsafe-renegotiation-1.patch
