@@ -33,9 +33,33 @@ find_wireless() {
 	return 1
 }
 
+ensure_wireless_available() {
+	local iface= n= backoff=.1
+
+	for n in $(seq 1 8); do
+		iface=$(find_wireless)
+		if [ -n "$iface" ]; then
+			if [ "$n" -gt 1 ]; then
+				eend 1
+			fi
+			return 0
+		fi
+		if [ "$n" -eq 1 ]; then
+			einfon "No wireless interfaces are available yet, waiting ..."
+		else
+			echo -n "."
+		fi
+		sleep "$backoff"
+		backoff=$(echo "$backoff * 2" | bc)
+	done
+
+	eend 1
+}
+
 append_wireless() {
 	local iface= i=
 
+	ensure_wireless_available
 	iface=$(find_wireless)
 	if [ -n "$iface" ]; then
 		for i in $iface; do
