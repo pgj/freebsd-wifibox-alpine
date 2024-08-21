@@ -2,7 +2,7 @@
 
 pkgname=iptables
 pkgver=1.8.10
-pkgrel=0 # base: 3
+pkgrel=1 # base: 3
 pkgdesc="Linux kernel firewall, NAT and packet mangling tools"
 url="https://www.netfilter.org/projects/iptables/index.html"
 arch="all"
@@ -14,6 +14,11 @@ source="https://www.netfilter.org/projects/iptables/files/iptables-$pkgver.tar.x
 	iptables.confd
 	ip6tables.confd
 	"
+
+prepare() {
+	default_prepare
+	update_config_sub
+}
 
 build() {
 	./configure \
