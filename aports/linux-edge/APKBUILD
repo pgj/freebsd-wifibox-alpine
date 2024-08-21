@@ -1,12 +1,12 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-edge
-pkgver=6.8.1
+pkgver=6.10.6
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=1
+pkgrel=0
 pkgdesc="Linux stable kernel"
 url="https://www.kernel.org"
 depends=
@@ -18,6 +18,8 @@ options="!strip"
 install=
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
 	config-edge.x86_64
+
+	0001-brcm80211-brcmfmac-pcie.patch
 	"
 subpackages="$pkgname-dev:_dev:$CBUILD_ARCH"
 builddir="$srcdir"/linux-"$_kernver"
@@ -160,7 +162,8 @@ _dev() {
 }
 
 sha512sums="
-5c4eb4aa1d3f7d1ea01c0f7ddeadacdece6e144fd4bdfc16b2b925d3e10dc04de3a6db69320b79a96c3560052616f001d2c09e7a1bb4f7b731e2380a7ecce068  linux-6.8.tar.xz
-57e70eda2de2f82e5bd67eb6625a0af71d90236848db16960ef2c234a14bcbe1e222d45ffc852f6aa33e7c53e9f33d35f80e465c193c21deba0adb240b6bb07f  config-edge.x86_64
-33ddb70a2df5ce51e23a82616e02197e4b812e0c094d0c88dd6ea6e2f00d843c2ff124fc15548e0ae3853fc1a6ea605e6b94eff7aa49a34961d7b20b7d27ff6c  patch-6.8.1.xz
+baa2487954044f991d2ae254d77d14a1f0185dd62c9f0fcaff69f586c9f906823017b8db1c4588f27b076dfa3ebb606929fec859f60ea419e7974330b9289cc2  linux-6.10.tar.xz
+6820bd8f6c6ff77c83c7311f3bcb38b40d4d1e4127b9f815c7bc782ba80cee4dfd7fa1348908d0498d234d6e756d0e390ab5d3e430e5b3da7c3362fadda213f8  config-edge.x86_64
+67eaa5e83ec244048a4b426e7cb288763cbdc972be3d66a9cfb0ec1dfaf68d569b8d939069a90d509d78c28a2500198c1b28cf67165dc14c697d4254a6534af5  0001-brcm80211-brcmfmac-pcie.patch
+cbff973f059aab36a8df5f71d1230a27fa24d7a0791dbe5249618beca37a7964d38c3dd9b544484e4ea2aa38c188dcd913678a9c05d92b5f5d4d34d954e0da1d  patch-6.10.6.xz
 "

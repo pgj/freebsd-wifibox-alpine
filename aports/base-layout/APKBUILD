@@ -1,14 +1,14 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=baselayout # base: alpine-baselayout, alpine-baselayout-data
-pkgver=3.4.3
-pkgrel=3 # base: 2
+pkgver=3.6.5
+pkgrel=0 # base: 0
 pkgdesc="Base dir structure and init scripts"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="noarch"
 license="GPL-2.0-only"
 pkggroups="shadow"
-options="!fhs !check"
+options="!fhs !check keepdirs"
 install=
 _nbver=6.4
 source="crontab
@@ -47,31 +47,35 @@ package() {
 		dev/pts \
 		dev/shm \
 		etc \
-		etc/conf.d \
 		etc/crontabs \
-		etc/init.d \
 		etc/modprobe.d \
 		etc/modules-load.d \
+		etc/network \
 		etc/network/if-down.d \
 		etc/network/if-post-down.d \
 		etc/network/if-pre-up.d \
 		etc/network/if-up.d \
+		etc/periodic \
 		etc/periodic/15min \
 		etc/periodic/daily \
 		etc/periodic/hourly \
 		etc/periodic/monthly \
 		etc/periodic/weekly \
 		etc/profile.d \
+		lib \
 		lib/firmware \
-		lib/mdev \
 		lib/modules-load.d \
+		media \
 		media/etc \
 		proc \
 		run \
 		sbin \
 		sys \
+		usr \
 		usr/bin \
+		usr/lib \
 		usr/lib/modules-load.d \
+		usr/local \
 		usr/local/bin \
 		usr/local/lib \
 		usr/local/share \
@@ -79,11 +83,13 @@ package() {
 		usr/share \
 		usr/share/man \
 		usr/share/misc \
+		var \
 		var/cache \
 		var/cache/misc \
 		var/lib \
 		var/lib/misc \
 		var/local \
+		var/lock \
 		var/lock/subsys \
 		var/log \
 		var/opt \
@@ -152,9 +158,9 @@ package() {
 sha512sums="
 6e169c0975a1ad1ad871a863e8ee83f053de9ad0b58d94952efa4c28a8c221445d9e9732ad8b52832a50919c2f39aa965a929b3d5b3f9e62f169e2b2e0813d82  crontab
 b2fc9b72846a43a45ba9a8749e581cef34d1915836833b51b7919dfbf4e275b7d55fec4dea7b23df3796380910971a41331e53e8cf0d304834e3da02cc135e5a  20locale.sh
-0b786df3a610e84ae98cbef8dc74998404a048c4a48d7acf57eafb04fb481b4b7f8a80c065f1ca10cced22c89243cc6e81b0ad46d5ca4a194d63ce49969cce09  group
-7cc3c23062c730ec7a1d7850423d9901047005520da5b347b7b24e5f33a9c9a9129b430557f7f41e565f143624b7f3c47e3f6e4a6a446e75f0ea245c03d70880  inittab
-b3508f9dc77e7eeb761c2d72b5f1003d09dbeaef1cd2d6b7ac47fb5c770cad507c89713d70d5ab0b645378e486cab2e130e9862cbfd2eea783b1808d4ca075f5  passwd
+702fabb11af6b09651f0b3cb828acec9b5873ccf75c2420e675e78803f49eee5a3cc9ea615c89e93c3638d6fa35783d30c5ab5053565712e2a573931f3ffea48  group
+dd4be1a92dd698628b03afe7fc0db417b5def2838497353739e98bd18ec3d5addc12009061f4f93c7d7ae95b679ed9e2a1cb6f7e911eabc40fb50bffea083e00  inittab
+87f21c4a2628e8a6924b7fece3d8a8b92f060c74ae70f9d88d1bf14f86598d06f6226297d78c666d8a38e482c44ec0188c29a9249a9c8a59a550b8ba58b41d3c  passwd
 4eb857ed59c2edb257636d2bf196989e514a273e9701e9f076c9ae8c1589b4898269180569960acf072c0981ec7ea54014fd230f014401d6bb92314285d1e6aa  profile
 3a00083bcdf5a9e884c9d07877d52311e3d99e79cbee656e236ba06e08ba0dddb7ba76494fdc9dd1a826c48e197a790a69e6bb458e9df64832d6b5e904e9fd15  protocols-6.4
 47b0f3ee73af2d259bd206a026204be0ea25531a895a0b035a904b38fe5407bc3dd2beab7f8fcb3d760587e6159702ebdb9cbc4f508942befdf7f10c10c87888  services-6.4

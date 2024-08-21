@@ -2,7 +2,7 @@
 #
 pkgname=radvd
 pkgver=2.19
-pkgrel=1 # base: 4
+pkgrel=2 # base: 4
 pkgdesc="IPv6 router advertisement daemon"
 url="http://www.litech.org/radvd"
 arch="all"
@@ -15,6 +15,11 @@ source="http://www.litech.org/radvd/dist/radvd-$pkgver.tar.xz
 	fix-alpine-plz.patch
 	"
 options="!check"
+
+prepare() {
+	default_prepare
+	update_config_sub
+}
 
 build() {
 	./configure \

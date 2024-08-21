@@ -2,5 +2,5 @@
 ::sysinit:/sbin/openrc boot
 ::wait:/sbin/openrc default
 ::restart:/sbin/init
-ttyS0::respawn:/sbin/getty -L ttyS0 115200 vt100
+ttyS0::respawn:/sbin/getty -L 115200 ttyS0 vt100
 ::shutdown:/sbin/openrc shutdown
