@@ -1,0 +1,33 @@
+#!/sbin/openrc-run
+
+description="Explicitly removes wireless devices."
+
+depend() {
+        before firewall
+        after logger
+}
+
+find_pci_wireless() {
+        local iface=
+        for iface in /sys/bus/pci/devices/*/net/*; do
+                if [ -e "$iface"/wireless -o -e "$iface"/phy80211 ]; then
+                        echo "${iface%/net/*}"
+                fi
+        done
+}
+
+start() {
+        :
+}
+
+stop() {
+        ebegin "Triggering remove for PCI wireless devices"
+        eindent
+        for device in $(find_pci_wireless); do
+                veinfo "Processing $device"
+                echo 1 > "$device"/remove
+        done
+        eoutdent
+
+        eend $?
+}
