@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=openrc
 pkgver=0.54
-pkgrel=0 # base: 1
+pkgrel=1 # base: 1
 pkgdesc="OpenRC manages the services, startup and shutdown of a host"
 url="https://github.com/OpenRC/openrc"
 arch="all"
@@ -36,6 +36,7 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/OpenRC/openrc/archive/$pkgve
 	firstboot.initd
 	sysctl.initd
 	machine-id.initd
+	remove-wireless.initd
 	"
 options="!check" # not updated to meson build system, require makefile build
 
@@ -152,4 +153,5 @@ d76c75c58e6f4b0801edac4e081b725ef3d50a9a8c9bbb5692bf4d0f804af7d383bf71a73d5d03ed
 990855f875513a85c2b737685ac5bfdfa86f8dadacf00c1826a456547f99b69d4ecf1b9a09c0ce002f1df618b44b1febabe53f95a2c0cd02b504d565bccb50c8  firstboot.initd
 2d5f9f6d41b7c0a8643cfdee1ce3c399bfe4ebff54421f33ab1e74c1c4c1b96a49e54b5cd69f0339a060342e4e5a11067bbff68c39fa487919259d73e8e46ed1  sysctl.initd
 35682e1742196133b79e4a0b21fe8df039a982ba4fdd0181b1e3872f3885e40726179d4996fec83a1da11ff314d71f8910609c1c05acb3d0f9b923147e2f1d55  machine-id.initd
+a8ff5a52a214beef85b21017b9d8c0a62576f3b674a891ddbf910db6033020a681a15ec1b208bb70b105957d394826a7f7fe1534bac43896244415279b7803fb  remove-wireless.initd
 "
