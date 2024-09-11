@@ -2,7 +2,7 @@
 
 pkgname='rtl8821ce'
 pkgver=20240326
-pkgrel=06060470000
+pkgrel=06060500000
 _gitrev='f119398d868b1a3395f40c1df2e08b57b2c882cd'
 pkgdesc='Driver for Realtek 8821CE, an 802.11ac device'
 arch="x86_64"
