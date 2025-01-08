@@ -44,6 +44,8 @@ GIT=$(LOCALBASE)/bin/git
 PATCHELF=$(LOCALBASE)/bin/patchelf
 BRANDELF=/usr/bin/brandelf
 TAR2SQFS=$(LOCALBASE)/bin/tar2sqfs
+IGOR=${LOCALBASE}/bin/igor
+MANDOC=/usr/bin/mandoc
 
 UID!=			$(ID) -u
 
@@ -174,6 +176,8 @@ _TARGETS=	$(SQUASHFS_IMG)
 
 all:	$(_TARGETS)
 
+_MAN_SRC=	man/wifibox-alpine.5
+
 install:
 	$(MKDIR) -p $(SHAREDIR)
 	$(INSTALL_DATA) $(SQUASHFS_VMLINUZ) $(SHAREDIR)/vmlinuz
@@ -186,7 +190,7 @@ install:
 .endfor
 
 	$(MKDIR) -p $(MANDIR)/man5
-	$(SED) ${_SUB_LIST_EXP} man/wifibox-alpine.5 \
+	$(SED) ${_SUB_LIST_EXP} ${_MAN_SRC} \
 	  | $(GZIP) -c > $(MANDIR)/man5/wifibox-alpine.5.gz
 
 	$(MKDIR) -p $(APPLIANCEDIR)
@@ -199,3 +203,12 @@ clean:
 	$(RM) -f $(SQUASHFS_IMG)
 
 .MAIN:	all
+
+mancheck:
+	@${ECHO} mandoc -T lint
+	# Create a dummy manual page to suppress the `mandoc` warning
+	@${TOUCH} wifibox.8
+	@$(SED) ${_SUB_LIST_EXP} ${_MAN_SRC} | ${MANDOC} -T lint
+	@${RM} wifibox.8
+	@${ECHO} igor
+	@$(SED) ${_SUB_LIST_EXP} ${_MAN_SRC} | ${IGOR}
