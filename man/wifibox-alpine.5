@@ -1,4 +1,4 @@
-.Dd June 29, 2024
+.Dd January 8, 2025
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -9,15 +9,15 @@ The implementation of the
 .Xr wifibox 8
 embedded wireless router is based on the use of a Linux-based guest
 operating system which can communicate with the host's wireless
-network card on behalf of the host.  In order to meet the requirements
-of this setup, this has to be a system with a low resource footprint
-and easy to manage.
+network card on behalf of the host.
+In order to meet the requirements of this setup, this has to be a
+system with a low resource footprint and easy to manage.
 .Pp
 This solution is derived from Alpine Linux, which is an actively
 maintained, security-oriented, lightweight distribution, based on
 .Sy musl libc
 and
-.Sy busybox.
+.Sy busybox .
 For more information and introduction to the tools that are going to
 be used in the sections below, please visit the following sites:
 .Pp
@@ -86,8 +86,8 @@ https://www.tcpdump.org/
 .Sh IMPLEMENTATION
 The guest is created with a
 .Sy root
-user, which is associated with a blank password.  This can only be
-used to login to the guest via the
+user, which is associated with a blank password.
+This can only be used to login to the guest via the
 .Cm console
 command of
 .Xr wifibox 8 ,
@@ -96,21 +96,22 @@ no other services are configured for remote access.
 Although the
 .Sy root
 user possesses unlimited access to every resource inside the guest,
-files might not be changed in every case.  That is because the
-operating system is built in a way that it does not require any write
-access to the contents of the root file system.  In addition to that,
-all the contents of the disk image is stored in a compressed format
-via SquashFS and uncompressed to memory only on demand.  Everything
-that needs to be modified during the guest's run time is stored on
-dedicated file systems that are either memory-backed or shared with
-the host.
+files might not be changed in every case.
+That is because the operating system is built in a way that it does
+not require any write access to the contents of the root file system.
+In addition to that, all the contents of the disk image is stored in a
+compressed format via SquashFS and uncompressed to memory only on
+demand.
+Everything that needs to be modified during the guest's run time is
+stored on dedicated file systems that are either memory-backed or
+shared with the host.
 .Pp
 The image can host either
 .Sy wpa_supplicant
 for connecting to wireless networks, or
 .Sy hostapd
-for creating wireless access points, depending how it was built.  In
-addition to that, a combination of
+for creating wireless access points, depending how it was built.
+In addition to that, a combination of
 .Sy dhcpcd
 and
 .Sy radvd
@@ -119,22 +120,22 @@ could be used to support IPv6 traffic,
 could be deployed to handle multicast DNS requests, and
 .Sy forwarding
 could be configured to pass traffic between originally isolated inner
-and outer networks, such as UDP broadcasts.  For packet analysis,
+and outer networks, such as UDP broadcasts.
+For packet analysis,
 .Sy tcpdump
-is provided as an optional component.  Each application-specific
-detail is going to be included below.
+is provided as an optional component.
+Each application-specific detail is going to be included below.
 .Sh SHARED CONFIGURATION FILES
-.Pp
 For ease of management, the host shares configuration files with the
-services that are responsible for implementing the domain logic.  On
-the host, all the files are stored under
+services that are responsible for implementing the domain logic.
+On the host, all the files are stored under
 .Pa %%LOCALBASE%%/etc/wifibox
 with additional subdirectories inside.
 .Pp
 The
 .Pa appliance
-subdirectory holds the generic configuration files.  On the guest,
-they are visible on the
+subdirectory holds the generic configuration files.
+On the guest, they are visible on the
 .Pa /media/etc
 directory where the
 .Sy config
@@ -144,21 +145,26 @@ directory where the
 .Sy forwarding
 works with the
 .Pa appliance/forwarding.conf
-file.  It uses the syntax of the
+file.
+It uses the syntax of the
 .Sy socat
 address specifications but it is limited to work with UDP and TCP
-ports only.  Note that this is an optional component, and its presence
-depends on the configuration of the guest image.  The respective
-configuration file on the guest is
+ports only.
+Note that this is an optional component, and its presence depends on
+the configuration of the guest image.
+The respective configuration file on the guest is
 .Pa /media/etc/forwarding.conf ,
 which is used directly from this location.
 .It
 .Sy hostname
 sets the hostname on boot from the
 .Pa applicance/hostname
-file.  This is the name that is going to be visible for others on the
-local network.  Changing the hostname requires updating this file and
-restarting the guest.  The configuration file shows up on the guest as
+file.
+This is the name that is going to be visible for others on the local
+network.
+Changing the hostname requires updating this file and restarting the
+guest.
+The configuration file shows up on the guest as
 .Pa /media/etc/hostname ,
 which is mapped to
 .Pa /etc/hostname ,
@@ -174,8 +180,8 @@ file to associate the internal network interfaces with IP addresses:
 is the wireless device and
 .Sy eth0
 is the virtual Ethernet device towards the host which are both
-configured according to the contents of the configuration file.  On
-the guest, this is
+configured according to the contents of the configuration file.
+On the guest, this is
 .Pa /media/etc/interfaces.conf ,
 which is directly included as part of
 .Pa /etc/network/interfaces .
@@ -188,8 +194,10 @@ Translation, NAT) between the
 .Sy eth0
 and
 .Sy wlan0
-interfaces.  The configuration file describes the flow of the network
-packets through the interfaces.  Using
+interfaces.
+The configuration file describes the flow of the network packets
+through the interfaces.
+Using
 .Pa /media/etc/iptables
 directly, it is loaded once at launching the respective service,
 usually on boot, and cannot be modified from the guest.
@@ -199,12 +207,13 @@ is the IPv6-enabled version of
 .Sy iptables
 which uses the
 .Pa appliance/ip6tables
-configuration file.  Its purpose is exactly the same as for its
-sibling, it bridges the
+configuration file.
+Its purpose is exactly the same as for its sibling, it bridges the
 .Sy eth0
 and
 .Sy wlan0
-networking interfaces with the help of NAT.  On the guest,
+networking interfaces with the help of NAT.
+On the guest,
 .Pa /media/etc/ip6tables
 is used directly in this case.
 .It
@@ -213,9 +222,10 @@ works with the
 .Pa appliance/mdnsd-services.conf
 file and it can handle multicast DNS query packets on UDP port 5353.
 The advertised services can be described by its configuration file so
-that others on the network could see them.  Note that this is optional
-component, and its presence depends on the configuration options of
-the guest image.  On the guest, the
+that others on the network could see them.
+Note that this is optional component, and its presence depends on the
+configuration options of the guest image.
+On the guest, the
 .Pa /media/etc/mdnsd-services.conf
 configuration file is used directly.
 .It
@@ -231,11 +241,13 @@ so that it can hand out IP addresses in a given range for the host
 or the clients on the wireless network
 .Sy ( hostapd ) ,
 and can set itself the default gateway for forwarding the network
-traffic.  It also manages the distribution of information about the
-name servers, in cooperation with
+traffic.
+It also manages the distribution of information about the name
+servers, in cooperation with
 .Sy udhcpc
-(DHCP client) when required. This is utilized only when dynamic IP
-addresses are in use.  On the guest, the configuration file becomes
+(DHCP client) when required.
+This is utilized only when dynamic IP addresses are in use.
+On the guest, the configuration file becomes
 .Pa /media/etc/udhcpd.conf ,
 which is used to generate
 .Pa /etc/udhcpd.conf
@@ -246,10 +258,11 @@ will eventually read.
 .Sy dhcpcd
 is an alternative to
 .Sy udhcpc
-and it is used only when IPv6 is optionally configured.  In that case,
-it takes over the role of
+and it is used only when IPv6 is optionally configured.
+In that case, it takes over the role of
 .Sy udhcpc
-and manages both IPv4 and IPv6 addresses.  It works with the
+and manages both IPv4 and IPv6 addresses.
+It works with the
 .Pa appliance/dhcpcd.conf
 file which often holds only a handful of overrides for the default
 options because otherwise they work well.
@@ -267,14 +280,15 @@ which is mapped to
 works with the
 .Pa appliance/radvd.conf
 configuration file and this is the IPv6 Routing Advertisement Daemon
-that implements the routing functionality in case IPv6 is enabled.  It
-sends Router Advertisement messages, specified by RFC 2461, towards
+that implements the routing functionality in case IPv6 is enabled.
+It sends Router Advertisement messages, specified by RFC 2461, towards
 the host
 .Sy ( wpa_supplicant )
 or the clients
 .Sy ( hostapd ) ,
-and sending a Router Solicitation message when requested.  These
-messages are required for IPv6 stateless autoconfiguration (SLAAC).
+and sending a Router Solicitation message when requested.
+These messages are required for IPv6 stateless autoconfiguration
+(SLAAC).
 The corresponding configuration file on the guest is
 .Pa /media/etc/radvd.conf ,
 which is mapped to
@@ -289,12 +303,13 @@ or
 It works with the
 .Pa appliance/uds_passthru.conf
 file, which is optional, and when it is present, it automatically
-implies that the service is enabled.  The contents describe what
-sockets should be exposed over configured TCP ports with the help of
+implies that the service is enabled.
+The contents describe what sockets should be exposed over configured
+TCP ports with the help of
 .Sy socat ,
 which a heavily stripped-down version of the original tool to minimize
-the related security risks.  On the guest, the path of the
-configuration file is
+the related security risks.
+On the guest, the path of the configuration file is
 .Pa /media/etc/uds_passthru.conf ,
 from where it is used.
 .El
@@ -307,13 +322,15 @@ subdirectory holds the configuration files that are used by either
 .Sy wpa_supplicant
 or
 .Sy hostapd ,
-respectively.  On the guest, they are published under the paths
+respectively.
+On the guest, they are published under the paths
 .Pa /etc/wpa_supplicant
 and
 .Pa /etc/hostapd
 where the
 .Sy app_config
-9P (VirtFS) share is mounted as read-write.  This will let
+9P (VirtFS) share is mounted as read-write.
+This will let
 .Sy wpa_supplicant
 or
 .Sy hostapd
@@ -327,17 +344,19 @@ file, while
 .Sy hostapd
 works with the
 .Pa hostapd/hostapd.conf
-file.  These are the same tools that are used in the FreeBSD base
-system for the same purpose, and their Linux version is utilized here
-to make it possible to reuse the configuration files of the same
+file.
+These are the same tools that are used in the
+.Fx
+base system for the same purpose, and their Linux version is utilized
+here to make it possible to reuse the configuration files of the same
 format from the host.
 .Pp
 The variable data files under the guest's
 .Pa /var
 directory are shared with the host by mounting the
 .Sy var
-9P (VirtFS) share there.  This includes streaming out all the logs
-under the
+9P (VirtFS) share there.
+This includes streaming out all the logs under the
 .Pa /var/log
 directory, such as
 .Pa /var/log/dmesg
@@ -351,27 +370,28 @@ The contents of the
 directory will not be visible on the host, as it is stored only in the
 memory.
 .Sh INTERNALS
-.Pp
 Further components of the guest that are not directly configurable or
 visible to the outside:
 .Bl -bullet
 .It
 Version 6.6 (LTS) of the Linux kernel and its wireless drivers are
-used to communicate with exposed hardware.  It does not always work
-with the latest ones, see the section on supported hardware for the
-exact details.  Alternatively, it is possible to configure the image
-to have Linux 6.8 (stable) which could be suitable for testing
-experimental features and drivers.
+used to communicate with exposed hardware.
+It does not always work with the latest ones, see the section on
+supported hardware for the exact details.
+Alternatively, it is possible to configure the image to have Linux 6.8
+(stable) which could be suitable for testing experimental features and
+drivers.
 .It
 .Sy busybox
 is a combination of tiny versions of the common UNIX utilities,
 including the
 .Sy ash
-shell itself, shipped in a single small executable.  It provides the
-execution environment for all the scripts and services.  All the
-irrelevant modules were removed for security hardening.
+shell itself, shipped in a single small executable.
+It provides the execution environment for all the scripts and
+services.
+All the irrelevant modules were removed for security hardening.
 .It
-The base layout of the Alpine sytem is stripped down to the bare
+The base layout of the Alpine system is stripped down to the bare
 minimum, and for example, the guest does not have the
 .Sy apk
 package manager installed since it would not be able to work.
@@ -382,15 +402,16 @@ includes all the needed applications.
 Every service running on the guest can be managed by the
 .Sy rc-service
 (locate and run OpenRC service) command, which is going to be used in
-this section.  The list of actively managed services can be learned as
-follows.
+this section.
+The list of actively managed services can be learned as follows.
 .Bd -literal -offset indent
 # rc-service --list
 .Ed
 .Pp
 The status of a specific service can be queried by the
 .Cm status
-command.  For example, the
+command.
+For example, the
 .Sy wpa_supplicant
 tool has its own associated service and it can be checked by the following
 command.
@@ -404,8 +425,9 @@ Similarly to this, the
 and
 .Cm restart
 commands are available as well to start, stop, or restart the given
-service, respectively.  In the example below, consider re-initializing
-all the network interfaces by restarting the
+service, respectively.
+In the example below, consider re-initializing all the network
+interfaces by restarting the
 .Sy networking
 service.
 .Bd -literal -offset indent
@@ -423,7 +445,8 @@ services, which need to be restarted so that the changes in either the
 .Pa iptables
 or the
 .Pa ip6tables
-file can take effect.  For example, in case of
+file can take effect.
+For example, in case of
 .Sy iptables :
 .Bd -literal -offset indent
 # rc-service iptables restart
@@ -437,9 +460,10 @@ The active set of rules can be queried by the following command.
 Rules can be dynamically added, deleted, inserted, replaced, and
 flushed through the corresponding commands of the
 .Sy iptables
-utility, see its documentation for the details.  The current state of
-the configuration can be recorded by dumping it to temporary file
-under a directory which is shared with the host, that is
+utility, see its documentation for the details.
+The current state of the configuration can be recorded by dumping it
+to temporary file under a directory which is shared with the host,
+that is
 .Pa /var/tmp
 in this case.
 .Bd -literal -offset indent
@@ -463,9 +487,10 @@ To verify the flow of network traffic, the
 or the
 .Sy ip6tables
 (for IPv6) utility can be asked to list the rules in a more verbose
-manner.  This will include the number of packets that matched each of
-the rules, so their effect becomes observable.  For example, in case
-of
+manner.
+This will include the number of packets that matched each of the
+rules, so their effect becomes observable.
+For example, in case of
 .Sy iptables :
 .Bd -literal -offset indent
 # iptables -L -nv
@@ -474,34 +499,38 @@ of
 For finding the right configuration parameters for the rules of
 network packet filtering, it is possible to additionally install the
 .Sy tcpdump
-utility.  It can be used to capture all the packets that are flowing
-through all the networking interfaces and determine the proper IP
-addresses and ports.  When invoked without any parameters, it will
-start dumping all the traffic-related information to the standard
-output.  For all the features and options, please consult the
-documentation.
+utility.
+It can be used to capture all the packets that are flowing through all
+the networking interfaces and determine the proper IP addresses and
+ports.
+When invoked without any parameters, it will start dumping all the
+traffic-related information to the standard output.
+For all the features and options, please consult the documentation.
 .Bd -literal -offset indent
 # tcpdump
 .Ed
 .Pp
 Mind that this facility is not available by default, the guest image
 has to be explicitly configured to include this as it is a security
-risk.  For the same reason, its removal is recommended once the
-analysis is concluded.
+risk.
+For the same reason, its removal is recommended once the analysis is
+concluded.
 .Sh DEALING WITH UDP PACKETS
 By design, UDP packets are not meant to passed between the
 .Sy eth0
 and
 .Sy wlan0
-interfaces which may cause certain applications to fail to work.  A
-possible way to address this shortcoming is to deploy the proper
+interfaces which may cause certain applications to fail to work.
+A possible way to address this shortcoming is to deploy the proper
 handlers to the user space and configure
 .Sy iptables
-to use them.  This can be requested by the
+to use them.
+This can be requested by the
 .Sy RETURN
 target, which can be inserted in the
 .Sy PREROUTING
-chain for the NAT rules.  For example, in case of
+chain for the NAT rules.
+For example, in case of
 .Sy mDNSResponder ,
 the packet filtering rules have to explicitly be configured to pass
 every UDP packet on port 5353 to the application for further
@@ -519,14 +548,15 @@ Details of wireless configuration can be learned through the use of
 the
 .Sy iw
 tool, which is suitable for showing and manipulating wireless devices
-and their configuration.  For example, it can list the device
-capabilities, such as band information (2.4 GHz and 5 GHz), and
-802.11n information.
+and their configuration.
+For example, it can list the device capabilities, such as band
+information (2.4 GHz and 5 GHz), and 802.11n information.
 .Bd -literal -offset indent
 # iw list
 .Ed
 .Pp
-Scanning can be initiated as follows.  There,
+Scanning can be initiated as follows.
+There,
 .Sy wlan0
 is the name of the wireless networking device, which can be considered
 constant.
@@ -536,7 +566,8 @@ constant.
 .Pp
 Wireless events can be traced with the
 .Cm event
-command.  In the related example below, the
+command.
+In the related example below, the
 .Fl f
 and
 .Fl t
@@ -562,11 +593,13 @@ command.
 .Ed
 .Sh BLOCKED WIRELESS DEVICES
 Sometimes it happens that even if the driver has successfully detected
-the wireless device, it is not yet ready to be used.  That is because
-the use of the device might be blocked either by software or hardware
-means, i.e. by a physical switch. The image contains the
+the wireless device, it is not yet ready to be used.
+That is because the use of the device might be blocked either by
+software or hardware means i.e., by a physical switch.
+The image contains the
 .Sy rfkill
-tool as part of BusyBox to unblock the wireless device.  Use the
+tool as part of BusyBox to unblock the wireless device.
+Use the
 .Sy list
 command to see if
 .Sy rfkill
@@ -577,7 +610,8 @@ is usable and list the available interfaces.
 .Pp
 If the interface is shown to be blocked, use the
 .Sy unblock
-command to unblock it.  This can be done either by function or index.
+command to unblock it.
+This can be done either by function or index.
 .Bd -literal -offset indent
 # rfkill unblock wlan
 .Ed
@@ -589,26 +623,30 @@ Or:
 .Pp
 Note that \(lqhard\(rq block status cannot be changed this way, as it
 is typically performed by the hardware switch or it is implemented by
-the firmware itself.  For example, the computer might be configured to
-turn off the wireless device when the wired networking interface card
-is active and the LAN cable is inserted.
-
+the firmware itself.
+For example, the computer might be configured to turn off the wireless
+device when the wired networking interface card is active and the LAN
+cable is inserted.
 .Sh SUPPORTED HARDWARE
-There are a number of Linux drivers available as kernel modules.  Note
-that not all of them could be used immediately because there might be
-additional, often proprietary firmware files have to be placed under
+There are a number of Linux drivers available as kernel modules.
+Note that not all of them could be used immediately because there
+might be additional, often proprietary firmware files have to be
+placed under
 .Pa /lib/firmware
 for activation.
 .Pp
-A list of wireless cards supported by the drivers is as follows.  The
-kernel modules that depend on specific firmware files are marked by
-name at the end of each entry, otherwise they should be working.  The
-availability of those auxiliary files is a function of how the
-corresponding FreeBSD port is configured.  Some of them might be
-included for certain package flavors only or disabled by default and
-has to be explicitly configured and built by the user due to licensing
-restrictions.  Note that this list might not be accurate and included
-here for information only.
+A list of wireless cards supported by the drivers is as follows.
+The kernel modules that depend on specific firmware files are marked
+by name at the end of each entry, otherwise they should be working.
+The availability of those auxiliary files is a function of how the
+corresponding
+.Fx
+port is configured.
+Some of them might be included for certain package flavors only or
+disabled by default and has to be explicitly configured and built by
+the user due to licensing restrictions.
+Note that this list might not be accurate and included here for
+information only.
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It ADMTek/Infineon AMD8211A
@@ -799,16 +837,17 @@ here for information only.
 .It Texas Instruments WL1271/3 [ti]
 .It Texas Instruments WL1281/3 [ti]
 .El
-.Sh CAVEATS
-Certain vendors may assign different PCI IDs for their rebranded
-products even if they ship exactly the same chipset.  For example, AMD
-RZ608 is technically the same as MediaTek MT7921, but its PCI ID had
-to be explictly added for the corresponding driver to make it work.
-Similar situations may occur any time, please let us know if this
-happens.
 .Sh SEE ALSO
-.Xr wifibox 8 ,
+.Xr hostapd.conf 5 ,
 .Xr wpa_supplicant.conf 5 ,
-.Xr hostapd.conf 5
+.Xr wifibox 8
 .Sh AUTHORS
 .An Gábor Páli Aq Mt pali.gabor@gmail.com
+.Sh CAVEATS
+Certain vendors may assign different PCI IDs for their rebranded
+products even if they ship exactly the same chipset.
+For example, AMD RZ608 is technically the same as MediaTek MT7921, but
+its PCI ID had to be explictly added for the corresponding driver to
+make it work.
+Similar situations may occur any time, please let us know if this
+happens.
