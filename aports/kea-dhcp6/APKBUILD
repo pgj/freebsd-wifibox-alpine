@@ -1,0 +1,87 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname=kea-dhcp6
+pkgver=2.4.1
+pkgrel=0 # base: 2
+pkgdesc="DHCPv6 server from ISC"
+url="https://kea.isc.org/"
+arch="all"
+license="MPL-2.0"
+makedepends="
+	autoconf
+	automake
+	bison
+	boost-dev
+	botan-dev
+	flex
+	libcap-utils
+	libtool
+	log4cplus-dev
+	"
+options="!check"
+install=
+builddir="$srcdir"/kea-"$pkgver"
+source="https://ftp.isc.org/isc/kea/$pkgver/kea-$pkgver.tar.gz
+	configs-fix-paths.patch
+	put-LOCKFILE_DIR-to-runstatedir.patch
+
+	kea-dhcp6.initd
+	kea-dhcp6.confd
+	"
+
+prepare() {
+	default_prepare
+	update_config_sub
+
+	autoreconf -fv
+
+	find src/share/database/scripts/ \
+		-name '*.sh.in' \
+		-exec sed -i 's|^\s*. @abs_top_builddir@/src/bin/admin/admin-utils.sh.*|echo "admin-utils.sh not found!"; exit 1|' {} \;
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--localstatedir=/var \
+		--libexecdir=/usr/lib \
+		--runstatedir=/run \
+		--without-mysql \
+		--without-pgsql \
+		--disable-rpath \
+		--disable-generate-messages \
+		--disable-generate-parser \
+		--disable-shell
+	make
+}
+
+package() {
+
+	install -Dm755 "$srcdir"/kea-dhcp6.initd \
+		"$pkgdir"/etc/init.d/kea-dhcp6
+	install -Dm644 "$srcdir"/kea-dhcp6.confd \
+		"$pkgdir"/etc/conf.d/kea-dhcp6
+
+	install -d -m 0750 -o 103 -g 104 \
+		"$pkgdir"/var/log/kea \
+		"$pkgdir"/var/lib/kea
+
+	ln -s /media/etc/kea-dhcp6.conf "$pkgdir/etc/kea/kea-dhcp6.conf"
+
+	# keactrl is unnecessary since we provide OpenRC init scripts.
+	rm \
+	   "$pkgdir"/usr/sbin/keactrl \
+	   "$pkgdir"/etc/kea/keactrl.conf
+	rm -Rf "$pkgdir"/run
+}
+
+sha512sums="
+b8a3b6f2cae213fd9826c37568c71d3458f52eed973dbe437a1d0974dafa026635a730d828c6ff03b32e030be57d75a7914a8ca313833e91d9996b6a05b2b224  kea-2.4.1.tar.gz
+3439046a80de33b31bf3f12e3c9728e47119e245fb888a1e4484a443b20e7b364f0e15e10fa96b4fcfcec29e6d2828ba9ab728a83028546a9c28f30fc404512d  configs-fix-paths.patch
+52de95e9b4de3e518b4fbbce19799230684a2924433e666c24b866e537ffeaea9cd16b0b41499a17dd3ed528be1f899e94e67f6e464d551149b850cdbf29c1b2  put-LOCKFILE_DIR-to-runstatedir.patch
+9fe5754b5d669fae3a2d1db2ffdeb9f061e2a76ea35aac8cee96ef3b1bb503b3d477f83037cc0cb756ddc685c906680dfd24decf049b510d28a79eff1101b6bb  kea-dhcp6.initd
+bb0aa406223214793212ec2e4f05ab2792bf4a444033fafe28a1b82a1129ed7e097d25bcd6af105ab3873c5e95a40433080dd3b04d3eb95b150369af7196c94e  kea-dhcp6.confd
+"

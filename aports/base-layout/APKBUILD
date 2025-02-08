@@ -2,7 +2,7 @@
 
 pkgname=baselayout # base: alpine-baselayout, alpine-baselayout-data
 pkgver=3.6.5
-pkgrel=0 # base: 0
+pkgrel=1 # base: 0
 pkgdesc="Base dir structure and init scripts"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="noarch"
