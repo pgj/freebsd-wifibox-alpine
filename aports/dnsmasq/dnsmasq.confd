@@ -1,0 +1,23 @@
+# Configuration for /etc/init.d/dnsmasq
+
+# Path to the dnsmasq configuration file.
+cfgfile="/etc/dnsmasq.conf"
+
+# Location where to store DHCP leases (sets --dhcp-leasefile).
+leasefile="/var/lib/misc/$RC_SVCNAME.leases"
+
+# Additional setup command (runs before starting dnsmasq)
+# This can be an external command or a function defined here.
+# Service will not start if this command fails.
+setup_command=
+
+# User and group to change to after startup.
+user="dnsmasq"
+group="dnsmasq"
+
+# Additional options to pass to the dnsmasq.
+# See the dnsmasq(8) man page for more information.
+command_args=
+
+# Uncomment to run with process supervisor.
+# supervisor=supervise-daemon

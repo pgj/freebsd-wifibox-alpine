@@ -1,0 +1,57 @@
+#!/sbin/openrc-run
+
+description="A lightweight DNS, DHCP, RA, TFTP and PXE server"
+
+extra_commands="checkconfig"
+description_checkconfig="Check configuration syntax"
+
+extra_started_commands="reload"
+description_reload="Clear cache and reload hosts files"
+
+command="/usr/sbin/dnsmasq"
+# Tell dnsmasq to not create pidfile, that's responsibility of init system.
+command_args="--keep-in-foreground --pid-file= $command_args --conf-file=$cfgfile"
+command_background="yes"
+pidfile="/run/$RC_SVCNAME.pid"
+
+depend() {
+	provide dns
+	need localmount net
+	after bootmisc
+	use logger
+}
+
+start_pre() {
+	$command --test --conf-file="$cfgfile" >/dev/null 2>&1 \
+		|| $command --test \
+		|| return 1
+
+	checkpath -m 0644 -o "$user:$group" -f "$leasefile" || return 1
+
+	if command -v "$setup_command" >/dev/null; then
+		$setup_command || return 1
+	fi
+}
+
+reload() {
+	ebegin "Reloading $RC_SVCNAME"
+
+	$command --test --conf-file="$cfgfile" >/dev/null 2>&1 \
+		|| $command --test \
+		|| return 1
+
+	if [ "$supervisor" ]; then
+		$supervisor "$RC_SVCNAME" --signal HUP
+	else
+		start-stop-daemon --signal HUP --pidfile "$pidfile"
+	fi
+	eend $?
+}
+
+checkconfig() {
+	ebegin "Checking $RC_SVCNAME configuration"
+
+	$command --test --conf-file="$cfgfile"
+
+	eend $?
+}
