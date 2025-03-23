@@ -2,7 +2,7 @@
 #
 pkgname=radvd
 pkgver=2.19
-pkgrel=2 # base: 4
+pkgrel=3 # base: 4
 pkgdesc="IPv6 router advertisement daemon"
 url="http://www.litech.org/radvd"
 arch="all"

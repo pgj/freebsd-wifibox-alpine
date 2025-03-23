@@ -1,8 +1,8 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
-pkgname=baselayout # base: alpine-baselayout, alpine-baselayout-data
-pkgver=3.6.5
-pkgrel=0 # base: 0
+pkgname=baselayout # base: alpine-baselayout
+pkgver=3.6.8
+pkgrel=0 # base: 1
 pkgdesc="Base dir structure and init scripts"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="noarch"
@@ -69,6 +69,7 @@ package() {
 		media/etc \
 		proc \
 		run \
+		run/lock \
 		sbin \
 		sys \
 		usr \
@@ -89,8 +90,6 @@ package() {
 		var/lib \
 		var/lib/misc \
 		var/local \
-		var/lock \
-		var/lock/subsys \
 		var/log \
 		var/opt \
 		var/spool \
@@ -98,6 +97,7 @@ package() {
 		var/mail
 
 	ln -s /run var/run
+	ln -s /run/lock var/lock
 	install -d -m 0555 var/empty
 	install -d -m 0700 "$pkgdir"/root
 	install -d -m 1777 "$pkgdir"/tmp "$pkgdir"/var/tmp
