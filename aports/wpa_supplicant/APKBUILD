@@ -2,7 +2,7 @@
 
 pkgname=wpa_supplicant
 pkgver=2.10
-pkgrel=9 # base: 11
+pkgrel=10 # base: 11
 pkgdesc="utility providing key negotiation for WPA wireless networks"
 url="https://w1.fi/wpa_supplicant/"
 arch="all"

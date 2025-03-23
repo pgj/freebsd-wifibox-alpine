@@ -1,23 +1,28 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=iptables
-pkgver=1.8.10
-pkgrel=1 # base: 3
+pkgver=1.8.11
+pkgrel=0 # base: 1
 pkgdesc="Linux kernel firewall, NAT and packet mangling tools"
 url="https://www.netfilter.org/projects/iptables/index.html"
 arch="all"
 license="GPL-2.0-or-later"
-makedepends="libnftnl-dev bison flex autoconf automake"
+makedepends="linux-headers libnftnl-dev bison flex autoconf automake libtool"
 source="https://www.netfilter.org/projects/iptables/files/iptables-$pkgver.tar.xz
 	use-sh-iptables-apply.patch
 	iptables.initd
 	iptables.confd
 	ip6tables.confd
+	configure-Avoid-addition-assignment-operators.patch
+	fix-interface-comparissons-in-dash-C-commands.patch
+	drop-interface-mask-leftovers-from-post-parse-callbacks.patch
 	"
 
 prepare() {
 	default_prepare
-	update_config_sub
+
+	# For configure-Avoid-addition-assignment-operators.patch
+	autoreconf -vfi
 }
 
 build() {
@@ -61,9 +66,12 @@ package() {
 }
 
 sha512sums="
-71e6ed2260859157d61981a4fe5039dc9e8d7da885a626a4b5dae8164c509a9d9f874286b9468bb6a462d6e259d4d32d5967777ecefdd8a293011ae80c00f153  iptables-1.8.10.tar.xz
+4937020bf52d57a45b76e1eba125214a2f4531de52ff1d15185faeef8bea0cd90eb77f99f81baa573944aa122f350a7198cef41d70594e1b65514784addbcc40  iptables-1.8.11.tar.xz
 ac78898c2acbe66ed8d32a06f41ff08cde7c22c3df6dfec6bc89a912d2cef2bde730de19d25a5407886d567cb0972a0b7bde7e6b18a34c4511495b4dad3b90ad  use-sh-iptables-apply.patch
 e82fcf10e9fffba37b7e4a11bc901b57d60214f5de4865c61df4add04057b9cb2c1d159b2af809b22e017197f2717b330f05a34a7e97589f48de65606060b1db  iptables.initd
 85bb1660c2452fdede5ae0a483489a3648a8b327ea658839a1ad8c6405f6526bdf842a62d4df3f6e3cbbb9ad59137d37b39266cee21e252814191964d4c50f44  iptables.confd
 1783557fea7350ab43b050e632ccd62eb490f1f2b3ad48e7e3fd53cc66c1a9b93c8df4dd692aca3a0d17658f53eb8b668e60055b113fa3091319f81294a1783b  ip6tables.confd
+73ef8c0bb4743c417de6219a86ee6b88e54ae261d586907c94ed4c73a7e41adde5dbef9eb992ac483b0457c409297a7c6629d443787e89f906de5e7ca747825f  configure-Avoid-addition-assignment-operators.patch
+4ed70d21abe2128413acfb2c86354a688270843773b73a81dc30318173dd45145d4b1a8f09f0ec170034956037c478874ca210a85e8ae7cc678d124d4a69adb6  fix-interface-comparissons-in-dash-C-commands.patch
+3c32c3cb3d8132612fc83ec6c31456dddeaa39113175d203e687ed827fedfd1d79a841b66543a25f230959fbde03e81d8b15df1b407ac34e636994d67c7726a6  drop-interface-mask-leftovers-from-post-parse-callbacks.patch
 "

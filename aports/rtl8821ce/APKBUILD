@@ -1,9 +1,9 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtl8821ce'
-pkgver=20240326
-pkgrel=06060500000
-_gitrev='f119398d868b1a3395f40c1df2e08b57b2c882cd'
+pkgver=20250312
+pkgrel=06120190000
+_gitrev='1bbfc35ece57cbdfb8473c49d3c6464eede54191'
 pkgdesc='Driver for Realtek 8821CE, an 802.11ac device'
 arch="x86_64"
 url='https://github.com/tomaspinho/rtl8821ce'
@@ -28,5 +28,5 @@ package() {
 }
 
 sha512sums="
-0341df96c66b3be0c730033804e70684cbdcda22a2b7f56ed591d9891c0f962fcf9a7cafa2be94d9e92b1851e0dd532b9a4bbafe2a94368b900b7363a7d6dec7  f119398d868b1a3395f40c1df2e08b57b2c882cd.zip
+3693d040dc44f44c42b557f4c657e0ce859f17892ce9e0f60ba9a044624d9caf87dc502bab7410fb067dcfd947477f92a38a71055096b62bcee9a57aaa369668  1bbfc35ece57cbdfb8473c49d3c6464eede54191.zip
 "

@@ -2,7 +2,7 @@
 
 pkgname=broadcom-wl
 pkgver=6.30.223.271
-pkgrel=06060500000
+pkgrel=06120190000
 pkgdesc='Broadcom 802.11 Linux STA wireless driver'
 arch="x86_64"
 url='https://www.broadcom.com/support/download-search/?pf=Wireless+LAN+Infrastructure'
@@ -30,6 +30,7 @@ source="broadcom-wl.conf
         014-linux414.patch
         015-linux600.patch
         016-linux601.patch
+        017-linux612.patch
         https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz
 	"
 
@@ -96,5 +97,6 @@ b815a4ff9289d81ddbe7f76553b092df19ee137438c9e33811c3a8b15e8a3896763715975b42391b
 30207d8872ee8925a7c7412184e3b4fd6935f8017fb46e1173aca77333c99fb4316ef1511a83e345593c369210d4cbf976eea53995e229b4d856d97662c98961  014-linux414.patch
 21cf9b0b01ad4b30fa8541638e9a8428c8c68c89992b7e15c19f8526e8df6f8c5ff20de5ae2759b36fead07deacd1805749a9ed82611d15fb75dc94812e4941e  015-linux600.patch
 8879aeb0a79b7e82ca5e70fd33acefda1733594d7e78940932d2c220cad48b643fc2c0cb8e79f1fc3ebaaa5a4383a0caf6798214f911c2f5859c8fab1c8532e8  016-linux601.patch
+3b57d064323e5602ac5e94538d3a810a72dd4185a09cf6be772e787ba968052d2bd43e5946689312cf8df934d72c9e7f495476d5851e106f3dcb2b525be8f3a1  017-linux612.patch
 6855781f7c69a9aecb9461932423688964879d5a4df571f01ae7adaa7bf21a410bef839605d555afb6c8f4eec92fe8510af6cb120930095617ff6cdcccedaf17  hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz
 "
