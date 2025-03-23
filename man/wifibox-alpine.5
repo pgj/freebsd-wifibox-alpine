@@ -1,4 +1,4 @@
-.Dd January 8, 2025
+.Dd March 23, 2025
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -374,13 +374,13 @@ Further components of the guest that are not directly configurable or
 visible to the outside:
 .Bl -bullet
 .It
-Version 6.6 (LTS) of the Linux kernel and its wireless drivers are
+Version 6.12 (LTS) of the Linux kernel and its wireless drivers are
 used to communicate with exposed hardware.
 It does not always work with the latest ones, see the section on
 supported hardware for the exact details.
-Alternatively, it is possible to configure the image to have Linux 6.8
-(stable) which could be suitable for testing experimental features and
-drivers.
+Alternatively, it is possible to configure the image to have Linux
+6.13 (stable) which could be suitable for testing experimental
+features and drivers.
 .It
 .Sy busybox
 is a combination of tiny versions of the common UNIX utilities,
@@ -811,27 +811,38 @@ information only.
 .It Realtek 8192C/8188C [rtlwifi]
 .It Realtek 8192S/8191S [rtlwifi]
 .It Realtek 8192DE [rtlwifi]
-.It Realtek 8723BE [rtlwifi]
-.It Realtek 8723D [rtlwifi]
-.It Realtek 8723DE [rtlwifi]
-.It Realtek 8723E [rtlwifi]
-.It Realtek 8821AE [rtw88]
-.It Realtek 8822B [rtw88]
+.It Realtek 8703B [rtw88]
+.It Realtek 8723BE [rtw88]
+.It Realtek 8723D [rtw88]
+.It Realtek 8723DE [rtw88]
+.It Realtek 8723E [rtw88]
+.It Realtek 8812A [rtw88]
+.It Realtek 8814A [rtw88]
+.It Realtek 8814AE [rtw88]
+.It Realtek 8821A [rtw88]
 .It Realtek 8821C [rtw88]
 .It Realtek 8821CE [rtw88]
+.It Realtek 8822B [rtw88]
 .It Realtek 8822BE [rtw88]
 .It Realtek 8822C [rtw88]
 .It Realtek 8822CE [rtw88]
 .It Realtek 8821C [rtw88]
 .It Realtek 8821CE [rtw88]
-.It Realtek 8851B [rtw88]
-.It Realtek 8851BE [rtw88]
-.It Realtek 8852A [rtw88]
-.It Realtek 8852AE [rtw88]
-.It Realtek 8852B [rtw88]
-.It Realtek 8852BE [rtw88]
+.It Realtek 8821C [rtw88]
+.It Realtek 8821CE [rtl8821ce]
+.It Realtek 8822BE [rtw88]
+.It Realtek 8822C [rtw88]
+.It Realtek 8822CE [rtw88]
+.It Realtek 8851B [rtw89]
+.It Realtek 8851BE [rtw89]
+.It Realtek 8852A [rtw89]
+.It Realtek 8852AE [rtw89]
+.It Realtek 8852B [rtw89]
+.It Realtek 8852BE [rtw89]
+.It Realtek 8852BT [rtw89]
+.It Realtek 8852BTE [rtw89]
 .It Realtek 8852C [rtw88]
-.It Realtek 8852CE [rtw88]
+.It Realtek 8852CE [rtw89]
 .It Realtek 8922A [rtw89]
 .It Realtek 8922AE [rtw89]
 .It Texas Instruments WL1271/3 [ti]
