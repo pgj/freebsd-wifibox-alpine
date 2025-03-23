@@ -53,6 +53,7 @@ ELF_INTERPRETER=	/lib/ld-musl-x86_64.so.1
 APK=			sbin/apk
 BUSYBOX=		bin/busybox
 
+_LIB_PATH=		$(BOOTSTRAPDIR)/usr/lib
 _APK=			$(BOOTSTRAPDIR)/$(APK)
 _BUSYBOX=		$(BOOTSTRAPDIR)/$(BUSYBOX)
 
@@ -91,7 +92,7 @@ $(GUESTDIR)/.done:
 	$(BRANDELF) -t Linux ${bin}
 .endfor
 	# add packages without chroot(8)
-	$(ENV) LD_LIBRARY_PATH=$(BOOTSTRAPDIR)/lib \
+	$(ENV) LD_LIBRARY_PATH=$(_LIB_PATH) \
 		$(_APK) add \
 			--initdb \
 			--no-network \
@@ -107,7 +108,7 @@ $(GUESTDIR)/.done:
 	# remove APK metadata
 	$(RM) -rf $(GUESTDIR)/lib/apk
 	# rebuild module dependency data
-	$(ENV) LD_LIBRARY_PATH=$(BOOTSTRAPDIR)/lib \
+	$(ENV) LD_LIBRARY_PATH=$(_LIB_PATH) \
 		$(_BUSYBOX) \
 		depmod -A -b $(GUESTDIR) $$($(LS) $(GUESTDIR)/lib/modules)
 	# try unmounting `linprocfs` if that was mounted (on FreeBSD 13
