@@ -1,4 +1,4 @@
-.Dd March 23, 2025
+.Dd June 18, 2025
 .Dt WIFIBOX-ALPINE 5
 .Os
 .Sh NAME
@@ -627,6 +627,52 @@ the firmware itself.
 For example, the computer might be configured to turn off the wireless
 device when the wired networking interface card is active and the LAN
 cable is inserted.
+.Sh WPA SUPPLICANT / HOSTAPD LOGGING
+The log events of the
+.Sy wpa_supplicant
+and
+.Sy hostapd
+applications are fed directly into
+.Sy syslogd
+that is running as part of the image's base system, offered by
+.Sy busybox .
+This means that all of those events will eventually show up under
+.Pa /var/log/messages
+on the guest and hence become visible on the
+.Fx
+host (as described earlier).
+.Pp
+By the default, the events might not be verbose or abundant enough to
+understand the reasons for the experienced failure.
+In those cases, when the
+.Sy uds_passthru
+is configured, the respective command line application, e.g.
+.Sy wpa_cli
+or
+.Sy hostapd_cli
+could be used to attach to the corresponding daemon from the
+.Fx
+host where the level of logging could be set by the
+.Sy log_level
+command in run time.
+.Pp
+For example:
+.Bd -literal -offset indent
+$ wpa_cli
+wpa_cli v2.11
+Copyright (c) 2004-2024, Jouni Malinen <j@w1.fi> and contributors
+
+This software may be distributed under the terms of the BSD license.
+See README for more details.
+
+
+Selected interface 'wlan0'
+
+Interactive mode
+
+> log_level DEBUG
+OK
+.Ed
 .Sh SUPPORTED HARDWARE
 There are a number of Linux drivers available as kernel modules.
 Note that not all of them could be used immediately because there

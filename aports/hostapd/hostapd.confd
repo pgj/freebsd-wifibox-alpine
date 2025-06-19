@@ -1,4 +1,3 @@
 cfgfile="/etc/hostapd/hostapd.conf"
-command_args=""
-# Uncomment to run with process supervisor.
-# supervisor="supervise-daemon"
+command_args="-s"
+supervisor="supervise-daemon"
