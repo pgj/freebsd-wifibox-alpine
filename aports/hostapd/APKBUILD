@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=hostapd
 pkgver=2.11
-pkgrel=0 # base: 1
+pkgrel=1 # base: 1
 pkgdesc="daemon for wireless software access points"
 url="https://w1.fi/hostapd/"
 arch="all"
@@ -69,6 +69,7 @@ prepare() {
 			-e '/^#CONFIG_WPA_CLI_EDIT=y/s/^#//' \
 			-e '/^#CONFIG_AIRTIME_POLICY=y/s/^#//' \
 			-e '/^#CONFIG_OCV=y/s/^#//' \
+			-e '/^#CONFIG_DEBUG_SYSLOG=y/s/^#//' \
 			defconfig
 
 		echo "CC ?= ${CC:-gcc}"
@@ -94,5 +95,5 @@ package() {
 sha512sums="
 1382af2a243e3a555507b55942f41d1233cc942826d26bc4f4dbe5e75560b3fe22e426948762fe162453e934685a69ef0c05723b7fecef71811fc1987e32b048  hostapd-2.11.tar.gz
 adeca34c6254ac6fccd84e6f08f8c394225e1b89e2c8771b46da5c85fe3fdabc568628530c39da3ab30b72e98891b07bbdb63f74217e79d6afb9796715d822f1  hostapd.initd
-95a80f5ceafd70da3d11207e591300d0e4f03d48724147cf3572420b177d50687524b715fe2001d826020e8b28959fa8c7b8334a5cbbfeec7c82d1db9a0b333a  hostapd.confd
+838e56078970c8289fb27425551b8b45e5cad7d94012d6389882ee5b0aeffb3ee42d2aab9556a0c991a070d7de0997727804cf0f77907c4fa3debb8c6c504762  hostapd.confd
 "
