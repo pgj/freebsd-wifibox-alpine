@@ -1,1 +1,1 @@
-SYSLOGD_OPTS="-t"
+SYSLOGD_OPTS="-t -s 1024"
