@@ -6,12 +6,12 @@ start() {
         ebegin "Setting defaults"
 	. /etc/udhcpc/udhcpc.conf
         if [ ! -s "$UDHCPD_CONF" ] ; then
-		sed 's|%%DNS%%||' < "$UDHCPD_CONF_TEMPLATE" > "$UDHCPD_CONF"
+		sed 's|%%DNS%%||;s|%%DOMAIN%%|localhost|;s|%%SEARCH%%|localhost|' < "$UDHCPD_CONF_TEMPLATE" > "$UDHCPD_CONF"
         fi
         if [ -f /etc/conf.d/radvd ]; then
                 . /etc/conf.d/radvd
                 if [ ! -s "$CONFIGFILE" ]; then
-                        sed 's|%%DNS%%||' < "$CONFIGFILE_TEMPLATE" > "$CONFIGFILE"  
+                        sed 's|%%DNS%%||;s|%%DOMAIN%%|localhost|;s|%%SEARCH%%|localhost|' < "$CONFIGFILE_TEMPLATE" > "$CONFIGFILE"
                 fi
         fi
         eend $?

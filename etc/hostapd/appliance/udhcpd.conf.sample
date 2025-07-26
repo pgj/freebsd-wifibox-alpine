@@ -5,10 +5,14 @@
 # interfaces.conf file: `interface` should be exactly the same,
 # `router` should correspond to `address` and `subnet` is the
 # `netmask`.  According to these settings below, the IP addresses are
-# handed out for the 192.168.0.0/24 network.  In the `opt dns` line,
-# the `%%DNS%%` variable would be replaced with the IP addresses of
-# the DNS servers as provided by the wireless network (wifibox
-# extension).
+# handed out for the 192.168.0.0/24 network.
+#
+# As Wifibox extensions, the following options are supported via
+# variable substitution with the data as propagated by the wireless
+# network:
+# - `dns`, `%%DNS%%`: addresses of the DNS servers
+# - `domain`, `%%DOMAIN%%`: local domain name
+# - `search`, `%%SEARCH%%`: search list for host-name lookup
 #
 # Change these values as needed, they are here only for inspiration.
 
@@ -19,4 +23,6 @@ interface	wlan0
 opt	subnet	255.255.255.0
 opt	router	192.168.0.1
 opt	dns	%%DNS%% 8.8.8.8 8.8.4.4
+opt	domain	%%DOMAIN%%
+#opt	search	%%SEARCH%% (excludes `domain` and vice versa)
 opt	lease	864000
