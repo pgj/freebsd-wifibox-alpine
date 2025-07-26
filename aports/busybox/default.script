@@ -126,7 +126,7 @@ udhcpd_conf() {
 		return
 	fi
 	cat $UDHCPD_CONF_TEMPLATE \
-		| sed "s!%%DNS%%!$dns!" \
+		| sed "s!%%DNS%%!$dns!;s!%%DOMAIN%%!$domain!;s!%%SEARCH%%!$search!" \
 		> $UDHCPD_CONF
 	chmod a+r "$UDHCPD_CONF"
 	service udhcpd --ifstarted restart
