@@ -1,0 +1,14 @@
+name: wpa_supplicant
+
+on:
+  push:
+    paths:
+      - 'aports/wpa_supplicant/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.wpa_supplicant.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: wpa_supplicant

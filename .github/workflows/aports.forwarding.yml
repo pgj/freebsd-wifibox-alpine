@@ -1,0 +1,16 @@
+name: forwarding
+
+on:
+  push:
+    paths:
+      - 'aports/forwarding/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.forwarding.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: forwarding
+      port_dependencies: socat
+      package_dependencies: socat-with-udp

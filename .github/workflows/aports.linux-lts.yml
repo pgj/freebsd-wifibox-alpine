@@ -1,0 +1,19 @@
+name: linux-lts
+
+on:
+  push:
+    paths:
+      - 'aports/broadcom-wl/**'
+      - 'aports/rtl8821ce/**'
+      - 'aports/rtw88/**'
+      - 'aports/rtw89/**'
+      - 'aports/linux-lts/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.linux-lts.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: linux-lts
+      dependent_ports: broadcom-wl rtl8821ce rtw88 rtw89

@@ -1,0 +1,16 @@
+name: uds_passthru
+
+on:
+  push:
+    paths:
+      - 'aports/uds_passthru/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.uds_passthru.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: uds_passthru
+      port_dependencies: socat
+      package_dependencies: socat

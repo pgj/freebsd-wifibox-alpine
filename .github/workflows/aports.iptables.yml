@@ -1,0 +1,14 @@
+name: iptables
+
+on:
+  push:
+    paths:
+      - 'aports/iptables/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.iptables.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: iptables

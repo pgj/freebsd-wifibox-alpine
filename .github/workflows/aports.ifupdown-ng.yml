@@ -1,0 +1,14 @@
+name: ifupdown-ng
+
+on:
+  push:
+    paths:
+      - 'aports/ifupdown-ng/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.ifupdown-ng.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: ifupdown-ng

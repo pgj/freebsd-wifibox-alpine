@@ -1,0 +1,19 @@
+name: linux-edge
+
+on:
+  push:
+    paths:
+      - 'aports/broadcom-wl-edge/**'
+      - 'aports/rtl8821ce-edge/**'
+      - 'aports/rtw88-edge/**'
+      - 'aports/rtw89-edge/**'
+      - 'aports/linux-edge/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.linux-edge.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: linux-edge
+      dependent_ports: broadcom-wl-edge rtl8821ce-edge rtw88-edge rtw89-edge

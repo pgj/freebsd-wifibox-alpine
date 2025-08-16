@@ -1,0 +1,14 @@
+name: socat
+
+on:
+  push:
+    paths:
+      - 'aports/socat/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.socat.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: socat
