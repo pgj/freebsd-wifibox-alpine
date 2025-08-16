@@ -1,22 +1,25 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw89-edge'
-pkgver=20250317
+pkgver=20250808
 pkgrel=06130070000
-_gitrev='e9b4224872ebc1e2920267e33e5eb079f33e48c8'
-pkgdesc='Driver for Realtek 8852AE, an 802.11ax device (edge)'
+_gitrev='2b491dca7e3dda64eeada28079ee4c02b78f48ac'
+pkgdesc='Linux drivers for Realtek Wi-Fi 6/6E and Wi-Fi 7 adapters and cards (edge)'
 arch="x86_64"
-url='https://github.com/a5a5aa555oo/rtw89'
+url='https://github.com/morrownr/rtw89'
 license="GPL-2.0"
-makedepends="linux-edge-dev xz bash"
+makedepends="linux-edge-dev xz"
 depends="linux-edge"
 install=
 options="!check !strip"
-source="https://github.com/a5a5aa555oo/rtw89/archive/${_gitrev}.zip"
+source="Makefile.patch
+	debug.c.patch
+	https://github.com/morrownr/rtw89/archive/${_gitrev}.zip"
 
 _kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-edge' | sed 's!./linux-headers-!!')
 _kbase="/lib/modules/${_kver}"
 _srcdir="$srcdir/rtw89-$_gitrev"
+builddir="$_srcdir"
 
 build() {
   make -C "$_srcdir" KVER="$_kver"
@@ -28,5 +31,7 @@ package() {
 }
 
 sha512sums="
-82b95b0d12514559432392b83b2b4005e7a9098a0529a55fac9956fe5bfc3c0b4df9e4b989f7bc4b8c64812ab9637ca16681bcf30b9d5c9212a36054aab09c9d  e9b4224872ebc1e2920267e33e5eb079f33e48c8.zip
+4ab14f571f3358519e63cdf3924ec610bf4ff3a40bb284d4ce587a888f1407cb922c1a32ecab3a6d2d56577a9e72d9e2e07bf4f822b9ada59f8bcc00cb2103c1  Makefile.patch
+dde8f7102ccaf8060e0c29832590a026230cb4a0d6c8eac196afdd856d30e86908f3a6f6423fad2197b952792265e1c2c3d50aa3e8c96bf6b109c5240e33e12b  debug.c.patch
+946a42666d9e61d3956c5c84155eab0d0ac25d9a74c17d664ff1d8fc05c0c30fe1793aa7e532e7fa641ad0f15b80be7d49a6e2df5239cc42cdfbfedeccc1848f  2b491dca7e3dda64eeada28079ee4c02b78f48ac.zip
 "
