@@ -1,0 +1,14 @@
+name: radvd
+
+on:
+  push:
+    paths:
+      - 'aports/radvd/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.radvd.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: radvd

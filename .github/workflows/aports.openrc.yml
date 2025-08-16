@@ -1,0 +1,14 @@
+name: openrc
+
+on:
+  push:
+    paths:
+      - 'aports/openrc/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.openrc.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: openrc

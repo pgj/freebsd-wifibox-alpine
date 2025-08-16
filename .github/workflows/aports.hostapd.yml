@@ -1,0 +1,14 @@
+name: hostapd
+
+on:
+  push:
+    paths:
+      - 'aports/hostapd/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.hostapd.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: hostapd

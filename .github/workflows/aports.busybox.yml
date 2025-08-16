@@ -1,0 +1,14 @@
+name: busybox
+
+on:
+  push:
+    paths:
+      - 'aports/busybox/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.busybox.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: busybox

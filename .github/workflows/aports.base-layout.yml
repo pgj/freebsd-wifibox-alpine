@@ -1,0 +1,14 @@
+name: base-layout
+
+on:
+  push:
+    paths:
+      - 'aports/base-layout/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.base-layout.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: base-layout

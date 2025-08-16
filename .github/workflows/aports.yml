@@ -1,0 +1,97 @@
+name: aports package builder
+on:
+  workflow_call:
+    inputs:
+      port_dependencies:
+        default: ''
+        required: false
+        type: string
+      package_dependencies:
+        default: ''
+        required: false
+        type: string
+      dependent_ports:
+        default: ''
+        required: false
+        type: string
+      package:
+        required: true
+        type: string
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jirutka/setup-alpine@v1
+        with:
+          arch: x86_64
+          branch: v3.21
+          packages: >
+            alpine-sdk
+            doas
+            linux-headers
+
+      - name: Get Alpine Linux version
+        run: cat /etc/alpine-release
+        shell: alpine.sh {0}
+
+      - name: Prepare for build
+        run: |
+          mkdir -p /usr/src
+          addgroup runner abuild
+        shell: alpine.sh --root {0}
+
+      - name: Generate signing keys
+        run: abuild-keygen -a -i -n
+        shell: alpine.sh {0}
+
+      - name: Build custom dependencies
+        if: inputs.port_dependencies != ''
+        run: |
+          cd aports
+          for pkg in ${{ inputs.port_dependencies }}; do
+            cd $pkg
+            abuild -r
+            cd ..
+          done
+          cd ..
+        shell: alpine.sh {0}
+
+      - name: Install custom dependencies
+        if: inputs.package_dependencies != ''
+        run: |
+          export REPO=/home/runner/packages/aports/x86_64
+          for pkg in ${{ inputs.package_dependencies }}; do
+            _package=$(ls "$REPO" | grep -E "^$pkg-[^-]+-r[0-9]+\.apk$" | head -1)
+            if [ -n "$_package" ]; then
+              apk add "$REPO"/"$_package"
+            else
+              echo "Package not found: $pkg"
+              exit 1
+            fi
+          done
+        shell: alpine.sh --root {0}
+
+      - name: Build package ${{ inputs.package }}
+        run: |
+          cd aports/${{ inputs.package }}
+          abuild -r
+        shell: alpine.sh {0}
+
+      - name: Install package
+        if: inputs.dependent_ports != ''
+        run: apk add /home/runner/packages/aports/x86_64/${{ inputs.package }}-*.apk
+        shell: alpine.sh --root {0}
+
+      - name: Build dependents
+        if: inputs.dependent_ports != ''
+        run: |
+          cd aports
+          for pkg in ${{ inputs.dependent_ports }}; do
+            cd $pkg
+            abuild -r
+            cd ..
+          done
+          cd ..
+        shell: alpine.sh {0}

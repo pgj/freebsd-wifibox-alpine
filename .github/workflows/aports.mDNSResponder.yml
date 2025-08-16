@@ -1,0 +1,14 @@
+name: mDNSResponder
+
+on:
+  push:
+    paths:
+      - 'aports/mDNSResponder/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.mDNSResponder.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: mDNSResponder

@@ -1,0 +1,14 @@
+name: dhcpcd
+
+on:
+  push:
+    paths:
+      - 'aports/dhcpcd/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.dhcpcd.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: dhcpcd
