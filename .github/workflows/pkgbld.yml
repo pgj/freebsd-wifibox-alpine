@@ -1,0 +1,16 @@
+name: Package builder
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jirutka/setup-alpine@v1
+        with:
+          arch: x86_64
+          branch: v3.21
+
+      - name: Get Alpine Linux version
+        run: cat /etc/alpine-release
+        shell: alpine.sh {0}
