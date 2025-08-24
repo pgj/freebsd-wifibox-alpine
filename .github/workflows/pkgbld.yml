@@ -1,16 +1,110 @@
 name: Package builder
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: Source branch for which the packages would be built
+        required: false
+        default: main
+        type: string
+      pkg_branch:
+        description: Package branch under which packages would be published
+        required: false
+        default: unstable
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.branch }}
+
       - uses: jirutka/setup-alpine@v1
         with:
           arch: x86_64
           branch: v3.21
+          packages: >
+            alpine-sdk
+            lua-aports
+            doas
+            linux-headers
 
       - name: Get Alpine Linux version
         run: cat /etc/alpine-release
         shell: alpine.sh {0}
+
+      - name: Prepare for build
+        run: |
+          mkdir -p /usr/src
+          addgroup runner abuild
+        shell: alpine.sh --root {0}
+
+      - name: Checkout package repository
+        uses: actions/checkout@v5
+        with:
+          repository: pgj/pgj.github.io
+          path: /home/runner/work/freebsd-wifibox-alpine/freebsd-wifibox-alpine/git/pkgs
+          token: ${{ secrets.WIFIBOX_PKG_UPDATE }}
+
+      - name: Configure package building
+        env:
+          ABUILD_KEY: ${{ secrets.ABUILD_KEY_PRIVATE }}
+          ABUILD_KEY_PUB: ${{ secrets.ABUILD_KEY_PUBLIC }}
+          ABUILD_DIR: /home/runner/.abuild
+          ABUILD_KEY_NAME: foo-67de8eff.rsa
+          PKGDIR: /home/runner/packages/aports
+        run: |
+          mkdir -p "$ABUILD_DIR"
+          echo "$ABUILD_KEY" > "$ABUILD_DIR"/"$ABUILD_KEY_NAME"
+          echo "$ABUILD_KEY_PUB" > "$ABUILD_DIR"/"$ABUILD_KEY_NAME".pub
+          cat << EOF > "$ABUILD_DIR"/abuild.conf
+          PACKAGER_PRIVKEY="$ABUILD_DIR/$ABUILD_KEY_NAME"
+          PACKAGER="Wifibox/Alpine Package Builder <pkgbld@wifibox-dev>"
+          EOF
+          chmod 644 "$ABUILD_DIR"/*
+          chmod 600 "$ABUILD_DIR"/"$ABUILD_KEY_NAME"
+          doas cp "$ABUILD_DIR"/"$ABUILD_KEY_NAME".pub /etc/apk/keys
+
+          mkdir -p "$PKGDIR"
+          ln -s \
+            /home/runner/work/freebsd-wifibox-alpine/freebsd-wifibox-alpine/git/pkgs/freebsd-wifibox/alpine/${{ inputs.pkg_branch }}/packages \
+            "$PKGDIR"/x86_64
+          cd "$PKGDIR"/x86_64
+          apk index -o APKINDEX.tar.gz $(ls *.apk)
+          abuild-sign -k "$ABUILD_DIR"/"$ABUILD_KEY_NAME" APKINDEX.tar.gz
+        shell: alpine.sh {0}
+
+      - name: Build packages (incremental)
+        env:
+          PKGROOT: /home/runner/packages
+        run: |
+          # Kernels have to be done first because they are not handled well
+          # as dependencies for the kernel modules to build.
+          cd aports
+          for pkg in linux-lts linux-edge; do
+            cd "$pkg"
+            abuild -r
+            cd ..
+          done
+          cd ..
+
+          doas apk add $(ls "$PKGROOT"/aports/x86_64/linux-*-dev-*.apk)
+
+          buildrepo -a "$(pwd)" -d "$PKGROOT" aports
+        shell: alpine.sh {0}
+
+      - name: Publish packages (incremental)
+        run: |
+          git config --global user.email "pkgbld@wifibox-dev"
+          git config --global user.name "Wifibox/Alpine package builder"
+
+          cd /home/runner/work/freebsd-wifibox-alpine/freebsd-wifibox-alpine/git/pkgs/freebsd-wifibox/alpine/${{ inputs.pkg_branch }}/packages
+          git add *.apk
+          if ! (git diff --staged --quiet); then
+            git commit -m "wifibox-alpine: Automatic package update via GitHub Actions"
+            git push
+          else
+            echo "No changes to publish"
+          fi
