@@ -1,0 +1,15 @@
+#!/sbin/openrc-run
+
+supervisor=supervise-daemon
+name="mDNS repeater"
+description="Repeater for multicast DNS"
+
+pidfile="/var/run/$SVCNAME.pid"
+command=/usr/bin/mdns-repeater
+command_args="-p ${pidfile} $MDNSREPEATER_OPTS"
+
+depend() {
+	need net
+	after firewall
+}
+

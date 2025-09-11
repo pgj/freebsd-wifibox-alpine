@@ -1,0 +1,14 @@
+name: mdns-repeater
+
+on:
+  push:
+    paths:
+      - 'aports/mdns-repeater/**'
+      - '.github/workflows/aports.yml'
+      - '.github/workflows/aports.mdns-repeater.yml'
+
+jobs:
+  aports:
+    uses: ./.github/workflows/aports.yml
+    with:
+      package: mdns-repeater

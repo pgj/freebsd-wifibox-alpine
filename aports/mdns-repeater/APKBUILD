@@ -1,0 +1,40 @@
+# Maintainer: Gabor Pali <pali.gabor@gmail.com>
+
+pkgname='mdns-repeater'
+pkgver=20231216
+pkgrel=0
+_gitrev='f714ec4d8a0eee248ead29c2ae1bb37f124a568f'
+pkgdesc='mDNS repeater'
+arch="x86_64"
+url='https://github.com/geekman/mdns-repeater'
+license="GPL-2.0"
+install=
+options="!check !strip"
+source="https://github.com/geekman/mdns-repeater/archive/${_gitrev}.zip
+	mdns-repeater.initd
+	mdns-repeater.confd"
+
+_srcdir="$srcdir"/mdns-repeater-"$_gitrev"
+
+build() {
+	make -C "$_srcdir" all
+}
+
+package() {
+	mkdir -p \
+		"$pkgdir"/usr/bin \
+		"$pkgdir"/etc/conf.d \
+		"$pkgdir"/etc/init.d
+
+	install -m 755 "$_srcdir"/mdns-repeater "$pkgdir"/usr/bin
+	strip "$pkgdir"/usr/bin/mdns-repeater
+
+	install -m 755 mdns-repeater.initd "$pkgdir"/etc/init.d/mdns-repeater
+	install -m 644 mdns-repeater.confd "$pkgdir"/etc/conf.d/mdns-repeater
+}
+
+sha512sums="
+331eb13d10ad711bc2872b4e12fc8721b1e89e7de89da672834c44b615543e74f356fd02d8854b1244654cbf10820a2e778eceeb981935319a509691bae564d3  f714ec4d8a0eee248ead29c2ae1bb37f124a568f.zip
+58bf62071b5f9500c2d923e9f190c600209d74bd4a6e3bae560f2ff3aed328d8e02e94eb58c85dc798be67a7d8a34f89ff1099584dc5130147e18d798b2d071f  mdns-repeater.initd
+8ecb92a2c5c18a2879093bf93db07cf1aa2c21e5c1e9b97b278ac5707c7e69d07d8cf82d8efe694852cf8d1977e463a6e0f0c4fbbcb3cb3f5dd2025d9eda4123  mdns-repeater.confd
+"
