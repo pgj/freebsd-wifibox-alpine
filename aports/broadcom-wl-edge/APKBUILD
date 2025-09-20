@@ -78,7 +78,7 @@ build() {
 
 package() {
   make install -C "$srcdir" KBASE="$pkgdir$_kbase"
-  find "$pkgdir" -name "*.ko" -exec xz {} +
+  find "$pkgdir" -name "*.ko" -exec xz -C crc32 {} +
   install -Dm644 "$srcdir"/broadcom-wl.conf \
     "$pkgdir"/etc/modprobe.d/broadcom-wl.conf
   install -Dm644 "$srcdir"/lib/LICENSE.txt \
