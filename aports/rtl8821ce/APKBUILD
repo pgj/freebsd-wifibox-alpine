@@ -1,20 +1,25 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtl8821ce'
-pkgver=20250312
-pkgrel=06120190000
-_gitrev='1bbfc35ece57cbdfb8473c49d3c6464eede54191'
+pkgver=20250820
+_kern_maj=6
+_kern_min=12
+_kern_pcs=48
+_kern_rel=0
+_drv_rel=0
+pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
+_gitrev='5df613d114d1ca6072aeaf9f64666029896eed61'
 pkgdesc='Driver for Realtek 8821CE, an 802.11ac device'
-arch="x86_64"
+arch='x86_64'
 url='https://github.com/tomaspinho/rtl8821ce'
-license="GPL-2.0"
-makedepends="linux-lts-dev xz"
-depends="linux-lts"
+license='GPL-2.0'
+makedepends="linux-lts-dev~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel xz"
+depends="linux-lts~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel"
 install=
 options="!check !strip"
 source="https://github.com/tomaspinho/rtl8821ce/archive/${_gitrev}.zip"
 
-_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-lts' | sed 's!./linux-headers-!!')
+_kver="$_kern_maj.$_kern_min.$_kern_pcs-$_kern_rel-lts"
 _kbase="/lib/modules/${_kver}"
 _srcdir="$srcdir/rtl8821ce-$_gitrev"
 
@@ -28,5 +33,5 @@ package() {
 }
 
 sha512sums="
-3693d040dc44f44c42b557f4c657e0ce859f17892ce9e0f60ba9a044624d9caf87dc502bab7410fb067dcfd947477f92a38a71055096b62bcee9a57aaa369668  1bbfc35ece57cbdfb8473c49d3c6464eede54191.zip
+21a13e34c9c450d177273238ba9f40712c16ecf6d7a7d6d44fc8b4d2ec9622480ef8b3ac4e6fa7ae0a07233f191b25dc9eebec021b37a01e122bd249a1d6b35b  5df613d114d1ca6072aeaf9f64666029896eed61.zip
 "

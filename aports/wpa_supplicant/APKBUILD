@@ -1,8 +1,8 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=wpa_supplicant
-pkgver=2.10
-pkgrel=11 # base: 11
+pkgver=2.11
+pkgrel=0 # base: 2
 pkgdesc="utility providing key negotiation for WPA wireless networks"
 url="https://w1.fi/wpa_supplicant/"
 arch="all"
@@ -14,16 +14,10 @@ source="https://w1.fi/releases/wpa_supplicant-$pkgver.tar.gz
 	wpa_supplicant.initd
 	wpa_supplicant.confd
 
-	CVE-2023-52160.patch
-
-	unsafe-renegotiation-1.patch
-	unsafe-renegotiation-2.patch
-
 	0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
 	0002-AP-guard-FT-SAE-code-with-CONFIG_IEEE80211R_AP.patch
-	0003-Add-support-for-pregenerated-MAC.patch
+	wpa_supplicant-2.11-Revert-Mark-authorization-completed-on-driver-indica.patch
 
-	lower-security-level-for-tls-1.patch
 	no-tools.patch
 	config
 	"
@@ -85,16 +79,12 @@ package() {
 }
 
 sha512sums="
-021c2a48f45d39c1dc6557730be5debaee071bc0ff82a271638beee6e32314e353e49d39e2f0dc8dff6e094dcc7008cfe1c32d0c7a34a1a345a12a3f1c1e11a1  wpa_supplicant-2.10.tar.gz
+9a0a3a9d6fa2235903c40aa57b5955f0c9dd1dccfd0e3825a3b6f92b3e32db8d464b3ea0aef3285ba3ee109e7b190560cedd744902e954f0003cdba543e277b2  wpa_supplicant-2.11.tar.gz
 db0ae409f40c9a7397f5664b78d8b6917e194d35847b180e6de712175a3ea1556eebb6d76736f2d5856ad2354be3931dc0f06f9b8fea0b85390763a925506c99  wpa_supplicant.initd
 175f1404b516121380b77a185e35de6e633663b1c87c2464a4d839db4c313d96851a45c46b514583f27c856d14589a94772ad275dbef1acd440bbe43b515e0d9  wpa_supplicant.confd
-955c219a9e4e3e89f7f880561755059ea9f1ea27f5a5ec9f6a5b7c29195b06123c8eecfba324f3695bdb8cb53c401745c3d030a97e133dd1730351dc36c92fec  CVE-2023-52160.patch
-9528735924faf876a7094de46760605e5e66e265187421a668be06dbf03d7b4db6b84cbad793fcd6bd614e3ba540f82f1f80660d75e8a6070eeb7e9abb54ed28  unsafe-renegotiation-1.patch
-a92ba3ed3f41022a8af9396d2b703ee47f78aa05c1fddb42919a7fe6a6fad71e3515c63457e97e252ae0a32c6c34d67ea6efe0278df1e141cf36e650237e5295  unsafe-renegotiation-2.patch
 fb328872087268056b035802f71df2f7af8d11699822fe68611201a07dc693c4fdb8c50dd4fd509ed6db4cca89f6003ce3303770951686a35633977f466f4fb5  0001-nl80211-add-extra-ies-only-if-allowed-by-driver.patch
-f8a5f5e18509b61ad6fb7ce78207c039fccfca6b71f494cbe9853bcb1b09025364554a45b6129a5b992f6327f72c8a97b660088d9c542f0e62a1c370a3c628a8  0002-AP-guard-FT-SAE-code-with-CONFIG_IEEE80211R_AP.patch
-693d1a7917ff18a3692c1e530c20013bd18d08194c840e5dba8c6f80a7e7022e37f49b1b75dbc434a3176243c062f7719df0e1bcf1d786c8cf87e95e5cbf17c0  0003-Add-support-for-pregenerated-MAC.patch
-b1217eff6fbdba5a4c7302ea33bec64290d26745967b24e825c100de9b0e9b6400f0769c3cfac3c761596bb01079c31b632f14bd3374735200385f38557d8cad  lower-security-level-for-tls-1.patch
-3278eff7118f9dc9e177adc3ed91cad562a8edde396af8619321ac8552a86e9c7de25212d5578ea17cbe4b6dc928d83cd6e9a7f0d41e07576656e6e9274107d6  no-tools.patch
+d70b2d98b1ffefb1c9023e693d02e1adf21ba21535f7fb76f69f30cb95fb9ab393561d59f27517874108088f0e9061ab88333f65e25d70fab760d4c0d8366dc4  0002-AP-guard-FT-SAE-code-with-CONFIG_IEEE80211R_AP.patch
+5d54d6e5a06bb8d0612b2178a3c6ddf27b9bca142e3c512f67df0ace9e650ae343170ea05f47156717c717484c85e5b890706a92ad353046a8a61e8aae8dc1c2  wpa_supplicant-2.11-Revert-Mark-authorization-completed-on-driver-indica.patch
+0acc0d5d05d295bfb3b9dc3e0e3c9b6d395b54aa1a39a2d56fd0b08dd864b1ce9cc0fd54d3c2ee52d06ed7007338024c7f6fd5c73ad2ed30a77446a05829a76f  no-tools.patch
 3a807fbd76d8c49102d3952052cbefc91131da5fea2b71057dc586563215fc9a94d9497127897055db15eaf55b08445c8a6fdfff22ef76aae63b9688c12cb775  config
 "

@@ -2,7 +2,7 @@
 
 pkgname=forwarding
 pkgver=0.1.0
-pkgrel=5
+pkgrel=6
 pkgdesc="Forwarding management service for Wifibox"
 url="https://github.com/pgj/freebsd-wifibox-alpine"
 arch="all"

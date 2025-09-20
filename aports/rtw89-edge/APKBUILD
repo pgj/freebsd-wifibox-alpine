@@ -1,25 +1,34 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw89-edge'
-pkgver=20250808
-pkgrel=06130070000
-_gitrev='2b491dca7e3dda64eeada28079ee4c02b78f48ac'
+pkgver=20250827
+_kern_maj=6
+_kern_min=16
+_kern_pcs=8
+_kern_rel=0
+_drv_rel=0
+pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
+_gitrev='8a8ba9bdee85c54b55efa27bd92e6475a77da7af'
 pkgdesc='Linux drivers for Realtek Wi-Fi 6/6E and Wi-Fi 7 adapters and cards (edge)'
-arch="x86_64"
+arch='x86_64'
 url='https://github.com/morrownr/rtw89'
-license="GPL-2.0"
-makedepends="linux-edge-dev xz"
-depends="linux-edge"
+license='GPL-2.0'
+makedepends="linux-edge-dev~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel xz"
+depends="linux-edge~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel"
 install=
 options="!check !strip"
 source="Makefile.patch
 	debug.c.patch
 	https://github.com/morrownr/rtw89/archive/${_gitrev}.zip"
 
-_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-edge' | sed 's!./linux-headers-!!')
-_kbase="/lib/modules/${_kver}"
+_kver="$_kern_maj.$_kern_min.$_kern_pcs-$_kern_rel-edge"
 _srcdir="$srcdir/rtw89-$_gitrev"
 builddir="$_srcdir"
+
+prepare() {
+  default_prepare
+  sed -i -E 's/_git//g' "$_srcdir"/Makefile
+}
 
 build() {
   make -C "$_srcdir" KVER="$_kver"
@@ -31,7 +40,7 @@ package() {
 }
 
 sha512sums="
-4ab14f571f3358519e63cdf3924ec610bf4ff3a40bb284d4ce587a888f1407cb922c1a32ecab3a6d2d56577a9e72d9e2e07bf4f822b9ada59f8bcc00cb2103c1  Makefile.patch
+d4ba10a433894026d0aee92766285fc98247296d8ece3531760f41ce3d4fb09c8a10efc6a4b646da1061ca07c23935d74120cce07b1cb7408f76205ed51fa1db  Makefile.patch
 dde8f7102ccaf8060e0c29832590a026230cb4a0d6c8eac196afdd856d30e86908f3a6f6423fad2197b952792265e1c2c3d50aa3e8c96bf6b109c5240e33e12b  debug.c.patch
-946a42666d9e61d3956c5c84155eab0d0ac25d9a74c17d664ff1d8fc05c0c30fe1793aa7e532e7fa641ad0f15b80be7d49a6e2df5239cc42cdfbfedeccc1848f  2b491dca7e3dda64eeada28079ee4c02b78f48ac.zip
+911cf7cb242e6c1c38596661d9f802c5fd2416db8fa0497caa8b192340b7c3e881c137b84ae33842d9cb2037fbfccb9df159ea02117ad12ec5254e1f9d19f7b1  8a8ba9bdee85c54b55efa27bd92e6475a77da7af.zip
 "
