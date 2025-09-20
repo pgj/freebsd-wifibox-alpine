@@ -35,7 +35,7 @@ build() {
 }
 
 package() {
-  xz "$_srcdir"/*.ko
+  xz -C crc32 "$_srcdir"/*.ko
   install -p -D -m 644 "$_srcdir"/*.ko.xz -t "$pkgdir"/lib/modules/"$_kver"/kernel/drivers/net/wireless/realtek/rtw89
 }
 
