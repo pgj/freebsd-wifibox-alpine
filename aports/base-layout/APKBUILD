@@ -1,8 +1,8 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=baselayout # base: alpine-baselayout
-pkgver=3.6.8
-pkgrel=0 # base: 1
+pkgver=3.7.0
+pkgrel=0 # base: 0
 pkgdesc="Base dir structure and init scripts"
 url="https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout"
 arch="noarch"

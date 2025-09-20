@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=hostapd
 pkgver=2.11
-pkgrel=1 # base: 1
+pkgrel=2 # base: 4
 pkgdesc="daemon for wireless software access points"
 url="https://w1.fi/hostapd/"
 arch="all"
@@ -54,9 +54,11 @@ prepare() {
 			-e '/^#CONFIG_DRIVER_WIRED=y/s/^#//' \
 			-e '/^#CONFIG_DRIVER_NONE=y/s/^#//' \
 			-e '/^#CONFIG_IEEE80211N=y/s/^#//' \
+			-e '/^#CONFIG_WNM=y/s/^#//' \
 			-e '/^#CONFIG_IEEE80211R=y/s/^#//' \
 			-e '/^#CONFIG_IEEE80211AC=y/s/^#//' \
 			-e '/^#CONFIG_IEEE80211AX=y/s/^#//' \
+			-e '/^#CONFIG_IEEE80211BE=y/s/^#//' \
 			-e '/^#CONFIG_FULL_DYNAMIC_VLAN=y/s/^#//' \
 			-e '/^#CONFIG_LIBNL32=y/s/^#//' \
 			-e '/^#CONFIG_ACS=y/s/^#//' \

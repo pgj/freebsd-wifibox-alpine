@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-edge
-pkgver=6.13.7
+pkgver=6.16.8
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -20,6 +20,7 @@ source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver
 	config-edge.x86_64
 
 	0001-brcm80211-brcmfmac-pcie.patch
+	0002-ath11k_pci-msi-parameters.patch
 	"
 subpackages="$pkgname-dev:_dev:$CBUILD_ARCH"
 builddir="$srcdir"/linux-"$_kernver"
@@ -162,8 +163,9 @@ _dev() {
 }
 
 sha512sums="
-1137e6440132b0958f89165440e99208f82b204e7245ae69dc9c808df97d13ce8f58136db92407e0e93394fa7f6283ec7a34597c6e92a5b6d9025e0960357957  linux-6.13.tar.xz
-34bd48e3b6a77333a949627c998a1af949a9eaeec3a7798c6b18698ce5d86e55218bcd245e6d522d51f3ea4d173f78b24fc8f48c80479681357faca3bbf18150  config-edge.x86_64
+55a00f89ad6db6db2e26ff5dc5cfc96bbf6654e5bd5d17d2a3b944a47640367e54139716d230923187bebc6cb7756edc9511a620fb8abc6f32c50a658a734784  linux-6.16.tar.xz
+421bad2ed56aaf3ce20b332ed60b30745ce4d362f6c4a18959df85efbbbdc52858894cb580d540184170c42579caac20129f8350b95bc42a117b00053f5733fb  config-edge.x86_64
 67eaa5e83ec244048a4b426e7cb288763cbdc972be3d66a9cfb0ec1dfaf68d569b8d939069a90d509d78c28a2500198c1b28cf67165dc14c697d4254a6534af5  0001-brcm80211-brcmfmac-pcie.patch
-d96ec7f92af765cee1809ff77a3d52949e4edda14f1bf25a48040804eb816a3856997b9520db19381e3c14239c359263b8ca91fcf604e36781900642486c2b15  patch-6.13.7.xz
+5a5261cde10598561e71d9840575e36794727f300fe718abc52eb6f57e26a308e29eb8e44ce63be91ad9a531dade499809510541910c65a521f902c011832ad8  0002-ath11k_pci-msi-parameters.patch
+ce466430fae6ff8501cca3798d1c3e72b3defc997175f7f1ea78c774c207b97579c1dac5f5eee8b56e3569ca23fabaeaba9186125b5fdce617414a9abd6dda82  patch-6.16.8.xz
 "

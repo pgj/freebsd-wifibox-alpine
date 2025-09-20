@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=busybox
 pkgver=1.37.0
-pkgrel=2 # base: 12
+pkgrel=3 # base: 19
 pkgdesc="Size optimized toolbox of many common UNIX utilities"
 url="https://busybox.net/"
 arch="all"
@@ -9,8 +9,7 @@ license="GPL-2.0-only"
 makedepends_build="perl"
 makedepends_host="linux-headers openssl-dev>3"
 # Only build with UTMPS support if we are not bootstrapping.
-# skalibs-static is needed for utmps-static
-[ -z "$BOOTSTRAP" ] && makedepends_host="$makedepends_host utmps-dev utmps-static skalibs-static"
+[ -z "$BOOTSTRAP" ] && makedepends_host="$makedepends_host utmps-dev utmps-static"
 makedepends="$makedepends_build $makedepends_host"
 checkdepends="zip"
 install=
@@ -63,6 +62,8 @@ source="https://busybox.net/downloads/busybox-$pkgver.tar.bz2
 	0001-hexdump-fix-regression-with-n4-e-u.patch
 	0001-awk-fix-handling-of-literal-backslashes-in-replaceme.patch
 	0001-tunctl-fix-segfault-on-ioctl-failure.patch
+	0001-init-add-support-for-separate-reboot-action.patch
+	0001-tar-fix-TOCTOU-symlink-race-condition.patch
 
 	acpid.logrotate
 	config
@@ -130,8 +131,8 @@ prepare() {
 build() {
 	local _extra_cflags= _extra_libs=
 	if [ -z "$BOOTSTRAP" ] ; then
-		_extra_cflags="$(pkg-config --cflags --static utmps)"
-		_extra_libs="$(pkg-config --libs --static utmps)"
+		_extra_cflags="$(pkg-config --cflags --static libutmps)"
+		_extra_libs="$(pkg-config --libs --static libutmps)"
 	fi
 
 	cd "$srcdir"/build
@@ -223,8 +224,10 @@ ac56a170a31f4329d00155a2a7d3950c4fe365e69e2e6b773a28fe3faa214a1330f0dd910bf07124
 ac026f8b289d1431c46d51a8c512eb0184aa81de1c41971a87c99bcdc5c63c2d9abed412cad20d3032b480d87a52ee2602411149eb5f271fa9d051165a7b8188  0001-hexdump-fix-regression-with-n4-e-u.patch
 7165661f3972f1800faf8d263126e3f238bb26bb7891230dbaad2d085e49e2ababc555294ecefed9d8ff00d93c8c3963e786db796cf3d03d68bf9e0492305d0c  0001-awk-fix-handling-of-literal-backslashes-in-replaceme.patch
 9548603cbadf690ab31354642ab3f7bef1b9f696df6b661ea644548fb831b2f78a47a9b09b5489aa43da7061dcc6808864d130d053906f44090983f5cb3dc169  0001-tunctl-fix-segfault-on-ioctl-failure.patch
+109d3e6a0141b0b28352c299a7d520f39d4626d424566d6ec14df95ba27f0ae8a755bb275c73217c07745c7b7f6fc7eb71555db818536afb09f04f29c4cd8b2f  0001-init-add-support-for-separate-reboot-action.patch
+906d6c9ff1a9b911997f8ca9debfc07c48c7f5ac8eac51860b076e8483979ea175028f7207cbe878769e58213e8293ada155b03c9691077ce2f6a91820ab319a  0001-tar-fix-TOCTOU-symlink-race-condition.patch
 aa93095e20de88730f526c6f463cef711b290b9582cdbd8c1ba2bd290019150cbeaa7007c2e15f0362d5b9315dd63f60511878f0ea05e893f4fdfb4a54af3fb1  acpid.logrotate
-a73391ee800325173d89f461312a666ce6f02abf72433429e70ec8e74ecb56e539c16d7da3d89fc9c16d98511f2781d1dbab69a6bc9ae3fe3af6e68342a47c94  config
+d609c7924e82b1a3eeab04612f5624c4358654d75de95ef6b11ff62cdd75f8b3a8a3be854dbaf8ef880a6f24f3d11c530975efaec289b203abc46ab49dee6f86  config
 1f332ccd89e0098711b4da8c66de6a8f54f5e8bc34d03eae566894f05631558d86675b70c4d539808f85867a97f2344e93bd52379f4763825c43a781d6a39cbc  default.script
 21fbd1fbe2e77922c5d465aace694cf69835a159361eb56571780d67168338bf34565f48158303ce39438fe03ffee2f64f9637e97c3d0a74fd25b0c200b1e392  udhcpc.conf
 3d8488cf3828190576c460aaab37728c0cbeba49f76dcb85d7b2f6ea4075c98913174cc974355976e31b1c2bbbff284e8145961bc5b402834864cb1cde932524  securetty

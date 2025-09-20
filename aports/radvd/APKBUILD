@@ -1,18 +1,17 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 #
 pkgname=radvd
-pkgver=2.19
-pkgrel=3 # base: 4
+pkgver=2.20
+pkgrel=0 # base: 0 
 pkgdesc="IPv6 router advertisement daemon"
 url="http://www.litech.org/radvd"
 arch="all"
 license="BSD-Advertising-Acknowledgement"
-makedepends="flex bison linux-headers"
+makedepends="bison flex libbsd-dev linux-headers"
 install=
 source="http://www.litech.org/radvd/dist/radvd-$pkgver.tar.xz
 	radvd.initd
 	radvd.confd
-	fix-alpine-plz.patch
 	"
 options="!check"
 
@@ -41,8 +40,7 @@ package() {
 }
 
 sha512sums="
-a1eb40af90fc83ebab2517c16a0f7e85c11338ab276bec400b7c33177748d1e36bc5abd7e373b6742f12f7c690dd7ae6b951bc832c7de9bbb56f7e9bc844ed22  radvd-2.19.tar.xz
+22d6d8888aae326d65e82359879082f5b7d6977eacb198e3f4af2ae9fba4c1d8723eccebd8857ddc60053ae08f0ca0a5406729883dd76766d3ec61a4b5e5e956  radvd-2.20.tar.xz
 9f91741b96a2c588ff415d0ddb29d083adfcfa000540b78ca0553ba06d62e646a32fb8927e39e3acfe13c72ae0c8037a22e7e9d6e61e94764360b61a8777bfc5  radvd.initd
 dab393c7b5b6c012fb190c7fb5c35c77de6fb93dae37cd41125caeb1160ad967f115d3f024019abf70fa446045ea8c61dfc391752e91f7d6f7c542c60750c4ba  radvd.confd
-dffe4167c54c430fc38953e70d546fdf443944eceee4c610f14d63947fe8c04960b48a8acf5742edf8721558c4b811c9a4033ad9abe787ead9cc1bb0721b654c  fix-alpine-plz.patch
 "

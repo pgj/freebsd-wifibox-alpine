@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-lts
-pkgver=6.12.19
+pkgver=6.12.48
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -12,11 +12,12 @@ url="https://www.kernel.org"
 depends=
 _depends_dev="perl gmp-dev mpc1-dev mpfr-dev elfutils-dev bash flex bison zstd"
 makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev>3 mawk
-	diffutils findutils zstd pahole>=1.25 python3 gcc>=13.1.1_git20230624"
+	diffutils findutils zstd pahole python3 gcc>=13.1.1_git20230624"
 options="!strip"
 install=
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
 	0001-brcm80211-brcmfmac-pcie.patch
+	0002-ath11k_pci-msi-parameters.patch
 	0004-objtool-respect-AWK-setting.patch
 	config-lts.x86_64
 	"
@@ -169,7 +170,8 @@ _dev() {
 sha512sums="
 a37b1823df7b4f72542f689b65882634740ba0401a42fdcf6601d9efd2e132e5a7650e70450ba76f6cd1f13ca31180f2ccee9d54fe4df89bc0000ade4380a548  linux-6.12.tar.xz
 e5c27e6d3d5e807b7771d559b07794899119fbe7f001c6f51bfc4e20b758f0b0c3291c52dd3fae27ed7ada79e5888dd687532dd3872df335f0ee02c58d14445f  0001-brcm80211-brcmfmac-pcie.patch
+5a5261cde10598561e71d9840575e36794727f300fe718abc52eb6f57e26a308e29eb8e44ce63be91ad9a531dade499809510541910c65a521f902c011832ad8  0002-ath11k_pci-msi-parameters.patch
 2956050bb332411d00a285e9656618f2e34b631492bbc19bef54d83a6e91b8531f4e18830b9313cfe52fbf8a8ca6fb76cf55b3ddd146ca3b977046cf2fd10cad  0004-objtool-respect-AWK-setting.patch
-1644724a329715e11eb2467f8e85a1fba323cfb20d2ac0d337b5a7fef0b2a9c83f03dd828300a092336705b8072d95befb094bc69b7f3595dd2b17d3268af343  config-lts.x86_64
-032c7a975d98711520b5174da7ed546b10feec503a4f6f36e1229503db4d46787fcc10df10b227cd26b543eb84fe05d1ddd24b672f5478b8514a11b765ff7162  patch-6.12.19.xz
+204b544887de29a4e79a29a002fc6fedd88e2170e2b7cf94e846db37af588ff985f232d31e1c179d53776533b2bfb38e09c0c5f351be6558b0871e9d15e89289  config-lts.x86_64
+f7a4999b1f2d2019fcaf691a2c0f1797be73858404fd4825962ec32945733fe98f625d8451d9bc264a1c14500b4596be6b73ea947da35e7b27f044f08642f2ab  patch-6.12.48.xz
 "

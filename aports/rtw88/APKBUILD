@@ -1,21 +1,26 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw88'
-pkgver=20250315
-pkgrel=06120190000
-_gitrev='11d29443525eca394e69d8adab065dc33cce23d6'
+pkgver=20250905
+_kern_maj=6
+_kern_min=12
+_kern_pcs=48
+_kern_rel=0
+_drv_rel=0
+pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
+_gitrev='bb0ed9d5709afd30e928d2d11f7b650e03c8c72b'
 pkgdesc='Backport of the Realtek Wifi 5 drivers from the wireless-next repo'
-arch="x86_64"
+arch='x86_64'
 url='https://github.com/lwfinger/rtw88'
-license="GPL-2.0"
-makedepends="linux-lts-dev xz"
-depends="linux-lts"
+license='GPL-2.0'
+makedepends="linux-lts-dev~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel xz"
+depends="linux-lts~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel"
 install=
 options="!check !strip"
 source="Makefile.patch
 	https://github.com/lwfinger/rtw88/archive/${_gitrev}.zip"
 
-_kver=$(cd /usr/src/ && find . -mindepth 1 -maxdepth 1 -type d -name '*-lts' | sed 's!./linux-headers-!!')
+_kver="$_kern_maj.$_kern_min.$_kern_pcs-$_kern_rel-lts"
 _kbase="/lib/modules/${_kver}"
 _srcdir="$srcdir/rtw88-$_gitrev"
 builddir="$_srcdir"
@@ -34,6 +39,6 @@ package() {
 }
 
 sha512sums="
-dd92164bdcb31c15e4bda2cd4e9400486622390df25c508e1764346873c0e3e4c852a4de185fb46022ac13a1d4f764b9899cc8c260147d74c4d63a1ca42d1aa5  Makefile.patch
-9cb82a07ebe91441d3be2bc58d53368c66e2fcb09fe57ae73f646c2d8b66eaa37b396053738b9a7dcb45efc9bf1c131470fd10aa970ef9c70db0e22609f85743  11d29443525eca394e69d8adab065dc33cce23d6.zip
+2434f85ab93657246978a11c08d44a09685f59abe9a44f7a48fef19d0fc679c4564206f23c4d68b78f5d511e9d7d093719dad506e292e286472b459d24bc203d  Makefile.patch
+6b2c5247ca528e12b59e518783ed199dab9efe6d496d2d6330e9dd6b76681357da116208c8d7ec3cd6d7fccc778e9709a6683b22a78d891ef664588a74d04e64  bb0ed9d5709afd30e928d2d11f7b650e03c8c72b.zip
 "

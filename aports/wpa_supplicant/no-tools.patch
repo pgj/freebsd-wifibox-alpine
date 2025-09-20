@@ -1,17 +1,12 @@
 --- a/wpa_supplicant/Makefile
 +++ b/wpa_supplicant/Makefile
-@@ -1,9 +1,5 @@
+@@ -1,4 +1,4 @@
 -BINALL=wpa_supplicant wpa_cli
 +BINALL=wpa_supplicant
  
--ifndef CONFIG_NO_WPA_PASSPHRASE
--BINALL += wpa_passphrase
--endif
--
  ALL = $(BINALL)
  ALL += systemd/wpa_supplicant.service
- ALL += systemd/wpa_supplicant@.service
-@@ -1812,7 +1808,7 @@
+@@ -1923,7 +1923,7 @@
  OBJS_priv += ../src/drivers/driver_common.o
  
  OBJS += wpa_supplicant.o events.o bssid_ignore.o wpas_glue.o scan.o
@@ -19,8 +14,8 @@
 +OBJS_t := $(OBJS) $(OBJS_l2)
  OBJS_t += ../src/radius/radius_client.o
  OBJS_t += ../src/radius/radius.o
- OBJS_t2 := $(OBJS) $(OBJS_l2) preauth_test.o
-@@ -1894,12 +1890,6 @@
+ ifdef CONFIG_RADIUS_TLS
+@@ -2008,12 +2008,6 @@
  	$(Q)$(LDO) $(LDFLAGS) -o wpa_supplicant $(OBJS) $(LIBS) $(EXTRALIBS)
  	@$(E) "  LD " $@
  
@@ -33,7 +28,7 @@
  _OBJS_VAR := OBJS_t2
  include ../src/objs.mk
  preauth_test: $(OBJS_t2)
-@@ -2030,8 +2020,6 @@
+@@ -2144,8 +2138,6 @@
  	mv -f $< $@
  win_if_list.exe: win_if_list
  	mv -f $< $@
@@ -42,7 +37,7 @@
  
  WINALL=wpa_supplicant.exe wpa_cli.exe wpa_passphrase.exe win_if_list.exe
  
-@@ -2064,7 +2052,7 @@
+@@ -2330,7 +2322,7 @@
  	$(MAKE) -C ../src clean
  	$(MAKE) -C dbus clean
  	rm -f core *~ *.o *.d *.gcno *.gcda *.gcov

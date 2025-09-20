@@ -26,7 +26,7 @@ jobs:
       - uses: jirutka/setup-alpine@v1
         with:
           arch: x86_64
-          branch: v3.21
+          branch: v3.22
           packages: >
             alpine-sdk
             doas
