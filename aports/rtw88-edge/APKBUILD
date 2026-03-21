@@ -1,14 +1,14 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw88-edge'
-pkgver=20250905
+pkgver=20260312
 _kern_maj=6
-_kern_min=16
-_kern_pcs=8
+_kern_min=19
+_kern_pcs=9
 _kern_rel=0
 _drv_rel=0
 pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
-_gitrev='bb0ed9d5709afd30e928d2d11f7b650e03c8c72b'
+_gitrev='d2258b4de21aeabf7ef85ec0cada1f3cff9bcbe0'
 pkgdesc='Backport of the Realtek Wifi 5 drivers from the wireless-next repo (edge)'
 arch='x86_64'
 url='https://github.com/lwfinger/rtw88'
@@ -17,7 +17,7 @@ makedepends="linux-edge-dev~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel xz"
 depends="linux-edge~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel"
 install=
 options="!check !strip"
-source="Makefile.patch
+source="../rtw88/Makefile.patch
 	https://github.com/lwfinger/rtw88/archive/${_gitrev}.zip"
 
 _kver="$_kern_maj.$_kern_min.$_kern_pcs-$_kern_rel-edge"
@@ -39,6 +39,6 @@ package() {
 }
 
 sha512sums="
-2434f85ab93657246978a11c08d44a09685f59abe9a44f7a48fef19d0fc679c4564206f23c4d68b78f5d511e9d7d093719dad506e292e286472b459d24bc203d  Makefile.patch
-6b2c5247ca528e12b59e518783ed199dab9efe6d496d2d6330e9dd6b76681357da116208c8d7ec3cd6d7fccc778e9709a6683b22a78d891ef664588a74d04e64  bb0ed9d5709afd30e928d2d11f7b650e03c8c72b.zip
+bce3cf0b2d160f1d6411bf55006132ed642c6414468f71a2e8c1fb3d0521152c7ea9281a7207798b8d3bf4e7638095fd67ee3ecf1f4b988705947dfe7d3370a7  Makefile.patch
+4b1546cd7bbe2de23fb50b6738e08743f06f6e6f969cbd563fc3fa3bbbbe1dba773872b2468c194381e8f0114af2ec2ad545e55df75d881bc118f1bc759f6f7e  d2258b4de21aeabf7ef85ec0cada1f3cff9bcbe0.zip
 "

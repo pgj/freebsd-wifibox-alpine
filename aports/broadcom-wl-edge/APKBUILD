@@ -3,8 +3,8 @@
 pkgname=broadcom-wl-edge
 pkgver=6.30.223.271
 _kern_maj=6
-_kern_min=16
-_kern_pcs=8
+_kern_min=19
+_kern_pcs=9
 _kern_rel=0
 _drv_rel=0
 pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
@@ -16,55 +16,39 @@ makedepends="linux-edge-dev~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel xz"
 depends="linux-edge~$_kern_maj.$_kern_min.$_kern_pcs-r$_kern_rel"
 install=
 options="!check !strip"
-source="broadcom-wl.conf
-        Makefile.patch
-        msi_support.patch
-        001-null-pointer-fix.patch
-        002-rdtscl.patch
-        003-linux47.patch
-        004-linux48.patch
-        005-debian-fix-kernel-warnings.patch
-        006-linux411.patch
-        007-linux412.patch
-        008-linux415.patch
-        009-fix_mac_profile_discrepancy.patch
-        010-linux56.patch
-        011-linux59.patch
-        012-linux517.patch
-        013-linux518.patch
-        014-linux414.patch
-        015-linux600.patch
-        016-linux601.patch
-        017-linux612.patch
-        018-linux613.patch
-        019-linux614.patch
-        020-linux615.patch
+source="../broadcom-wl/broadcom-wl.conf
+        ../broadcom-wl/Makefile.patch
+        ../broadcom-wl/msi_support.patch
+        ../broadcom-wl/001-null-pointer-fix.patch
+        ../broadcom-wl/002-rdtscl.patch
+        ../broadcom-wl/003-linux47.patch
+        ../broadcom-wl/004-linux48.patch
+        ../broadcom-wl/005-debian-fix-kernel-warnings.patch
+        ../broadcom-wl/006-linux411.patch
+        ../broadcom-wl/007-linux412.patch
+        ../broadcom-wl/008-linux415.patch
+        ../broadcom-wl/009-fix_mac_profile_discrepancy.patch
+        ../broadcom-wl/010-linux56.patch
+        ../broadcom-wl/011-linux59.patch
+        ../broadcom-wl/012-linux517.patch
+        ../broadcom-wl/013-linux518.patch
+        ../broadcom-wl/014-linux414.patch
+        ../broadcom-wl/015-linux600.patch
+        ../broadcom-wl/016-linux601.patch
+        ../broadcom-wl/017-linux612.patch
+        ../broadcom-wl/018-linux613.patch
+        ../broadcom-wl/019-linux614.patch
+        ../broadcom-wl/020-linux615.patch
+        ../broadcom-wl/021-linux617.patch
         https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz
 	"
 
 _kernver="$_kern_maj.$_kern_min.$_kern_pcs-$_kern_rel-edge"
 _kbase="/lib/modules/${_kernver}"
+builddir="$srcdir"
 
 prepare() {
-  local _patch_failed=
-
-  for i in $source; do
-    case $i in
-      *.patch)
-        msg "Applying $i..."
-        if ! patch -s -p1 -N -i "$srcdir"/$i; then
-          echo $i >>failed
-          _patch_failed=1
-        fi
-        ;;
-    esac
-  done
-
-  if ! [ -z "$_patch_failed" ]; then
-    error "The following patches failed:"
-    cat failed
-    return 1
-  fi
+  default_prepare
 
   rm -f localversion*
 
@@ -109,5 +93,6 @@ b815a4ff9289d81ddbe7f76553b092df19ee137438c9e33811c3a8b15e8a3896763715975b42391b
 3caf2049555f39f71270d768d0b25d0cc8177f50a649a915284467f87de1d74926ecff158e211f3c05ea7e3107ab4047ec005786cf3bb88e856431e537974ab5  018-linux613.patch
 db8f677138ed9b25d2c8cc8f66dff340a63fdef5e6d8a325bc684bda80053b68441b84b2e8b148aff06de51dc357c9d2dcf6ac11d40814d0914c393a24e93d62  019-linux614.patch
 3dc6ee29cd5a1805c210b2ee9774c2745559369740b1a6f336a29e757556f979ac753b384af4e6bb9f79a50becb59fd51958a18ad4b467973e7cab812c897356  020-linux615.patch
+e32ca4ba264b9394f11e5bf3d05f9cd89af1cb6b27901df804cf18343a16404133cbe441e4de5e06e6005c15b4c85af33f378f48d1cb92aadf7601477cb256ea  021-linux617.patch
 6855781f7c69a9aecb9461932423688964879d5a4df571f01ae7adaa7bf21a410bef839605d555afb6c8f4eec92fe8510af6cb120930095617ff6cdcccedaf17  hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz
 "

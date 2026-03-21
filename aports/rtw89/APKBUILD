@@ -1,14 +1,14 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='rtw89'
-pkgver=20250827
+pkgver=20260320
 _kern_maj=6
-_kern_min=12
-_kern_pcs=48
+_kern_min=18
+_kern_pcs=19
 _kern_rel=0
 _drv_rel=0
 pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
-_gitrev='8a8ba9bdee85c54b55efa27bd92e6475a77da7af'
+_gitrev='506d193b8cb7d6394509aebcf8de1531629f6100'
 pkgdesc='Linux drivers for Realtek Wi-Fi 6/6E and Wi-Fi 7 adapters and cards'
 arch='x86_64'
 url='https://github.com/morrownr/rtw89'
@@ -40,5 +40,5 @@ package() {
 
 sha512sums="
 d4ba10a433894026d0aee92766285fc98247296d8ece3531760f41ce3d4fb09c8a10efc6a4b646da1061ca07c23935d74120cce07b1cb7408f76205ed51fa1db  Makefile.patch
-911cf7cb242e6c1c38596661d9f802c5fd2416db8fa0497caa8b192340b7c3e881c137b84ae33842d9cb2037fbfccb9df159ea02117ad12ec5254e1f9d19f7b1  8a8ba9bdee85c54b55efa27bd92e6475a77da7af.zip
+4f0f1f64db3fcb0d265ac5db27e5f7048ac38c4582de3db8bd34538b98c519d2da011f6e5c036f0ca869acf8da8c32b95e5ec0fe2d5b671dedba2fe79a5a6f95  506d193b8cb7d6394509aebcf8de1531629f6100.zip
 "
