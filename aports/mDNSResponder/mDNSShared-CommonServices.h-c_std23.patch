@@ -1,0 +1,11 @@
+--- a/mDNSShared/CommonServices.h
++++ b/mDNSShared/CommonServices.h
+@@ -844,7 +844,7 @@
+         #define false   0
+     #endif
+ #else
+-    #if ( !defined( __cplusplus ) && !__bool_true_false_are_defined )
++    #if ( !defined( __cplusplus ) && !__bool_true_false_are_defined && __STDC_VERSION__ < 202311L )
+         #define COMMON_SERVICES_NEEDS_BOOL      1
+     #else
+         #define COMMON_SERVICES_NEEDS_BOOL      0

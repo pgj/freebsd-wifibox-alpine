@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname='mDNSResponder'
-pkgver=2600.100.147
+pkgver=2881.0.25
 pkgrel=0
 pkgdesc='Bonjour (zero-configuration networking) by Apple'
 arch="x86_64"
@@ -13,8 +13,11 @@ install=
 options="!check !strip"
 source="https://github.com/apple-oss-distributions/mDNSResponder/archive/refs/tags/$pkgname-$pkgver.tar.gz
 	mdnsresponderposix.initd
-	mdnsresponderposix.confd"
+	mdnsresponderposix.confd
 
+	mDNSShared-CommonServices.h-c_std23.patch"
+
+builddir="$srcdir"/"$pkgname"-"$pkgname"-"$pkgver"
 _srcdir="$srcdir"/"$pkgname"-"$pkgname"-"$pkgver"
 _bins="mDNSResponderPosix"
 
@@ -42,7 +45,8 @@ package() {
 }
 
 sha512sums="
-ef8be9eecddc8cc000542f390dae449f3e4b1befe294c6b6e4bbd3fea7402ff021487ab8b5d037adc02e967ebbb53f0fef9e37117a0ae9e827037e85bfe0fdd1  mDNSResponder-2600.100.147.tar.gz
+3f5be70d5cb851180a98883b1d92a863d2e789f8b9ba720ff66f6292af9afc751cc03737998137fd9a7b26b7c366d42b72b09ede8b92344ab8c006d20fb32cfe  mDNSResponder-2881.0.25.tar.gz
 d2f8359164f4aa1d4c881a5ad4b9a53a44df71ab6c7a57adbeda42cfd7339a7d1f860850df894d9a1f74d1989d012c83733ebfb9a891bdf410cd45fcf47ec1a6  mdnsresponderposix.initd
 b53af6a0a1351bd328a54fc8826350340371ad3134fc4131d3a8d1b0e016cf074141a89e515054b2119dc0eff84c609a0b7c422669c3fa00a17d2460140bc24f  mdnsresponderposix.confd
+f90955872871bd4a73f05d6dc0e0b351a347e6668b62b9480e1a60a877df9ff207dbe8c8465630897fd67e9d9a67d770e1cd8880e863702586359e9add76bff7  mDNSShared-CommonServices.h-c_std23.patch
 "

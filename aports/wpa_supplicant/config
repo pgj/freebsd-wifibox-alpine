@@ -491,6 +491,11 @@ CONFIG_GETRANDOM=y
 # IEEE 802.11n (High Throughput) support (mainly for AP mode)
 #CONFIG_IEEE80211N=y
 
+# required for disable_he=1:
+# Disable HE (IEEE 802.11ax) for networks
+# https://gitlab.alpinelinux.org/alpine/aports/-/issues/17635
+CONFIG_HE_OVERRIDES=y
+
 # IEEE 802.11ac (Very High Throughput) support (mainly for AP mode)
 # (depends on CONFIG_IEEE80211N)
 #CONFIG_IEEE80211AC=y

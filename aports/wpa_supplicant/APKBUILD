@@ -2,7 +2,7 @@
 
 pkgname=wpa_supplicant
 pkgver=2.11
-pkgrel=0 # base: 2
+pkgrel=1 # base: 3
 pkgdesc="utility providing key negotiation for WPA wireless networks"
 url="https://w1.fi/wpa_supplicant/"
 arch="all"
@@ -86,5 +86,5 @@ fb328872087268056b035802f71df2f7af8d11699822fe68611201a07dc693c4fdb8c50dd4fd509e
 d70b2d98b1ffefb1c9023e693d02e1adf21ba21535f7fb76f69f30cb95fb9ab393561d59f27517874108088f0e9061ab88333f65e25d70fab760d4c0d8366dc4  0002-AP-guard-FT-SAE-code-with-CONFIG_IEEE80211R_AP.patch
 5d54d6e5a06bb8d0612b2178a3c6ddf27b9bca142e3c512f67df0ace9e650ae343170ea05f47156717c717484c85e5b890706a92ad353046a8a61e8aae8dc1c2  wpa_supplicant-2.11-Revert-Mark-authorization-completed-on-driver-indica.patch
 0acc0d5d05d295bfb3b9dc3e0e3c9b6d395b54aa1a39a2d56fd0b08dd864b1ce9cc0fd54d3c2ee52d06ed7007338024c7f6fd5c73ad2ed30a77446a05829a76f  no-tools.patch
-3a807fbd76d8c49102d3952052cbefc91131da5fea2b71057dc586563215fc9a94d9497127897055db15eaf55b08445c8a6fdfff22ef76aae63b9688c12cb775  config
+644660ea6fc7ec25619eff806871d6b8537ca34456a2e082ef2ecb2e81599a7e1c03fadb269328d1b337f6b287d72d612a52c9b4421d41960adc9be2ddceca46  config
 "
