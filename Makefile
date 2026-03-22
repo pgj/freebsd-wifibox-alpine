@@ -95,14 +95,16 @@ $(GUESTDIR)/.done:
 	$(ENV) LD_LIBRARY_PATH=$(_LIB_PATH) \
 		$(_APK) add \
 			--initdb \
-			--no-network \
-			--no-cache \
+			--network=no \
+			--cache=no \
 			--force-non-repository \
 			--allow-untrusted \
-			--no-progress \
+			--progress=no \
 			--clean-protected \
 			--root $(GUESTDIR) \
-			--no-scripts \
+			--scripts=no \
+			--logfile=no \
+			--interactive=no \
 			--no-chown \
 			$(PACKAGES)
 	# remove APK metadata
