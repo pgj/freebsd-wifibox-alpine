@@ -61,6 +61,12 @@ _BUSYBOX=		$(BOOTSTRAPDIR)/$(BUSYBOX)
 INITRD_IMG=		$(BOOTDIR)/initramfs
 .endif
 
+.if $(UID) != 0
+_USERMODE=		--usermode
+.else
+_USERMODE=		#
+.endif
+
 SQUASHFS_COMP?=		lzo
 SQUASHFS_IMG=		$(PWD)/alpine-$(VERSION).squashfs.img
 SQUASHFS_VMLINUZ=	$(BOOTDIR)/vmlinuz*
@@ -105,7 +111,7 @@ $(GUESTDIR)/.done:
 			--scripts=no \
 			--logfile=no \
 			--interactive=no \
-			--no-chown \
+			$(_USERMODE) \
 			$(PACKAGES)
 	# remove APK metadata
 	$(RM) -rf $(GUESTDIR)/lib/apk
