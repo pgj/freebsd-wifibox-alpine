@@ -57,10 +57,6 @@ _LIB_PATH=		$(BOOTSTRAPDIR)/usr/lib
 _APK=			$(BOOTSTRAPDIR)/$(APK)
 _BUSYBOX=		$(BOOTSTRAPDIR)/$(BUSYBOX)
 
-.if !empty(INITRD_FILES)
-INITRD_IMG=		$(BOOTDIR)/initramfs
-.endif
-
 .if $(UID) != 0
 _USERMODE=		--usermode
 .else
