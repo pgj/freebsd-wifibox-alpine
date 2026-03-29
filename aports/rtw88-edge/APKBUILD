@@ -4,7 +4,7 @@ pkgname='rtw88-edge'
 pkgver=20260312
 _kern_maj=6
 _kern_min=19
-_kern_pcs=9
+_kern_pcs=10
 _kern_rel=0
 _drv_rel=0
 pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
@@ -39,6 +39,6 @@ package() {
 }
 
 sha512sums="
-bce3cf0b2d160f1d6411bf55006132ed642c6414468f71a2e8c1fb3d0521152c7ea9281a7207798b8d3bf4e7638095fd67ee3ecf1f4b988705947dfe7d3370a7  Makefile.patch
+cb1232a8f90d7223e8cc514aeee912ebda4f1762583290eb1a6659167cd0cc857d42f78372f472d1564db003468b69fa35d2869431fd29d7df0582b76392e990  Makefile.patch
 4b1546cd7bbe2de23fb50b6738e08743f06f6e6f969cbd563fc3fa3bbbbe1dba773872b2468c194381e8f0114af2ec2ad545e55df75d881bc118f1bc759f6f7e  d2258b4de21aeabf7ef85ec0cada1f3cff9bcbe0.zip
 "
