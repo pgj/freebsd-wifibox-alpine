@@ -86,11 +86,14 @@ jobs:
           for pkg in linux-lts linux-edge; do
             cd "$pkg"
             abuild -r
+            abuild listpkg | grep -E "linux-.*-dev-.*\.apk" > ../"$pkg".dev.apk
             cd ..
           done
           cd ..
 
-          doas apk add $(ls "$PKGROOT"/aports/x86_64/linux-*-dev-*.apk)
+          for pkg in $(cat linux-*.dev.pkg); do
+            doas apk add "$PKGROOT"/aports/x86_64/"$pkg"
+          done
 
           buildrepo -a "$(pwd)" -d "$PKGROOT" aports
         shell: alpine.sh {0}
