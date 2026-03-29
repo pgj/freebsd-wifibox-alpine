@@ -7,7 +7,7 @@
 -MODLIST := rtw_8723cs rtw_8723de rtw_8723ds rtw_8723du \
 -	   rtw_8812au rtw_8814ae rtw_8814au rtw_8821au rtw_8821ce rtw_8821cs rtw_8821cu \
 -	   rtw_8822be rtw_8822bs rtw_8822bu rtw_8822ce rtw_8822cs rtw_8822cu \
-+MODLIST := rtw_8723de rtw_8814ae rtw_8821ce rtw_8822be rtw_8822ce \
++MODLIST := rtw_8723de rtw_8814ae rtw_8822be rtw_8822ce \
  	   rtw_8703b rtw_8723d rtw_8821a rtw_8812a rtw_8814a rtw_8821c rtw_8822b rtw_8822c \
 -	   rtw_8723x rtw_88xxa rtw_pci rtw_sdio rtw_usb rtw_core
 +	   rtw_8723x rtw_88xxa rtw_pci rtw_core
@@ -67,10 +67,15 @@
  ifeq ($(CONFIG_PCI), y)
  obj-m		+= rtw_8814ae.o
  rtw_8814ae-objs	:= rtw8814ae.o
-@@ -136,14 +112,6 @@
- rtw_8821ce-objs	:= rtw8821ce.o
- endif
+@@ -131,19 +107,6 @@
+ obj-m		+= rtw_8821c.o
+ rtw_8821c-objs	:= rtw8821c.o rtw8821c_table.o
  
+-ifeq ($(CONFIG_PCI), y)
+-obj-m		+= rtw_8821ce.o
+-rtw_8821ce-objs	:= rtw8821ce.o
+-endif
+-
 -ifneq ($(CONFIG_MMC), )
 -obj-m		+= rtw_8821cs.o
 -rtw_8821cs-objs	:= rtw8821cs.o
@@ -82,7 +87,7 @@
  obj-m		+= rtw_8822b.o
  rtw_8822b-objs	:= rtw8822b.o rtw8822b_table.o
  
-@@ -152,14 +120,6 @@
+@@ -152,14 +115,6 @@
  rtw_8822be-objs	:= rtw8822be.o
  endif
  
@@ -97,7 +102,7 @@
  obj-m		+= rtw_8822c.o
  rtw_8822c-objs	:= rtw8822c.o rtw8822c_table.o
  
-@@ -168,26 +128,10 @@
+@@ -168,26 +123,10 @@
  rtw_8822ce-objs	:= rtw8822ce.o
  endif
  
