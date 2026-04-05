@@ -37,15 +37,20 @@ GZIP=/usr/bin/gzip
 INSTALL_DATA=/usr/bin/install -m $(SHAREMODE)
 ID=/usr/bin/id
 UMOUNT=/sbin/umount
+BC=/usr/bin/bc
 STAT=/usr/bin/stat
 TOUCH=/usr/bin/touch
 TRUE=/usr/bin/true
+NEWFS_MSDOS=/sbin/newfs_msdos
+
 GIT=$(LOCALBASE)/bin/git
 PATCHELF=$(LOCALBASE)/bin/patchelf
 BRANDELF=/usr/bin/brandelf
 TAR2SQFS=$(LOCALBASE)/bin/tar2sqfs
 IGOR=${LOCALBASE}/bin/igor
 MANDOC=/usr/bin/mandoc
+MCOPY=$(LOCALBASE)/bin/mcopy
+MMD=$(LOCALBASE)/bin/mmd
 
 UID!=			$(ID) -u
 
@@ -65,7 +70,9 @@ _USERMODE=		#
 
 SQUASHFS_COMP?=		lzo
 SQUASHFS_IMG=		$(PWD)/alpine-$(VERSION).squashfs.img
-SQUASHFS_VMLINUZ=	$(BOOTDIR)/vmlinuz*
+
+ESP_IMG=		$(PWD)/alpine-$(VERSION).esp.img
+VMLINUZ=		$(BOOTDIR)/vmlinuz*
 
 .if !defined(VERSION)
 VERSION!=	$(GIT) describe --tags --always
@@ -177,7 +184,19 @@ $(SQUASHFS_IMG): image-contents
 			--compressor $(SQUASHFS_COMP) \
 			$(SQUASHFS_IMG)
 
-_TARGETS=	$(SQUASHFS_IMG)
+$(ESP_IMG): image-contents
+		# find the file system size by rounding the kernel image file size
+		# to the nearest cluster size (8 * 512 = 4096 bytes) and consider
+		# space needed for metadata nad the entries for the `EFI` and
+		# `EFI/BOOT` directories.
+		@_vmlinuz_size=$$($(STAT) -f "%z" $(VMLINUZ)) ; \
+			_esp_img_size=$$($(ECHO) "(($$_vmlinuz_size / 4096) + 9) * 4096" | $(BC)) ; \
+			$(NEWFS_MSDOS) -C "$$_esp_img_size" -F 12 -c 8 -S 512 $(ESP_IMG)
+		$(MMD) -i $(ESP_IMG) ::EFI
+		$(MMD) -i $(ESP_IMG) ::EFI/BOOT
+		$(MCOPY) -i $(ESP_IMG) $(VMLINUZ) ::EFI/BOOT/bootx64.efi
+
+_TARGETS=	$(SQUASHFS_IMG) $(ESP_IMG)
 
 all:	$(_TARGETS)
 
@@ -185,9 +204,8 @@ _MAN_SRC=	man/wifibox-alpine.5
 
 install:
 	$(MKDIR) -p $(SHAREDIR)
-	$(INSTALL_DATA) $(SQUASHFS_VMLINUZ) $(SHAREDIR)/vmlinuz
-	$(INSTALL_DATA) $(SQUASHFS_IMG) $(SHAREDIR)/disk.img
-	$(SED) ${_SUB_LIST_EXP} share/grub.cfg > $(SHAREDIR)/grub.cfg
+	$(INSTALL_DATA) $(SQUASHFS_IMG) $(SHAREDIR)/root.img
+	$(INSTALL_DATA) $(ESP_IMG) $(SHAREDIR)/esp.img
 
 	$(MKDIR) -p $(ETCDIR)
 .for srcs in $(ETC_SRCS)
@@ -206,6 +224,7 @@ install:
 clean:
 	$(RM) -rf $(GUESTDIR)
 	$(RM) -f $(SQUASHFS_IMG)
+	$(RM) -f $(ESP_IMG)
 
 .MAIN:	all
 
