@@ -20,6 +20,13 @@ software is employed, which must be installed beforehand.
   package.
 - [GNU Tar] or the `archivers/gtar` FreeBSD package.
 - [PatchELF] or the `sysutils/patchelf` FreeBSD package.
+- [Mtools] or the `filesystems/mtools` FreeBSD package.
+
+That is:
+
+```console
+# pkg install squashfs-tools-ng gtar patchelf mtools
+```
 
 Note that the build process also uses native 64-bit Linux binaries,
 that is why the [Linuxulator] must be activated by loading the
@@ -131,6 +138,7 @@ used once installed.
 [SquashFS Tools NG]: https://infraroot.at/projects/squashfs-tools-ng/
 [GNU Tar]: https://www.gnu.org/software/tar/
 [PatchELF]: https://github.com/NixOS/patchelf
+[Mtools]: https://www.gnu.org/software/mtools/
 [Linuxulator]: https://docs.freebsd.org/en/books/handbook/linuxemu/
 [freebsd-wifibox-port]: https://github.com/pgj/freebsd-wifibox-port/
 [OpenRC]: https://github.com/OpenRC/openrc
