@@ -1,6 +1,6 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=dhcpcd
-pkgver=10.3.0
+pkgver=10.5.2
 pkgrel=0 # base: 0
 pkgdesc="RFC2131 compliant DHCP client"
 url="https://roy.marples.name/projects/dhcpcd"
@@ -14,6 +14,13 @@ source="$pkgname-$pkgver.tar.gz::https://github.com/NetworkConfiguration/dhcpcd/
 	99-udhcpd.conf
 	99-radvd.conf
 	"
+
+# secfixes:
+#   10.5.2-r0:
+#     - CVE-2026-56113
+#     - CVE-2026-56114
+#     - CVE-2026-56116
+#     - CVE-2026-56117
 
 build() {
 	./configure \
@@ -46,7 +53,7 @@ package() {
 }
 
 sha512sums="
-7cc0880cb23f051946c41fcded88962343788981f754013675d43644dbb8bcbec54f53b09d4feb9cb4e4823d9bdf0563062e81ef4b0f0f23b39fdf511bad5421  dhcpcd-10.3.0.tar.gz
+695be022b9c7e5456579fd2b0d9d60401eb00c3cac894a94978db7034fd629bcb648e8f9719b1436bf44c2e19ca6b5279f3574e525d2687c90820fbeae9f1707  dhcpcd-10.5.2.tar.gz
 b6bdaac9fc0d5d2d7e8c5e30d1a45db1cff2284d01f92f8821b2f03aaff4e0dbd8cbfbced96d8d9d934dc11f22b792a8345d634d8e4e3b84f43016b7e866e302  busybox-logger.patch
 7fb44b82a6fa25ee6249fc4835853a4c1fc7d327653efabd9fde303b1f306b3aa6956b2621b55a24fc007ec7ad878ce50e7418ebff0b17fece76e2fdd9e5190d  dhcpcd.initd
 ceaf35c3b4fff7c1f156ed53003c19d24aa77234d0ac0b5d1886a96e0dab4865431502791c7874c90bffdf652ef001f0cacebbdb1fee883f10344d603fe2feb3  99-udhcpd.conf

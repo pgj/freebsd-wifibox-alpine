@@ -2,9 +2,9 @@
 
 pkgname=broadcom-wl-edge
 pkgver=6.30.223.271
-_kern_maj=6
-_kern_min=19
-_kern_pcs=11
+_kern_maj=7
+_kern_min=2
+_kern_pcs=5
 _kern_rel=0
 _drv_rel=0
 pkgrel=$(printf "%02d%02d%03d%02d%02d" $_kern_maj $_kern_min $_kern_pcs $_kern_rel $_drv_rel)
@@ -21,15 +21,15 @@ source="../broadcom-wl/broadcom-wl.conf
         ../broadcom-wl/msi_support.patch
         ../broadcom-wl/001-null-pointer-fix.patch
         ../broadcom-wl/002-rdtscl.patch
-        ../broadcom-wl/003-linux47.patch
-        ../broadcom-wl/004-linux48.patch
+        ../broadcom-wl/003-linux407.patch
+        ../broadcom-wl/004-linux408.patch
         ../broadcom-wl/005-debian-fix-kernel-warnings.patch
         ../broadcom-wl/006-linux411.patch
         ../broadcom-wl/007-linux412.patch
         ../broadcom-wl/008-linux415.patch
         ../broadcom-wl/009-fix_mac_profile_discrepancy.patch
-        ../broadcom-wl/010-linux56.patch
-        ../broadcom-wl/011-linux59.patch
+        ../broadcom-wl/010-linux506.patch
+        ../broadcom-wl/011-linux509.patch
         ../broadcom-wl/012-linux517.patch
         ../broadcom-wl/013-linux518.patch
         ../broadcom-wl/014-linux414.patch
@@ -40,6 +40,8 @@ source="../broadcom-wl/broadcom-wl.conf
         ../broadcom-wl/019-linux614.patch
         ../broadcom-wl/020-linux615.patch
         ../broadcom-wl/021-linux617.patch
+        ../broadcom-wl/022-linux701.patch
+        ../broadcom-wl/023-linux702.patch
         https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz
 	"
 
@@ -75,15 +77,15 @@ sha512sums="
 6bd2dbfd65930397f01861d5acfcdb9e89286f4b930756759667e67ee6cf11b0229466751442654d2ac4ccf4aaafd5d30435ebc9ab93ace21c372fe605bd3837  msi_support.patch
 4403cad0360b01f8e88faccb77e6239865e9cc2b68dac62896153ab37957f1e73e5e4c95d3e81dac334106a2cd4ef0784955a5fefd8abc6e793a68f182bbffe4  001-null-pointer-fix.patch
 b483a4fd5fbb5a4697365b6ddcd8034b4d90ddee9bf2aecf003b0fd6838a708d3e84be33b08acdbe165d440480da25fdf0dfff0d2fe12fa2c5271c51d6ac74c0  002-rdtscl.patch
-f61ecfb6b8c5a377c7a4da7549c9ec75677782fa2f97e64de0df1259e0ec3b993cfa3eaa4ff50331703ee18ef28f2af0d09839dd3b63ed994e6b29cbfe8ed73f  003-linux47.patch
-e5959921b6f0cd5d61d7ed568f549b0920f394458c28257c05064b89d7067ce11c8e44ed0e5a48a65bd041c6193d9ae2d02fca2f5efbfb787d3f9001786a4578  004-linux48.patch
+f61ecfb6b8c5a377c7a4da7549c9ec75677782fa2f97e64de0df1259e0ec3b993cfa3eaa4ff50331703ee18ef28f2af0d09839dd3b63ed994e6b29cbfe8ed73f  003-linux407.patch
+e5959921b6f0cd5d61d7ed568f549b0920f394458c28257c05064b89d7067ce11c8e44ed0e5a48a65bd041c6193d9ae2d02fca2f5efbfb787d3f9001786a4578  004-linux408.patch
 6209a0a5a46a3efcede3cb1e263467173153d779b6267ba4c20f46421a9abd8743a7068527ace350a3da3ef3046b0399e09b37aba917fabe020c8c2600b60fdf  005-debian-fix-kernel-warnings.patch
 b7db17e30731a9cbc940b83f7b62f059529cff6c134e47e2176cd7c6fcd8d028334ed4fe1fdce7cf1aef87590f9664b463383ae3302a6e2aabe1baa79fbc5c95  006-linux411.patch
 d4acd891023ff8d4b9308afdd55c4e971cdf7773570c8e3a545400ed9e414eeca5016ebc8a530002e7858fd44f1fd5b0ae70c0d0a3cdbbffd5bd9abb702b2cde  007-linux412.patch
 2fb5c3eebd48b6099fb87a9fd92545c17b2abf318b040a434c1b0bdd75a7a682b6e7ec9f80245c198f1c306bbaef35a2488123c5ba8764d5a83eb18132c0857b  008-linux415.patch
 97d34398d18ac9a7943233c12e01cf7006bf0648938303100932cabf5000c346f1a852978e3c8c48bb6e8652177e625ce1190047d580624319e680a13802ce92  009-fix_mac_profile_discrepancy.patch
-8fb320c1272246c91fdd99cade2fb67a6ecd924a132c1b9432fa1ff0338444700451ffc6a1cb35e07188c58c5bd1ccaf59ebf014c49f44cb6ba33d1ec732859d  010-linux56.patch
-b9a0193ab604da92c99051e2a4fd91e43c3b6aeea7dbda15635b43eabd35b414e197bf5f25ac0d4ec905a1cb75abc15f165428470bc788dbefd73f178d165099  011-linux59.patch
+8fb320c1272246c91fdd99cade2fb67a6ecd924a132c1b9432fa1ff0338444700451ffc6a1cb35e07188c58c5bd1ccaf59ebf014c49f44cb6ba33d1ec732859d  010-linux506.patch
+b9a0193ab604da92c99051e2a4fd91e43c3b6aeea7dbda15635b43eabd35b414e197bf5f25ac0d4ec905a1cb75abc15f165428470bc788dbefd73f178d165099  011-linux509.patch
 ec34a2800d7a70a7a1ff8a96ba87c2327f68066addf5adc9f60ba303cfda9cee39159f110013f075e357988f92efe802010e9c1d7884a5dfb1908df1489bd608  012-linux517.patch
 b815a4ff9289d81ddbe7f76553b092df19ee137438c9e33811c3a8b15e8a3896763715975b42391b4edfb60cfb0db46b71f4fee0f33a7b07f8d45cc4608d3faa  013-linux518.patch
 30207d8872ee8925a7c7412184e3b4fd6935f8017fb46e1173aca77333c99fb4316ef1511a83e345593c369210d4cbf976eea53995e229b4d856d97662c98961  014-linux414.patch
@@ -94,5 +96,7 @@ b815a4ff9289d81ddbe7f76553b092df19ee137438c9e33811c3a8b15e8a3896763715975b42391b
 db8f677138ed9b25d2c8cc8f66dff340a63fdef5e6d8a325bc684bda80053b68441b84b2e8b148aff06de51dc357c9d2dcf6ac11d40814d0914c393a24e93d62  019-linux614.patch
 3dc6ee29cd5a1805c210b2ee9774c2745559369740b1a6f336a29e757556f979ac753b384af4e6bb9f79a50becb59fd51958a18ad4b467973e7cab812c897356  020-linux615.patch
 e32ca4ba264b9394f11e5bf3d05f9cd89af1cb6b27901df804cf18343a16404133cbe441e4de5e06e6005c15b4c85af33f378f48d1cb92aadf7601477cb256ea  021-linux617.patch
+efdd95014ec838ce986a6186ef62f661c8a105a6a9203a4e513a35b8ae1e9fe41fb73c6961903703cbb2afe30df7ad40de80fbc027370e8a2f98ed296a201609  022-linux701.patch
+82ff03def981d6aca0c1ee4023cbcd32bbcd2d945b7b48013655c454a733257893176456ac11958de3f95eac05f3f0bc09017f8cbd7f2b202fd557358f805516  023-linux702.patch
 6855781f7c69a9aecb9461932423688964879d5a4df571f01ae7adaa7bf21a410bef839605d555afb6c8f4eec92fe8510af6cb120930095617ff6cdcccedaf17  hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz
 "

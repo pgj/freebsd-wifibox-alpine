@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 
 pkgname=linux-edge
-pkgver=6.19.11
+pkgver=7.2.5
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -10,9 +10,22 @@ pkgrel=0
 pkgdesc="Linux stable kernel"
 url="https://www.kernel.org"
 depends=
-_depends_dev="perl gmp-dev elfutils-dev flex bison"
-makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev>3
-	diffutils findutils"
+_depends_dev="perl gmp-dev mpc1-dev mpfr-dev elfutils-dev bash flex bison zstd"
+makedepends="$_depends_dev
+	bc
+	diffutils
+	elfutils
+	findutils
+	gcc>=13.1.1_git20230624 
+	grep
+	installkernel
+	linux-firmware-any
+	linux-headers
+	mawk
+	openssl-dev>3
+	pahole
+	python3
+	sed"
 provides="linux"
 options="!strip"
 install=
@@ -64,8 +77,8 @@ build() {
 	msg "Building the kernel"
 	cd "$srcdir"/build-edge.x86_64
 	make ARCH="x86_64" \
-		DTC_FLAGS="-@" \
 		CC="${CC:-gcc}" \
+		AWK="${AWK:-mawk}" \
 		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
 }
 
@@ -121,6 +134,7 @@ _dev() {
 	make -C "$srcdir"/linux-"$_kernver" \
 		O="$dir" \
 		ARCH="x86_64" \
+		AWK="${AWK:-mawk}" \
 		prepare modules_prepare scripts
 
 	# remove the stuff that points to real sources. we want 3rd party
@@ -158,9 +172,9 @@ _dev() {
 }
 
 sha512sums="
-c68361a19d04529226beb12cdd3a764bdcf481dbad342d5626d83412a00857588942308e880a92fceac31c79fe6f389bcf7b1f171e7c57b0110ec2babc0e24ae  patch-6.19.11.patch.xz
-01b29c7f4e5bc0c9802794c2cd027fece825f90417be229a71e60eefce530010d5d301749c54ae744e9d4a483518e769e2bb7e6e9209687681ad7fff11c3ed86  linux-6.19.tar.xz
-d6b75191f44b4a74bb43874bf82fd08bebb33c12617373d0d96bbd6cdf32db506e3108fd2e9a39b02ece038af3a8907a3eed86a2a4a1da531e83c2d7e0067086  config-edge.x86_64
+60af2204eddf616e3e31cd4e5f6043afab3956443da3221b9048f1e2ed7a539ae5b69bdd0ea9a664938158d099c8d2648ef66a86763305ceb7a4db8286438fbb  patch-7.2.5.patch.xz
+47e63679363261a864d271277340a6f2d45f544e1a056be4159df081f4f6537d0efa865c4af26611ab33a3079ee65db88ec2f6bc0e5fff43e0c043cde0cd91e1  linux-7.2.tar.xz
+94295e5368c721f72b5cb80355df9e19765398b8db43b3f3177b73427c8a845aedf7c5781a2464b920b79925e6f86361808d18200545f633378b927cca5ccff6  config-edge.x86_64
 67eaa5e83ec244048a4b426e7cb288763cbdc972be3d66a9cfb0ec1dfaf68d569b8d939069a90d509d78c28a2500198c1b28cf67165dc14c697d4254a6534af5  0001-brcm80211-brcmfmac-pcie.patch
 5a5261cde10598561e71d9840575e36794727f300fe718abc52eb6f57e26a308e29eb8e44ce63be91ad9a531dade499809510541910c65a521f902c011832ad8  0002-ath11k_pci-msi-parameters.patch
 "
