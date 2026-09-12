@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.branch }}
 
@@ -42,7 +42,7 @@ jobs:
         shell: alpine.sh --root {0}
 
       - name: Checkout package repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: pgj/pgj.github.io
           path: /home/runner/work/freebsd-wifibox-alpine/freebsd-wifibox-alpine/git/pkgs
