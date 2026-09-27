@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=busybox
 pkgver=1.37.0
-pkgrel=4 # base: 30
+pkgrel=5 # base: 31
 pkgdesc="Size optimized toolbox of many common UNIX utilities"
 url="https://busybox.net/"
 arch="all"

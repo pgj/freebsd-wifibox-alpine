@@ -1,7 +1,7 @@
 # Maintainer: Gabor Pali <pali.gabor@gmail.com>
 pkgname=openrc
-pkgver=0.63
-pkgrel=0 # base: 1
+pkgver=0.63.2
+pkgrel=0 # base: 0
 pkgdesc="OpenRC manages the services, startup and shutdown of a host"
 url="https://github.com/OpenRC/openrc"
 arch="all"
@@ -59,7 +59,7 @@ prepare() {
 
 build() {
 	abuild-meson \
-		$lto \
+		-Db_lto=true \
 		-Dzsh-completions=false \
 		-Dbash-completions=false \
 		-Dpam=false \
@@ -124,7 +124,7 @@ package() {
 }
 
 sha512sums="
-c3e5f5442ac7e04667894e315e451910425930bf6da2f8775197fa63d4bb631ef3fd7a350d85829fcbc62844ddfa107749c92bff2880a27b8ed254540251ab45  openrc-0.63.tar.gz
+f71d52cdb6607afb08da2dc653088087273243c169ddc5df2b47d6d63ba101d7ff45bf4f85a3f108f2cbe495b1a74c899a488a5bf0a26d51e75cbff6028df1c6  openrc-0.63.2.tar.gz
 3aaeb32ab7b0e56b9250cbf31fa35d160f49ba5febbd80ae61e320425d6c18673a69c1a8dffb2bcaec5f5c431f79ba7944e0dccd496216b970da00e6331e4032  0001-call-sbin-mkmntdirs-in-localmount-OpenRC-service.patch
 bd332b920f6fbf19f55098f75b6df0148917293aad8fc8ca1d2691b00f883b5099975bc2070daf821150b20417532d9954fd2e552affb83d721c842efa66ea35  0002-fsck-don-t-add-C0.patch
 0bd69d9e8e9c321a5e67cf924be07b9dd0b58801143c18f74bebf442958fc878e46a65f07cc2842566a8c3434e788ef3ca0c90c607de6b10931f01324bfc1b11  0003-rc-pull-in-sysinit-and-boot-as-stacked-levels-when-n.patch
